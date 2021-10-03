@@ -1,0 +1,176 @@
+loadkeys sv-latin1
+timedatectl set-ntp true
+mkfs.vfat /dev/nvme1n1p1 
+mkfs.btrfs -f /dev/mapper/linux--vg-arch 
+mount /dev/mapper/linux--vg-arch /mnt
+cd /mnt
+btrfs subvolume create @
+btrfs subvolume create @home
+btrfs subvolume create @snapshots
+btrfs subvolume create @var
+cd
+umount /mnt
+mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@ /dev/mapper/linux--vg-arch /mnt
+mkdir /mnt/{boot,home,.snapshots,var}
+mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@home /dev/mapper/linux--vg-arch /mnt/home
+mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@snapshots /dev/mapper/linux--vg-arch /mnt/.snapshots
+mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@var /dev/mapper/linux--vg-arch /mnt/var
+mount /dev/nvme1n1p1 /mnt/boot
+swapon /dev/mapper/linux--vg-swap
+pacstrap /mnt base linux linux-firmware amd-ucode btrfs-progs
+genfstab -U /mnt >> /mnt/etc/fstab
+arch-chroot /mnt
+
+mkdir /arch_install
+copy install_uefi.sh from USB to /arch_install directory
+nano /arch_install/install.uefi (change password for root and user)
+chmod +x install-uefi.sh
+./arch_install/install_uefi.sh
+
+Minimal:
+accountsservice
+amd-ucode
+arc-gtk-theme
+base
+base-devel (autoconf automake binutils bison fakeroot flex gcc groff libtool m4 make patch pkgconf sudo texinfo which)
+bspwm
+efibootmgr
+feh
+firefox
+firewalld
+geany
+git
+grub
+grub-btrfs
+kitty
+light-locker
+lightdm-gtk-greeter
+lightdm-gtk-greeter-settings
+linux
+linux-firmware
+lvm2
+lxappearance-gtk3
+nano
+networkmanager
+nvidia
+nvidia-settings
+os-prober
+pacman-contrib
+picom
+polybar
+pulseaudio
+rofi
+rsync
+snap-pac
+snapper
+sxhkd
+ttf-font-awesome
+ttf-roboto
+udiskie
+xautolock
+xorg-xprop
+xorg-xrandr
+xorg-xrdb
+xorg-xset
+zsh
+zsh-autosuggestions
+zsh-completions
+
+Normal:
+
+accountsservice
+*amd-ucode
+archlinux-wallpaper
+*base
+*base-devel (autoconf automake binutils bison fakeroot flex gcc groff libtool m4 make patch pkgconf sudo texinfo which)
+bspwm
+*btrfs-progs
+dunst
+efibootmgr
+feh
+firefox
+firewalld
+geany
+git
+gnome-themes-extra
+grub
+grub-btrfs
+kitty
+light-locker
+lightdm-gtk-greeter
+lightdm-gtk-greeter-settings
+*linux
+*linux-firmware
+*lvm2
+lxappearance-gtk3
+*nano
+networkmanager
+nvidia
+nvidia-settings
+os-prober
+pacman-contrib
+picom
+polybar
+pulseaudio
+rofi
+rsync
+snap-pac
+snapper
+sxhkd
+ttf-font-awesome
+ttf-roboto
+udiskie
+xautolock
+xorg
+zsh
+zsh-autosuggestions
+zsh-completions
+
+-----------------------------
+
+/etc/mkinitcpio.conf
+Add lvm2 between block and filesystems:
+
+HOOKS=(base udev autodetect modconf block lvm2 filesystems keyboard fsck)
+
+-----------------------------
+
+localectl status
+   System Locale: LANG=en_US.UTF-8
+       VC Keymap: sv-latin1
+      X11 Layout: se
+
+localectl set-x11-keymap se
+
+-----------------------------
+
+systemctl enabled services:
+
+grub-btrfs.path
+firewalld.service
+lightdm.service
+NetworkManager-dispatcher.service
+NetworkManager-wait-online.service
+NetworkManager.service
+systemd-timesyncd.service
+snapper-cleanup.timer
+snapper-timeline.timer
+
+-----------------------------
+
+/etc/default/grub
+edit:
+GRUB_GFXMODE=3440x1440x32
+
+add:
+GRUB_DISABLE_OS_PROBER=false
+
+-----------------------------
+
+/etc/snapper/configs/config
+TIMELINE_MIN_AGE="1800"
+TIMELINE_LIMIT_HOURLY="5"
+TIMELINE_LIMIT_DAILY="7"
+TIMELINE_LIMIT_WEEKLY="0"
+TIMELINE_LIMIT_MONTHLY="0"
+TIMELINE_LIMIT_YEARLY="0"
