@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+
+bg=272727
+fg=CACACA
+ac=f4511e
+mf=383838
+
+slice="$HOME/backgrounds/slice.png"
+# lock="${pictures_dir:-$HOME/backgrounds}/lock.png"
+image=$(mktemp --tmpdir --suffix=.png lock.XXXXXXXXXX)
+trap 'rm -f "$image"' SIGINT SIGTERM EXIT
+
+screens=$(xrandr | grep -Eo '[0-9]+x[0-9]+\+[0-9]+\+[0-9]+')
+declare -a lines
+
+for screen in $screens; do
+    read -r W H X Y < <(sed 's/[^0-9]/ /g' <<< "$screen")
+    lines+=(\( "$slice"
+        -resize "${W}x1080!"
+        -geometry "+${X}+${Y}" \)
+        -composite -matte)
+done
+
+maim -u -m 1 \
+    | convert png:- -scale 10% -scale 1000% \
+    -fill "#${bg}" -colorize 10% \
+    ${lines[*]} "$image"
+
+i3lock \
+    --color="$bg" \
+    --image="$image" \
+    --insidecolor="${bg}ff" \
+    --insidevercolor="${ac}ff" \
+    --insidewrongcolor="${fg}ff" \
+    --ringcolor="${bg}ff" \
+    --ringvercolor="${bg}ff" \
+    --ringwrongcolor="${bg}ff" \
+    --linecolor="${ac}ff" \
+    --keyhlcolor="${ac}ff" \
+    --bshlcolor="${fg}ff" \
+    --separatorcolor="${bg}ff" \
+    --verifcolor=00000000 \
+    --wrongcolor=00000000 \
+    --layoutcolor=00000000 \
+    --timecolor="${ac}ff" \
+    --datecolor=00000000 \
+    --indpos='x+100:y+645' \
+    --timepos='x+280:y+657' \
+    --timestr='%H:%M:%S' \
+    --time-font='Cantarell' \
+    --timesize=32 \
+    --radius=32 \
+    --ring-width=4 \
+    --veriftext='' \
+    --wrongtext='' \
+    --noinputtext='' \
+    --locktext='' \
+    --lockfailedtext='' \
+    --indicator \
+    --ignore-empty-password \
+    --pass-media-keys \
+    --force-clock

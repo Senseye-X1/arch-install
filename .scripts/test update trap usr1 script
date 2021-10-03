@@ -1,0 +1,10 @@
+#!/bin/sh
+
+trap USR1
+
+while true; do
+	kitty pacman -Syu
+    echo $(checkupdates 2>/dev/null | wc -l)
+    sleep 1 &
+    wait
+done

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+MENU="$(rofi -sep "|" -dmenu -i -p '' -theme-str '#window { height: 190px; }' -theme-str '#window { width: 180px; }' -hide-scrollbar -line-padding 4 -padding 1 -lines 5 <<< "	Lock|	Suspend|	Logout|	Reboot|	Shutdown")"
+            case "$MENU" in
+                *Lock) light-locker-command -l ;;
+                *Suspend) systemctl suspend ;;
+                *Logout) loginctl terminate-user "$USER" ;;
+                *Reboot) systemctl reboot ;;
+                *Shutdown) systemctl -i poweroff ;;
+            esac
