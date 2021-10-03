@@ -22,9 +22,8 @@ genfstab -U /mnt >> /mnt/etc/fstab
 arch-chroot /mnt
 
 git clone https://github.com/andnix/arch_install.git
-cd arch_install
 nano /arch_install/install.uefi (change password for root and user)
-chmod +x install-uefi.sh
+chmod +x /arch_install/install-uefi.sh
 ./arch_install/install_uefi.sh
 
 Minimal:

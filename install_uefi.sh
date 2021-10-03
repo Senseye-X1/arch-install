@@ -12,7 +12,7 @@ echo 'arch' | tee -a /etc/hostname > /dev/null
 echo '127.0.0.1	localhost\n::1		localhost\n127.0.1.1	arch.localdomain	arch' | tee -a /etc/hosts > /dev/null
 echo root:password | chpasswd
 
-pacman -S  alsa-utils base-devel efibootmgr firewalld git grub grub-btrfs gvfs lvm2 nano networkmanager os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto udiskie
+pacman -S  alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs lvm2 networkmanager os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto udiskie
 pacman -S --noconfirm nvidia nvidia-settings
 
 sed -i 's/\(^HOOKS.*block \)\(filesystems.*\)/\1lvm2 \2/' /etc/mkinitcpio.conf
