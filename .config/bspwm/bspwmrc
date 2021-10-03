@@ -1,0 +1,35 @@
+#! /bin/sh
+
+_() { bspc config "$@";  }
+
+sxhkd &
+picom --config ~/.config/picom/picom.conf -b &
+sh ~/.config/polybar/launch.sh
+udiskie &
+light-locker &
+xset s off
+xset dpms 0 0 0
+xautolock -time 15 -locker "systemctl suspend" -detectsleep &
+
+AC=$(grep -m1 'ac = ' ~/.config/polybar/colors.ini | awk '{print $3}')
+
+bspc wm --reorder-monitors DP-0 HDMI-0
+bspc monitor DP-0 -d 1 2
+bspc monitor HDMI-0 -d 3 4
+
+_ border_width 3
+_ window_gap 8
+_ focused_border_color "$AC"
+_ normal_border_color '#171a1f'
+_ active_border_color '#171a1f'
+_ ignore_ewmh_focus true
+_ pointer_follows_monitor true
+
+_ split_ratio 0.52
+_ borderless_monocle true
+_ gapless_monocle true
+
+#bspc rule -a Gimp desktop='^5' state=floating follow=on
+bspc rule -a Google-chrome desktop='^1'
+bspc rule -a Geany desktop='^3'
+bspc rule -a firefox desktop='^1'

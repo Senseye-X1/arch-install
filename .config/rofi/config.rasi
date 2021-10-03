@@ -1,0 +1,4 @@
+configuration {
+	font: "Roboto Bold 12";
+}
+@import "/home/andreas/.config/rofi/text1.rasi"
