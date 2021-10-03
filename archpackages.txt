@@ -17,12 +17,12 @@ mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@snapshots /d
 mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@var /dev/mapper/linux--vg-arch /mnt/var
 mount /dev/nvme1n1p1 /mnt/boot
 swapon /dev/mapper/linux--vg-swap
-pacstrap /mnt base linux linux-firmware amd-ucode btrfs-progs
+pacstrap /mnt base linux linux-firmware amd-ucode btrfs-progs git
 genfstab -U /mnt >> /mnt/etc/fstab
 arch-chroot /mnt
 
-mkdir /arch_install
-copy install_uefi.sh from USB to /arch_install directory
+git clone https://github.com/andnix/arch_install.git
+cd arch_install
 nano /arch_install/install.uefi (change password for root and user)
 chmod +x install-uefi.sh
 ./arch_install/install_uefi.sh
