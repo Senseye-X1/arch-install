@@ -24,6 +24,7 @@ arch-chroot /mnt
 git clone https://github.com/andnix/arch_install.git
 nano /arch_install/install.uefi (change password for root and user)
 chmod +x /arch_install/install-uefi.sh
+chmod +x /arch_install/install-bspwm.sh
 ./arch_install/install_uefi.sh
 
 Minimal:
@@ -127,9 +128,7 @@ zsh-completions
 
 -----------------------------
 
-/etc/mkinitcpio.conf
-Add lvm2 between block and filesystems:
-
+/etc/mkinitcpio.conf:
 HOOKS=(base udev autodetect modconf block lvm2 filesystems keyboard fsck)
 
 -----------------------------
@@ -156,20 +155,3 @@ snapper-cleanup.timer
 snapper-timeline.timer
 
 -----------------------------
-
-/etc/default/grub
-edit:
-GRUB_GFXMODE=3440x1440x32
-
-add:
-GRUB_DISABLE_OS_PROBER=false
-
------------------------------
-
-/etc/snapper/configs/config
-TIMELINE_MIN_AGE="1800"
-TIMELINE_LIMIT_HOURLY="5"
-TIMELINE_LIMIT_DAILY="7"
-TIMELINE_LIMIT_WEEKLY="0"
-TIMELINE_LIMIT_MONTHLY="0"
-TIMELINE_LIMIT_YEARLY="0"
