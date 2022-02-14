@@ -3,21 +3,19 @@ timedatectl set-ntp true
 mkfs.vfat /dev/nvme1n1p1 
 mkfs.btrfs -f /dev/mapper/linux--vg-arch 
 mount /dev/mapper/linux--vg-arch /mnt
-cd /mnt
-btrfs subvolume create @
-btrfs subvolume create @home
-btrfs subvolume create @snapshots
-btrfs subvolume create @var
-cd
+btrfs subvolume create /mnt/@
+btrfs subvolume create /mnt/@home
+btrfs subvolume create /mnt/@snapshots
+btrfs subvolume create /mnt/@var
 umount /mnt
 mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@ /dev/mapper/linux--vg-arch /mnt
-mkdir /mnt/{boot,home,.snapshots,var}
+mkdir -p /mnt/{boot,home,.snapshots,var}
 mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@home /dev/mapper/linux--vg-arch /mnt/home
 mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@snapshots /dev/mapper/linux--vg-arch /mnt/.snapshots
 mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@var /dev/mapper/linux--vg-arch /mnt/var
 mount /dev/nvme1n1p1 /mnt/boot
 swapon /dev/mapper/linux--vg-swap
-pacstrap /mnt base linux linux-firmware amd-ucode btrfs-progs git
+pacstrap /mnt base linux linux-firmware amd-ucode btrfs-progs git nano
 genfstab -U /mnt >> /mnt/etc/fstab
 arch-chroot /mnt
 
