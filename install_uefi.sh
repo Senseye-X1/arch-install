@@ -32,6 +32,8 @@ systemctl enable firewalld
 systemctl enable systemd-timesyncd
 
 sed -i 's/#AutoEnable=false/AutoEnable=true/' /etc/bluetooth/main.conf
+sed -i 's/#\(ReconnectAttempts=.*\)/\1/' /etc/bluetooth/main.conf
+sed -i 's/#\(ReconnectIntervals=.*\)/\1/' /etc/bluetooth/main.conf
 
 useradd -m andreas
 echo 'andreas:password' | chpasswd
