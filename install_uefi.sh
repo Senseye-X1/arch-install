@@ -27,13 +27,16 @@ grub-mkconfig -o /boot/grub/grub.cfg
 
 systemctl enable NetworkManager
 systemctl enable fstrim.timer
-systemctl enable bluetooth
+systemctl enable --now bluetooth
 systemctl enable firewalld
 systemctl enable systemd-timesyncd
 
 sed -i 's/#AutoEnable=false/AutoEnable=true/' /etc/bluetooth/main.conf
+sed -i 's/#FastConnectable.*/FastConnectable = true/' /etc/bluetooth/main.conf
 sed -i 's/#\(ReconnectAttempts=.*\)/\1/' /etc/bluetooth/main.conf
 sed -i 's/#\(ReconnectIntervals=.*\)/\1/' /etc/bluetooth/main.conf
+bluetoothctl pair [Keyboard MAC]
+bluetoothctl trust [Keyboard MAC]
 
 useradd -m andreas
 echo 'andreas:password' | chpasswd
