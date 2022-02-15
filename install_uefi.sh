@@ -35,6 +35,7 @@ sed -i 's/#AutoEnable=false/AutoEnable=true/' /etc/bluetooth/main.conf
 sed -i 's/#FastConnectable.*/FastConnectable = true/' /etc/bluetooth/main.conf
 sed -i 's/#\(ReconnectAttempts=.*\)/\1/' /etc/bluetooth/main.conf
 sed -i 's/#\(ReconnectIntervals=.*\)/\1/' /etc/bluetooth/main.conf
+bluetoothctl power on
 bluetoothctl pair [Keyboard MAC]
 bluetoothctl trust [Keyboard MAC]
 
