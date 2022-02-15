@@ -31,6 +31,8 @@ systemctl enable bluetooth
 systemctl enable firewalld
 systemctl enable systemd-timesyncd
 
+sed -i 's/#AutoEnable=false/AutoEnable=true/' /etc/bluetooth/main.conf
+
 useradd -m andreas
 echo 'andreas:password' | chpasswd
 
