@@ -2,7 +2,7 @@
 
 loadkeys sv-latin1
 timedatectl set-ntp true
-mkfs.vfat -F 32 /dev/nvme1n1p1 
+mkfs.fat -F 32 /dev/nvme1n1p1 
 mkfs.btrfs -f /dev/mapper/linux--vg-arch 
 mount /dev/mapper/linux--vg-arch /mnt
 btrfs subvolume create /mnt/@
