@@ -14,6 +14,7 @@ echo 'root:password' | chpasswd
 
 pacman -S  alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs lvm2 networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto udiskie
 pacman -S --noconfirm nvidia nvidia-settings
+pacman -S accountsservice archlinux-wallpaper bspwm dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-gtk-greeter lightdm-gtk-greeter-settings lxappearance-gtk3 numlockx picom rofi sxhkd xautolock xorg zsh zsh-autosuggestions zsh-completions
 
 sed -i 's/^MODULES=.*/MODULES=\(btrfs nvidia nvidia_modeset nvidia_uvm nvidia_drm\)/' /etc/mkinitcpio.conf
 
