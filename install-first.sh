@@ -77,7 +77,7 @@ arch-chroot /mnt
 #echo "/swap/swapfile none swap defaults 0 0" | sudo tee -a /etc/fstab
 
 git clone https://github.com/andnix/arch_install.git
-chmod +x /arch_install/install-as-root.sh
+#chmod +x /arch_install/install-as-root.sh
 chmod +x /arch_install/install-as-user.sh
 
 #timedatectl set-ntp true
