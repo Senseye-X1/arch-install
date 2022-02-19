@@ -3,8 +3,10 @@
 loadkeys sv-latin1
 pacman -Syy
 timedatectl set-ntp true
-mkfs.fat -F 32 /dev/nvme1n1p1 
-mkfs.btrfs -f /dev/mapper/linux--vg-arch 
+mkfs.fat -F 32 /dev/nvme1n1p1
+#mkfs.btrfs -f /dev/nvme1n1p2
+#mount /dev/nvme1n1p2 /mnt
+mkfs.btrfs -f /dev/mapper/linux--vg-arch
 mount /dev/mapper/linux--vg-arch /mnt
 
 # Creating BTRFS subvolumes.
