@@ -1,12 +1,13 @@
 #!/bin/bash
 
+keymap="sv-latin1"
 EFI="/dev/nvme1n1p1"
 BTRFS="/dev/nvme1n1p2"
 
 username="andreas"
 password="password"
 
-loadkeys sv-latin1
+loadkeys $keymap
 pacman -Syy
 timedatectl set-ntp true
 mkfs.fat -F 32 $EFI
@@ -84,12 +85,11 @@ hwclock --systohc
 sed -i 's/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
 locale-gen
 echo 'LANG=en_US.UTF-8' | tee -a /etc/locale.conf > /dev/null
-echo 'KEYMAP=sv-latin1' | tee -a /etc/vconsole.conf > /dev/null
+echo "KEYMAP=$keymap" | tee -a /etc/vconsole.conf > /dev/null
 localectl set-x11-keymap se
 echo 'arch' | tee -a /etc/hostname > /dev/null
 echo '127.0.0.1	localhost\n::1		localhost\n127.0.1.1	arch.localdomain	arch' | tee -a /etc/hosts > /dev/null
-echo 'root:password' | chpasswd
-echo "root:$password"
+echo "root:$password" | chpasswd
 
 pacman -S  alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs lvm2 networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto udiskie
 pacman -S --noconfirm nvidia nvidia-settings
