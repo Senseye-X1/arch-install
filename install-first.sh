@@ -6,8 +6,8 @@ loadkeys sv-latin1
 pacman -Syy
 timedatectl set-ntp true
 mkfs.fat -F 32 /dev/nvme1n1p1
-#mkfs.btrfs -f /dev/nvme1n1p2
-#mount /dev/nvme1n1p2 /mnt
+#mkfs.btrfs -f $BTRFS
+#mount $BTRFS /mnt
 mkfs.btrfs -f /dev/mapper/linux--vg-arch
 mount /dev/mapper/linux--vg-arch /mnt
 
@@ -30,13 +30,6 @@ print "Creating BTRFS subvolumes."
 #mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@var $BTRFS /mnt/var
 #mount -o subvol=@swap $BTRFS /mnt/swap
 #chattr +C /mnt/var
-#truncate -s 0 /mnt/swap/swapfile
-#chattr +C /mnt/swap/swapfile
-#btrfs property set /mnt/swap/swapfile compression none
-#dd if=/dev/zero of=/mnt/swap/swapfile bs=1M count=8192 status=progress
-#chmod 600 /mnt/swap/swapfile
-#mkswap /mnt/swap/swapfile
-#swapon /mnt/swap/swapfile
 
 #btrfs subvolume create /mnt/@
 #btrfs subvolume create /mnt/@home
