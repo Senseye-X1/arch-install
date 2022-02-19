@@ -68,5 +68,5 @@ genfstab -U /mnt >> /mnt/etc/fstab
 arch-chroot /mnt
 
 git clone https://github.com/andnix/arch_install.git
-chmod +x /arch_install/install-uefi.sh
-chmod +x /arch_install/install-bspwm.sh
+chmod +x /arch_install/install-as-root.sh
+chmod +x /arch_install/install-as-user.sh
