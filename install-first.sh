@@ -32,7 +32,7 @@ mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@opt $BTRFS
 mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@srv $BTRFS /mnt/srv
 mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@snapshots $BTRFS /mnt/.snapshots
 mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@var $BTRFS /mnt/var
-mount -o subvol=@swap $BTRFS /mnt/swap
+mount -o defaults,noatime,subvol=@swap $BTRFS /mnt/swap
 chattr +C /mnt/var
 
 #btrfs subvolume create /mnt/@
