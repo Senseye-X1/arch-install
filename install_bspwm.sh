@@ -22,9 +22,7 @@ sudo sed -i 's/TIMELINE_LIMIT_YEARLY=.*/TIMELINE_LIMIT_YEARLY="0"/' /etc/snapper
 #sudo firewall-cmd --add-port=1025-65535/udp --permanent
 #sudo firewall-cmd --reload
 
-echo "MAIN PACKAGES"
-
-sleep 5
+print "Main packages."
 
 sudo pacman -S accountsservice archlinux-wallpaper bspwm dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-gtk-greeter lightdm-gtk-greeter-settings lxappearance-gtk3 numlockx picom rofi sxhkd xautolock xorg zsh zsh-autosuggestions zsh-completions
 
@@ -71,4 +69,4 @@ install -Dm644 /arch_install/.config/sxhkd/sxhkdrc ~/.config/sxhkd/sxhkdrc
 install -Dm755 /arch_install/.scripts/* -t ~/.scripts
 #install -Dm644 /arch_install/.mozilla/firefox/a5qjmjc5.default-release/chrome/userChrome.css ~/.mozilla/firefox/*.default-release/chrome/userChrome.css
 
-printf "All done."
+print "All done."
