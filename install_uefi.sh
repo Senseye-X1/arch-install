@@ -36,9 +36,6 @@ sed -i 's/#AutoEnable=false/AutoEnable=true/' /etc/bluetooth/main.conf
 sed -i 's/#FastConnectable.*/FastConnectable = true/' /etc/bluetooth/main.conf
 sed -i 's/#\(ReconnectAttempts=.*\)/\1/' /etc/bluetooth/main.conf
 sed -i 's/#\(ReconnectIntervals=.*\)/\1/' /etc/bluetooth/main.conf
-bluetoothctl power on
-bluetoothctl pair  DC:2C:26:FF:17:17
-bluetoothctl trust DC:2C:26:FF:17:17
 
 useradd -m andreas
 echo 'andreas:password' | chpasswd
