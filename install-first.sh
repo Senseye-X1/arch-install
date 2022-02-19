@@ -149,7 +149,7 @@ systemctl enable fstrim.timer
 systemctl enable bluetooth
 systemctl enable firewalld
 systemctl enable systemd-timesyncd
-systemctl enable lightdm
+#systemctl enable lightdm
 systemctl enable snapper-timeline.timer
 systemctl enable snapper-cleanup.timer
 systemctl enable grub-btrfs.path
@@ -164,4 +164,4 @@ useradd -m $username
 echo "$username:$password" | chpasswd
 echo "$username ALL=(ALL) ALL" | tee -a /etc/sudoers.d/andreas > /dev/null
 
-printf "Exit, umount -a, reboot.\nAfter reboot login as normal user and run install-as-user.sh"
+print "Exit, umount -a, reboot.\nAfter reboot login as normal user and run install-as-user.sh."
