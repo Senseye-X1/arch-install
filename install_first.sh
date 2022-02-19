@@ -20,16 +20,23 @@ print "Creating BTRFS subvolumes."
 #done
 
 #umount /mnt
-#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@ /dev/mapper/linux--vg-arch /mnt
+#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@ $BTRFS /mnt
 #mkdir -p /mnt/{boot,home,root,opt,srv,.snapshots,var,swap}
-#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@home /dev/mapper/linux--vg-arch /mnt/home
-#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@root /dev/mapper/linux--vg-arch /mnt/root
-#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@opt /dev/mapper/linux--vg-arch /mnt/opt
-#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@srv /dev/mapper/linux--vg-arch /mnt/srv
-#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@snapshots /dev/mapper/linux--vg-arch /mnt/.snapshots
-#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@var /dev/mapper/linux--vg-arch /mnt/var
-#mount -o defaults,noatime,subvol=@swap /dev/mapper/linux--vg-arch /mnt/swap
+#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@home $BTRFS /mnt/home
+#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@root $BTRFS /mnt/root
+#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@opt $BTRFS /mnt/opt
+#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@srv $BTRFS /mnt/srv
+#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@snapshots $BTRFS /mnt/.snapshots
+#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@var $BTRFS /mnt/var
+#mount -o defaults,noatime,subvol=@swap $BTRFS /mnt/swap
 #chattr +C /mnt/var
+#truncate -s 0 /mnt/swap/swapfile
+#chattr +C /mnt/swap/swapfile
+#btrfs property set /mnt/swap/swapfile compression none
+#dd if=/dev/zero of=/mnt/swap/swapfile bs=1M count=512 status=progress
+#chmod 600 /mnt/swap/swapfile
+#mkswap /mnt/swap/swapfile
+#swapon /mnt/swap/swapfile
 
 #btrfs subvolume create /mnt/@
 #btrfs subvolume create /mnt/@home
