@@ -4,7 +4,7 @@ EFI="/dev/nvme1n1p1"
 BTRFS="/dev/nvme1n1p2"
 
 username="andreas"
-userpass="password"
+password="password"
 
 loadkeys sv-latin1
 pacman -Syy
@@ -89,6 +89,7 @@ localectl set-x11-keymap se
 echo 'arch' | tee -a /etc/hostname > /dev/null
 echo '127.0.0.1	localhost\n::1		localhost\n127.0.1.1	arch.localdomain	arch' | tee -a /etc/hosts > /dev/null
 echo 'root:password' | chpasswd
+echo "root:$password"
 
 pacman -S  alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs lvm2 networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto udiskie
 pacman -S --noconfirm nvidia nvidia-settings
@@ -124,8 +125,8 @@ sed -i 's/#FastConnectable.*/FastConnectable = true/' /etc/bluetooth/main.conf
 sed -i 's/#\(ReconnectAttempts=.*\)/\1/' /etc/bluetooth/main.conf
 sed -i 's/#\(ReconnectIntervals=.*\)/\1/' /etc/bluetooth/main.conf
 
-useradd -m andreas
-echo "$username:$userpass" | chpasswd
+useradd -m $username
+echo "$username:$password" | chpasswd
 echo "$username ALL=(ALL) ALL" | tee -a /etc/sudoers.d/andreas > /dev/null
 
 printf "Exit, umount -a, reboot.\nAfter reboot login as normal user and run install-as-user.sh"
