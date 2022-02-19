@@ -48,6 +48,10 @@ sudo sed -i 's/#greeter-setup-script=.*/greeter-setup-script=\/etc\/lightdm\/mon
 echo '[greeter]\ncursor-theme-name = Adwaita\ncursor-theme-size = 16\ntheme-name = Arc-Dark\nicon-theme-name = Adwaita\nfont-name = Roboto 10\nindicators = ~spacer;~clock;~spacer;~language;~session;~a11y;~power' | sudo tee /etc/lightdm/lightdm-gtk-greeter.conf > /dev/null
 echo 'Section "ServerFlags"\n    Option "DontVTSwitch" "True"\nEndSection' | sudo tee -a /etc/X11/xorg.conf > /dev/null
 
+bluetoothctl power on
+bluetoothctl pair DC:2C:26:FF:17:17
+bluetoothctl trust DC:2C:26:FF:17:17
+
 mkdir ~/.config/{bspwm,dunst,gtk-3.0,kitty,picom,polybar,rofi,sxhkd}
 install -m644 /arch_install/.zshrc ~/.zshrc
 echo 'setxkbmap se\nxrdb ~/.Xresources' | tee -a ~/.xprofile > /dev/null
@@ -67,7 +71,7 @@ install -Dm644 /arch_install/.config/sxhkd/sxhkdrc ~/.config/sxhkd/sxhkdrc
 install -Dm755 /arch_install/.scripts/* -t ~/.scripts
 #install -Dm644 /arch_install/.mozilla/firefox/a5qjmjc5.default-release/chrome/userChrome.css ~/.mozilla/firefox/*.default-release/chrome/userChrome.css
 
-printf "\e[1;32mCHANGE NECESSARY FILES BEFORE REBOOT\e[0m"
+printf "All done."
 
 
 
