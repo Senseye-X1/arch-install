@@ -33,7 +33,7 @@ cd
 
 paru polybar
 
-#sudo systemctl enable lightdm
+sudo systemctl enable lightdm
 #sudo systemctl enable --now snapper-timeline.timer
 #sudo systemctl enable --now snapper-cleanup.timer
 #sudo systemctl enable grub-btrfs.path
@@ -50,6 +50,7 @@ bluetoothctl power on
 bluetoothctl pair DC:2C:26:FF:17:17
 bluetoothctl trust DC:2C:26:FF:17:17
 
+print "Populating .configs."
 mkdir ~/.config/{bspwm,dunst,gtk-3.0,kitty,picom,polybar,rofi,sxhkd}
 install -m644 /arch_install/.zshrc ~/.zshrc
 echo 'setxkbmap se\nxrdb ~/.Xresources' | tee -a ~/.xprofile > /dev/null
