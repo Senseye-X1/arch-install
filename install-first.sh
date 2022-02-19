@@ -135,6 +135,10 @@ systemctl enable fstrim.timer
 systemctl enable bluetooth
 systemctl enable firewalld
 systemctl enable systemd-timesyncd
+systemctl enable lightdm
+systemctl enable snapper-timeline.timer
+systemctl enable snapper-cleanup.timer
+systemctl enable grub-btrfs.path
 
 # Fix Keychron Bluetooth Keyboard Connection
 sed -i 's/#AutoEnable=false/AutoEnable=true/' /etc/bluetooth/main.conf
