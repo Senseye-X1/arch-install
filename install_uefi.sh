@@ -14,9 +14,14 @@ echo 'root:password' | chpasswd
 
 pacman -S  alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs lvm2 networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto udiskie
 pacman -S --noconfirm nvidia nvidia-settings
+
 sed -i 's/^MODULES=.*/MODULES=\(btrfs nvidia nvidia_modeset nvidia_uvm nvidia_drm\)/' /etc/mkinitcpio.conf
-sed -i 's/\(^HOOKS.*block \)\(filesystems.*\)/\1lvm2 \2/' /etc/mkinitcpio.conf
+
+# If using LVM
+#sed -i 's/\(^HOOKS.*block \)\(filesystems.*\)/\1lvm2 \2/' /etc/mkinitcpio.conf
+
 mkinitcpio -P
+
 sed -i 's/^GRUB_GFXMODE=.*/GRUB_GFXMODE=3440x1440x32/' /etc/default/grub
 sed -i 's/^GRUB_DEFAULT=.*/GRUB_DEFAULT=saved/' /etc/default/grub
 sed -i 's/\(^GRUB_CMDLINE_LINUX_DEFAULT=".*\)\(.\)$/\1 nvidia-drm.modeset=1\2/' /etc/default/grub
@@ -42,4 +47,4 @@ echo 'andreas:password' | chpasswd
 
 echo 'andreas ALL=(ALL) ALL' | tee -a /etc/sudoers.d/andreas > /dev/null
 
-printf "Do exit, umount -a and reboot."
+printf "Exit, umount -a, reboot. After reboot login as normal user and run install_user.sh"
