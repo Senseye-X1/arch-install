@@ -72,6 +72,3 @@ install -Dm755 /arch_install/.scripts/* -t ~/.scripts
 #install -Dm644 /arch_install/.mozilla/firefox/a5qjmjc5.default-release/chrome/userChrome.css ~/.mozilla/firefox/*.default-release/chrome/userChrome.css
 
 printf "All done."
-
-
-
