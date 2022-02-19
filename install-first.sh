@@ -67,7 +67,7 @@ pacstrap /mnt base linux linux-firmware amd-ucode btrfs-progs git nano
 genfstab -U /mnt >> /mnt/etc/fstab
 arch-chroot /mnt
 
-# Create swapfile, set No_COW, add tp fstab
+# Create swapfile, set No_COW, add to fstab
 #truncate -s 0 /swap/swapfile
 #chattr +C /swap/swapfile
 #btrfs property set /swap/swapfile compression none
@@ -75,7 +75,7 @@ arch-chroot /mnt
 #chmod 600 /swap/swapfile
 #mkswap /swap/swapfile
 #swapon /swap/swapfile
-
+#echo "/swap/swapfile none swap defaults 0 0" | sudo tee -a /etc/fstab
 
 git clone https://github.com/andnix/arch_install.git
 chmod +x /arch_install/install-as-root.sh
