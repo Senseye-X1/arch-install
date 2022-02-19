@@ -113,6 +113,15 @@ echo 'GRUB_DISABLE_OS_PROBER=false' | tee -a /etc/default/grub > /dev/null
 grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
 grub-mkconfig -o /boot/grub/grub.cfg
 
+umount /.snapshots
+rm -r /.snapshots
+snapper -c root create-config /
+btrfs subvolume delete /.snapshots
+mkdir /.snapshots
+mount -a
+chmod 750 /.snapshots
+#chmod a+rx /.snapshots
+
 # Enable Services
 systemctl enable NetworkManager
 systemctl enable fstrim.timer
