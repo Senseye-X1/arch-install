@@ -17,6 +17,16 @@ done
 #do
 #    btrfs su cr /mnt/$volume
 #done
+#umount /mnt
+#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@ /dev/mapper/linux--vg-arch /mnt
+#mkdir -p /mnt/{boot,home,root,opt,srv,.snapshots,var}
+#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@home /dev/mapper/linux--vg-arch /mnt/home
+#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@root /dev/mapper/linux--vg-arch /mnt/root
+#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@opt /dev/mapper/linux--vg-arch /mnt/opt
+#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@srv /dev/mapper/linux--vg-arch /mnt/srv
+#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@snapshots /dev/mapper/linux--vg-arch /mnt/.snapshots
+#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@var /dev/mapper/linux--vg-arch /mnt/var
+#chattr +C /mnt/var
 
 #btrfs subvolume create /mnt/@
 #btrfs subvolume create /mnt/@home
