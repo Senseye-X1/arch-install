@@ -1,11 +1,12 @@
 #!/bin/bash
 
+EFI="/dev/nvme1n1p1"
 BTRFS="/dev/nvme1n1p2"
 
 loadkeys sv-latin1
 pacman -Syy
 timedatectl set-ntp true
-mkfs.fat -F 32 /dev/nvme1n1p1
+mkfs.fat -F 32 $EFI
 #mkfs.btrfs -f $BTRFS
 #mount $BTRFS /mnt
 mkfs.btrfs -f /dev/mapper/linux--vg-arch
