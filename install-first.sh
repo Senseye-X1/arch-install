@@ -11,30 +11,29 @@ loadkeys $keymap
 pacman -Syy
 timedatectl set-ntp true
 mkfs.fat -F 32 $EFI
-#mkfs.btrfs -f $BTRFS
-#mount $BTRFS /mnt
-mkfs.btrfs -f /dev/mapper/linux--vg-arch
-mount /dev/mapper/linux--vg-arch /mnt
+mkfs.btrfs -f $BTRFS
+mount $BTRFS /mnt
+#mkfs.btrfs -f /dev/mapper/linux--vg-arch
+#mount /dev/mapper/linux--vg-arch /mnt
 
 # Creating BTRFS subvolumes.
 print "Creating BTRFS subvolumes."
+for volume in @ @home @root @opt @srv @snapshots @var @swap
+do
+    btrfs su cr /mnt/$volume
+done
 
-#for volume in @ @home @root @opt @srv @snapshots @var @swap
-#do
-#    btrfs su cr /mnt/$volume
-#done
-
-#umount /mnt
-#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@ $BTRFS /mnt
-#mkdir -p /mnt/{boot,home,root,opt,srv,.snapshots,var,swap}
-#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@home $BTRFS /mnt/home
-#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@root $BTRFS /mnt/root
-#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@opt $BTRFS /mnt/opt
-#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@srv $BTRFS /mnt/srv
-#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@snapshots $BTRFS /mnt/.snapshots
-#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@var $BTRFS /mnt/var
-#mount -o subvol=@swap $BTRFS /mnt/swap
-#chattr +C /mnt/var
+umount /mnt
+mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@ $BTRFS /mnt
+mkdir -p /mnt/{boot,home,root,opt,srv,.snapshots,var,swap}
+mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@home $BTRFS /mnt/home
+mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@root $BTRFS /mnt/root
+mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@opt $BTRFS /mnt/opt
+mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@srv $BTRFS /mnt/srv
+mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@snapshots $BTRFS /mnt/.snapshots
+mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@var $BTRFS /mnt/var
+mount -o subvol=@swap $BTRFS /mnt/swap
+chattr +C /mnt/var
 
 #btrfs subvolume create /mnt/@
 #btrfs subvolume create /mnt/@home
@@ -42,39 +41,40 @@ print "Creating BTRFS subvolumes."
 #btrfs subvolume create /mnt/@var_log
 #btrfs subvolume create /mnt/@pkg
 
-for volume in @ @home @root @opt @srv @snapshots @var_log @pkg
-do
-    btrfs su cr /mnt/$volume
-done
+#for volume in @ @home @root @opt @srv @snapshots @var_log @pkg
+#do
+#    btrfs su cr /mnt/$volume
+#done
 
-umount /mnt
-mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@ /dev/mapper/linux--vg-arch /mnt
-mkdir -p /mnt/{boot,home,root,opt,srv,.snapshots,var/log,var/cache/pacman/pkg}
-mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@home /dev/mapper/linux--vg-arch /mnt/home
-mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@root /dev/mapper/linux--vg-arch /mnt/root
-mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@opt /dev/mapper/linux--vg-arch /mnt/opt
-mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@srv /dev/mapper/linux--vg-arch /mnt/srv
-mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@snapshots /dev/mapper/linux--vg-arch /mnt/.snapshots
-mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@var_log /dev/mapper/linux--vg-arch /mnt/var/log
-mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@pkg /dev/mapper/linux--vg-arch /mnt/var/cache/pacman/pkg
-chattr +C /mnt/var/log
-chattr +C /mnt/cache/pacman/pkg
+#umount /mnt
+#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@ /dev/mapper/linux--vg-arch /mnt
+#mkdir -p /mnt/{boot,home,root,opt,srv,.snapshots,var/log,var/cache/pacman/pkg}
+#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@home /dev/mapper/linux--vg-arch /mnt/home
+#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@root /dev/mapper/linux--vg-arch /mnt/root
+#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@opt /dev/mapper/linux--vg-arch /mnt/opt
+#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@srv /dev/mapper/linux--vg-arch /mnt/srv
+#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@snapshots /dev/mapper/linux--vg-arch /mnt/.snapshots
+#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@var_log /dev/mapper/linux--vg-arch /mnt/var/log
+#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@pkg /dev/mapper/linux--vg-arch /mnt/var/cache/pacman/pkg
+#chattr +C /mnt/var/log
+#chattr +C /mnt/cache/pacman/pkg
+#swapon /dev/mapper/linux--vg-swap
 
-mount /dev/nvme1n1p1 /mnt/boot
-swapon /dev/mapper/linux--vg-swap
+mount $EFI /mnt/boot
 pacstrap /mnt base linux linux-firmware amd-ucode btrfs-progs git nano
 genfstab -U /mnt >> /mnt/etc/fstab
 arch-chroot /mnt
 
 # Create swapfile, set No_COW, add to fstab
-#truncate -s 0 /swap/swapfile
-#chattr +C /swap/swapfile
-#btrfs property set /swap/swapfile compression none
-#dd if=/dev/zero of=/swap/swapfile bs=1M count=8192 status=progress
-#chmod 600 /swap/swapfile
-#mkswap /swap/swapfile
-#swapon /swap/swapfile
-#echo "/swap/swapfile none swap defaults 0 0" | sudo tee -a /etc/fstab
+prinf "Create swapfile"
+truncate -s 0 /swap/swapfile
+chattr +C /swap/swapfile
+btrfs property set /swap/swapfile compression none
+dd if=/dev/zero of=/swap/swapfile bs=1M count=8192 status=progress
+chmod 600 /swap/swapfile
+mkswap /swap/swapfile
+swapon /swap/swapfile
+echo "/swap/swapfile none swap defaults 0 0" | sudo tee -a /etc/fstab
 
 git clone https://github.com/andnix/arch_install.git
 #chmod +x /arch_install/install-as-root.sh
@@ -142,6 +142,7 @@ chmod +x /etc/lightdm/monitor_numlock.sh
 sed -i 's/#greeter-setup-script=.*/greeter-setup-script=\/etc\/lightdm\/monitor_numlock.sh/' /etc/lightdm/lightdm.conf
 echo '[greeter]\ncursor-theme-name = Adwaita\ncursor-theme-size = 16\ntheme-name = Arc-Dark\nicon-theme-name = Adwaita\nfont-name = Roboto 10\nindicators = ~spacer;~clock;~spacer;~language;~session;~a11y;~power' | tee /etc/lightdm/lightdm-gtk-greeter.conf > /dev/null
 
+# Disallow Ctrl+Alt+Fn switching for added security
 echo 'Section "ServerFlags"\n    Option "DontVTSwitch" "True"\nEndSection' | tee -a /etc/X11/xorg.conf > /dev/null
 
 # Enable Services
