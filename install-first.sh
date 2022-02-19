@@ -58,6 +58,7 @@ mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@snapshots 
 mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@var_log /dev/mapper/linux--vg-arch /mnt/var/log
 mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@pkg /dev/mapper/linux--vg-arch /mnt/var/cache/pacman/pkg
 chattr +C /mnt/var/log
+chattr +C /mnt/cache/pacman/pkg
 
 mount /dev/nvme1n1p1 /mnt/boot
 swapon /dev/mapper/linux--vg-swap
