@@ -28,7 +28,7 @@ grub-mkconfig -o /boot/grub/grub.cfg
 
 systemctl enable NetworkManager
 systemctl enable fstrim.timer
-systemctl enable --now bluetooth
+systemctl enable bluetooth
 systemctl enable firewalld
 systemctl enable systemd-timesyncd
 
