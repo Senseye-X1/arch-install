@@ -5,11 +5,19 @@ timedatectl set-ntp true
 mkfs.fat -F 32 /dev/nvme1n1p1 
 mkfs.btrfs -f /dev/mapper/linux--vg-arch 
 mount /dev/mapper/linux--vg-arch /mnt
-btrfs subvolume create /mnt/@
-btrfs subvolume create /mnt/@home
-btrfs subvolume create /mnt/@snapshots
-btrfs subvolume create /mnt/@var_log
-btrfs subvolume create /mnt/@pkg
+
+# Creating BTRFS subvolumes.
+print "Creating BTRFS subvolumes."
+for volume in @ @home @root @srv @snapshots @var_log @var_pkgs
+do
+    btrfs su cr /mnt/$volume
+done
+
+#btrfs subvolume create /mnt/@
+#btrfs subvolume create /mnt/@home
+#btrfs subvolume create /mnt/@snapshots
+#btrfs subvolume create /mnt/@var_log
+#btrfs subvolume create /mnt/@pkg
 umount /mnt
 mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@ /dev/mapper/linux--vg-arch /mnt
 mkdir -p /mnt/{boot,home,.snapshots,var/log,var/cache/pacman/pkg}
