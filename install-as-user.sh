@@ -2,15 +2,15 @@
 
 #sudo timedatectl set-ntp true
 #sudo hwclock --systohc
-sudo umount /.snapshots
-sudo rm -r /.snapshots
-sudo snapper -c root create-config /
-sudo btrfs subvolume delete /.snapshots
-sudo mkdir /.snapshots
-sudo mount -a
-sudo chmod 750 /.snapshots
-sudo chmod a+rx /.snapshots
-sudo chown :andreas /.snapshots
+#sudo umount /.snapshots
+#sudo rm -r /.snapshots
+#sudo snapper -c root create-config /
+#sudo btrfs subvolume delete /.snapshots
+#sudo mkdir /.snapshots
+#sudo mount -a
+#sudo chmod 750 /.snapshots
+#sudo chmod a+rx /.snapshots
+#sudo chown :andreas /.snapshots
 sudo sed -i 's/ALLOW_USERS=""/ALLOW_USERS="andreas"/' /etc/snapper/configs/root
 sudo sed -i 's/TIMELINE_LIMIT_HOURLY=.*/TIMELINE_LIMIT_HOURLY="5"/' /etc/snapper/configs/root
 sudo sed -i 's/TIMELINE_LIMIT_DAILY=.*/TIMELINE_LIMIT_DAILY="7"/' /etc/snapper/configs/root
