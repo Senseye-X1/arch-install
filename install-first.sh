@@ -123,6 +123,7 @@ mkdir /.snapshots
 mount -a
 chmod 750 /.snapshots
 #chmod a+rx /.snapshots
+#chown :$username /.snapshots
 sed -i 's/ALLOW_USERS=""/ALLOW_USERS="'"$username"'"/' /etc/snapper/configs/root
 sed -i 's/TIMELINE_LIMIT_HOURLY=.*/TIMELINE_LIMIT_HOURLY="5"/' /etc/snapper/configs/root
 sed -i 's/TIMELINE_LIMIT_DAILY=.*/TIMELINE_LIMIT_DAILY="7"/' /etc/snapper/configs/root
@@ -153,6 +154,11 @@ systemctl enable systemd-timesyncd
 systemctl enable snapper-timeline.timer
 systemctl enable snapper-cleanup.timer
 systemctl enable grub-btrfs.path
+systemctl enable btrfs-scrub@-.timer
+# BTRFS scrub should scrub the whole filesystem regardless
+#systemctl enable btrfs-scrub@home.timer
+#systemctl enable btrfs-scrub@var.timer
+#systemctl enable btrfs-scrub@\\x2esnapshots.timer
 
 # Fix Keychron Bluetooth Keyboard Connection
 sed -i 's/#AutoEnable=false/AutoEnable=true/' /etc/bluetooth/main.conf
@@ -162,6 +168,6 @@ sed -i 's/#\(ReconnectIntervals=.*\)/\1/' /etc/bluetooth/main.conf
 
 useradd -m $username
 echo "$username:$password" | chpasswd
-echo "$username ALL=(ALL) ALL" | tee -a /etc/sudoers.d/andreas > /dev/null
+echo "$username ALL=(ALL) ALL" | tee -a /etc/sudoers.d/$username > /dev/null
 
 print "Exit, umount -a, reboot.\nAfter reboot login as normal user and run install-as-user.sh."
