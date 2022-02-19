@@ -13,6 +13,11 @@ do
     btrfs su cr /mnt/$volume
 done
 
+#for volume in @ @home @root @opt @srv @snapshots @var
+#do
+#    btrfs su cr /mnt/$volume
+#done
+
 #btrfs subvolume create /mnt/@
 #btrfs subvolume create /mnt/@home
 #btrfs subvolume create /mnt/@snapshots
@@ -29,6 +34,8 @@ mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@srv /dev/m
 mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@snapshots /dev/mapper/linux--vg-arch /mnt/.snapshots
 mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@var_log /dev/mapper/linux--vg-arch /mnt/var/log
 mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@pkg /dev/mapper/linux--vg-arch /mnt/var/cache/pacman/pkg
+#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@var /dev/mapper/linux--vg-arch /mnt/var
+#chattr +C /mnt/var
 chattr +C /mnt/var/log
 mount /dev/nvme1n1p1 /mnt/boot
 swapon /dev/mapper/linux--vg-swap
