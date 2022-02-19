@@ -1,6 +1,7 @@
 #!/bin/bash
 
 loadkeys sv-latin1
+pacman -Syy
 timedatectl set-ntp true
 mkfs.fat -F 32 /dev/nvme1n1p1 
 mkfs.btrfs -f /dev/mapper/linux--vg-arch 
