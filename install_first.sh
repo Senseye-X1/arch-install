@@ -17,6 +17,7 @@ mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@home /dev/
 mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@snapshots /dev/mapper/linux--vg-arch /mnt/.snapshots
 mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@var_log /dev/mapper/linux--vg-arch /mnt/var/log
 mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@pkg /dev/mapper/linux--vg-arch /mnt/var/cache/pacman/pkg
+chattr +C /mnt/var/log
 mount /dev/nvme1n1p1 /mnt/boot
 swapon /dev/mapper/linux--vg-swap
 pacstrap /mnt base linux linux-firmware amd-ucode btrfs-progs git nano
