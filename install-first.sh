@@ -114,6 +114,7 @@ echo 'GRUB_DISABLE_OS_PROBER=false' | tee -a /etc/default/grub > /dev/null
 grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
 grub-mkconfig -o /boot/grub/grub.cfg
 
+print "Configuring Snapper."
 umount /.snapshots
 rm -r /.snapshots
 snapper -c root create-config /
@@ -122,7 +123,6 @@ mkdir /.snapshots
 mount -a
 chmod 750 /.snapshots
 #chmod a+rx /.snapshots
-
 sed -i 's/ALLOW_USERS=""/ALLOW_USERS="'"$username"'"/' /etc/snapper/configs/root
 sed -i 's/TIMELINE_LIMIT_HOURLY=.*/TIMELINE_LIMIT_HOURLY="5"/' /etc/snapper/configs/root
 sed -i 's/TIMELINE_LIMIT_DAILY=.*/TIMELINE_LIMIT_DAILY="7"/' /etc/snapper/configs/root
