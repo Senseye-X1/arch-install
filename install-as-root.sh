@@ -47,4 +47,4 @@ echo 'andreas:password' | chpasswd
 
 echo 'andreas ALL=(ALL) ALL' | tee -a /etc/sudoers.d/andreas > /dev/null
 
-printf "Exit, umount -a, reboot. After reboot login as normal user and run install_user.sh"
+printf "Exit, umount -a, reboot. After reboot login as normal user and run install-as-user.sh"
