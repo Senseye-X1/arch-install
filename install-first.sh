@@ -133,6 +133,11 @@ echo '[greeter]\ncursor-theme-name = Adwaita\ncursor-theme-size = 16\ntheme-name
 # Disallow Ctrl+Alt+Fn switching for added security
 echo 'Section "ServerFlags"\n    Option "DontVTSwitch" "True"\nEndSection' | tee -a /etc/X11/xorg.conf > /dev/null
 
+# Firewall config
+#sudo firewall-cmd --add-port=1025-65535/tcp --permanent
+#sudo firewall-cmd --add-port=1025-65535/udp --permanent
+#sudo firewall-cmd --reload
+
 # Enable Services
 systemctl enable NetworkManager
 systemctl enable fstrim.timer
