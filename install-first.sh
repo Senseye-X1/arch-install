@@ -74,9 +74,8 @@ echo 'arch' | tee -a /etc/hostname > /dev/null
 echo '127.0.0.1	localhost\n::1		localhost\n127.0.1.1	arch.localdomain	arch' | tee -a /etc/hosts > /dev/null
 echo "root:$password" | chpasswd
 
-pacman -S alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto udiskie
+pacman -S alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto udiskie accountsservice archlinux-wallpaper bspwm dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-gtk-greeter lightdm-gtk-greeter-settings lxappearance-gtk3 picom rofi sxhkd xautolock xorg zsh zsh-autosuggestions zsh-completions
 pacman -S --noconfirm nvidia nvidia-settings
-pacman -S accountsservice archlinux-wallpaper bspwm dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-gtk-greeter lightdm-gtk-greeter-settings lxappearance-gtk3 picom rofi sxhkd xautolock xorg zsh zsh-autosuggestions zsh-completions
 
 # Modules for BTRFS and NVIDIA
 sed -i 's/^MODULES=.*/MODULES=\(btrfs nvidia nvidia_modeset nvidia_uvm nvidia_drm\)/' /etc/mkinitcpio.conf
