@@ -4,12 +4,13 @@ pacman -Syu
 pacman -S --noconfirm curl
 
 hostname="arch"
+timezone="Europe/Stockholm"
 keymap="sv-latin1"
 DISK="/dev/nvme1n1"
 EFI="/dev/nvme1n1p1"
 BTRFS="/dev/nvme1n1p2"
 
-username="andreas"
+#username="andreas"
 password="password"
 locale="en_US"
 
@@ -20,6 +21,12 @@ if [[ $CPU == *"AuthenticAMD"* ]]; then
 else
     microcode=intel-ucode
 fi
+
+# Setting username.
+read -r -p "Please enter name for a user account (enter empty to not create one): " username
+
+# Setting password
+read -r -p "Please enter name for a user account (enter empty to not create one): " password
 
 loadkeys $keymap
 timedatectl set-ntp true
@@ -128,12 +135,12 @@ arch-chroot /mnt /bin/bash -e <<EOF
     echo "/swap/swapfile none swap defaults 0 0" >> /etc/fstab
 
     # Setting up timezone.
-    ln -sf /usr/share/zoneinfo/$(curl -s http://ip-api.com/line?fields=timezone) /etc/localtime &>/dev/null
+    ln -sf /usr/share/zoneinfo/$timezone /etc/localtime &>/dev/null
     
     # Setting up clock.
     hwclock --systohc
     
-    # Generating locales.my keys aren't even on 
+    # Generating locales.
     echo "Generating locales."
     locale-gen &>/dev/null
     
@@ -159,15 +166,6 @@ arch-chroot /mnt /bin/bash -e <<EOF
     echo "Creating GRUB config file."
     grub-mkconfig -o /boot/grub/grub.cfg &>/dev/null
 
-    # Adding user with sudo privilege
-    if [ -n "$username" ]; then
-        echo "Adding $username with root privilege."
-        useradd -m $username
-        usermod -aG wheel $username
-        passwd ${USER}
-        groupadd -r audit
-        gpasswd -a ${USER} audit
-    fi
 EOF
 
 # Fetching .configs from git
@@ -177,24 +175,24 @@ chmod +x /arch_install/install-as-user.sh
 
 #timedatectl set-ntp true
 ln -sf /usr/share/zoneinfo/Europe/Stockholm /etc/localtime
-hwclock --systohc
-locale-gen
 
 localectl set-x11-keymap se
 
+# Setting root password.
+print "Setting root password."
+echo "root:$password" | arch-chroot /mnt chpasswd
 
-echo "root:$password" | chpasswd
-
-
-
-
+# Setting user password.
+if [ -n "$username" ]; then
+    print "Adding the user $username to the system with root privilege."
+    arch-chroot /mnt useradd -m -G wheel -s /bin/bash "$username"
+    sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/' /mnt/etc/sudoers
+    print "Setting user password for $username." 
+    echo "$username:$password" | arch-chroot /mnt chpasswd
+fi
 
 # If using LVM
 #sed -i 's/\(^HOOKS.*block \)\(filesystems.*\)/\1lvm2 \2/' /etc/mkinitcpio.conf
-
-mkinitcpio -P
-
-
 
 grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
 grub-mkconfig -o /boot/grub/grub.cfg
