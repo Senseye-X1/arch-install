@@ -11,7 +11,7 @@ EFI="/dev/nvme1n1p1"
 BTRFS="/dev/nvme1n1p2"
 
 #username="andreas"
-password="password"
+#password="password"
 locale="en_US"
 
 # Checking the microcode to install.
@@ -25,11 +25,29 @@ fi
 # Setting username.
 read -r -p "Please enter name for a user account (enter empty to not create one): " username
 
+# Setting up a password for the user account (function).
+userpass_selector () {
+while true; do
+  read -r -s -p "Set a user password for $username: " password
+	while [ -z "$password" ]; do
+	echo
+	print "You need to enter a password for $username."
+	read -r -s -p "Set a user password for $username: " password
+	[ -n "$password" ] && break
+	done
+  echo
+  read -r -s -p "Insert password again: " password2
+  echo
+  [ "$password" = "$password2" ] && break
+  echo "Passwords don't match, try again."
+done
+}
+
 # Setting password
-read -r -p "Please enter name for a user account (enter empty to not create one): " password
+#read -r -p "Please enter password for the user account $username: " password
 
 loadkeys $keymap
-timedatectl set-ntp true
+#timedatectl set-ntp true
 mkfs.fat -F 32 $EFI
 mkfs.btrfs -f $BTRFS
 mount $BTRFS /mnt
@@ -166,17 +184,15 @@ arch-chroot /mnt /bin/bash -e <<EOF
     echo "Creating GRUB config file."
     grub-mkconfig -o /boot/grub/grub.cfg &>/dev/null
 
+    timedatectl set-ntp true
+    localectl set-x11-keymap se
+
 EOF
 
 # Fetching .configs from git
 git clone https://github.com/andnix/arch_install.git
 #chmod +x /arch_install/install-as-root.sh
 chmod +x /arch_install/install-as-user.sh
-
-#timedatectl set-ntp true
-ln -sf /usr/share/zoneinfo/Europe/Stockholm /etc/localtime
-
-localectl set-x11-keymap se
 
 # Setting root password.
 print "Setting root password."
