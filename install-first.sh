@@ -1,5 +1,6 @@
 #!/bin/bash
 
+hostname="arch"
 keymap="sv-latin1"
 EFI="/dev/nvme1n1p1"
 BTRFS="/dev/nvme1n1p2"
@@ -70,8 +71,8 @@ locale-gen
 echo 'LANG=en_US.UTF-8' | tee -a /etc/locale.conf > /dev/null
 echo "KEYMAP=$keymap" | tee -a /etc/vconsole.conf > /dev/null
 localectl set-x11-keymap se
-echo 'arch' | tee -a /etc/hostname > /dev/null
-echo '127.0.0.1	localhost\n::1		localhost\n127.0.1.1	arch.localdomain	arch' | tee -a /etc/hosts > /dev/null
+echo "$hostname" | tee -a /etc/hostname > /dev/null
+echo "127.0.0.1	localhost\n::1		localhost\n127.0.1.1	$hostname.localdomain	$hostname" | tee -a /etc/hosts > /dev/null
 echo "root:$password" | chpasswd
 
 pacman -S alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto udiskie accountsservice archlinux-wallpaper bspwm dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-gtk-greeter lightdm-gtk-greeter-settings lxappearance-gtk3 picom rofi sxhkd xautolock xorg zsh zsh-autosuggestions zsh-completions
