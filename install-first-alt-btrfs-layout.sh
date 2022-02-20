@@ -9,6 +9,14 @@ username="andreas"
 password="password"
 locale="en_US"
 
+# Checking the microcode to install.
+CPU=$(grep vendor_id /proc/cpuinfo)
+if [[ $CPU == *"AuthenticAMD"* ]]; then
+    microcode=amd-ucode
+else
+    microcode=intel-ucode
+fi
+
 loadkeys $keymap
 pacman -Syu
 pacman -S --noconfirm curl
@@ -65,7 +73,7 @@ mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,nodatacow,node
 mkdir -p /mnt/boot/efi
 mount -o nodev,nosuid,noexec $EFI /mnt/boot/efi
 
-pacstrap /mnt base linux linux-firmware amd-ucode btrfs-progs git nano alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto udiskie accountsservice archlinux-wallpaper bspwm dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-gtk-greeter lightdm-gtk-greeter-settings lxappearance-gtk3 picom rofi sxhkd xautolock xorg zsh zsh-autosuggestions zsh-completions nvidia nvidia-settings
+pacstrap /mnt base linux linux-firmware ${microcode} btrfs-progs git nano alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto udiskie accountsservice archlinux-wallpaper bspwm dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-gtk-greeter lightdm-gtk-greeter-settings lxappearance-gtk3 picom rofi sxhkd xautolock xorg zsh zsh-autosuggestions zsh-completions nvidia nvidia-settings
 
 # Generating /etc/fstab.
 echo "Generating a new fstab."
