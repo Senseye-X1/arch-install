@@ -22,8 +22,7 @@ else
     microcode=intel-ucode
 fi
 
-# Setting username.
-read -r -p "Please enter name for a user account (enter empty to not create one): " username
+
 
 # Setting up a password for the user account (function).
 userpass_selector () {
@@ -117,6 +116,10 @@ echo "" >> /mnt/etc/default/grub
 echo -e "# Booting with BTRFS subvolume\nGRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION=true" >> /mnt/etc/default/grub
 sed -i 's#rootflags=subvol=${rootsubvol}##g' /mnt/etc/grub.d/10_linux
 
+# Setting username and password.
+read -r -p "Please enter name for a user account (enter empty to not create one): " username
+userpass_selector
+
 echo "$hostname" > /mnt/etc/hostname
 # Setting hosts file.
 echo "Setting hosts file."
@@ -175,6 +178,12 @@ arch-chroot /mnt /bin/bash -e <<EOF
     mkdir /.snapshots
     mount -a
     chmod 750 /.snapshots
+    sed -i 's/ALLOW_USERS=""/ALLOW_USERS="'"$username"'"/' /etc/snapper/configs/root
+    sed -i 's/TIMELINE_LIMIT_HOURLY=.*/TIMELINE_LIMIT_HOURLY="5"/' /etc/snapper/configs/root
+    sed -i 's/TIMELINE_LIMIT_DAILY=.*/TIMELINE_LIMIT_DAILY="7"/' /etc/snapper/configs/root
+    sed -i 's/TIMELINE_LIMIT_WEEKLY=.*/TIMELINE_LIMIT_WEEKLY="0"/' /etc/snapper/configs/root
+    sed -i 's/TIMELINE_LIMIT_MONTHLY=.*/TIMELINE_LIMIT_MONTHLY="0"/' /etc/snapper/configs/root
+    sed -i 's/TIMELINE_LIMIT_YEARLY=.*/TIMELINE_LIMIT_YEARLY="0"/' /etc/snapper/configs/root
 
     # Installing GRUB.
     echo "Installing GRUB on /boot."
@@ -223,12 +232,7 @@ mount -a
 chmod 750 /.snapshots
 #chmod a+rx /.snapshots
 #chown :$username /.snapshots
-sed -i 's/ALLOW_USERS=""/ALLOW_USERS="'"$username"'"/' /etc/snapper/configs/root
-sed -i 's/TIMELINE_LIMIT_HOURLY=.*/TIMELINE_LIMIT_HOURLY="5"/' /etc/snapper/configs/root
-sed -i 's/TIMELINE_LIMIT_DAILY=.*/TIMELINE_LIMIT_DAILY="7"/' /etc/snapper/configs/root
-sed -i 's/TIMELINE_LIMIT_WEEKLY=.*/TIMELINE_LIMIT_WEEKLY="0"/' /etc/snapper/configs/root
-sed -i 's/TIMELINE_LIMIT_MONTHLY=.*/TIMELINE_LIMIT_MONTHLY="0"/' /etc/snapper/configs/root
-sed -i 's/TIMELINE_LIMIT_YEARLY=.*/TIMELINE_LIMIT_YEARLY="0"/' /etc/snapper/configs/root
+
 
 # Boot backup hook.
 print "Configuring /boot backup when pacman transactions are made."
