@@ -72,17 +72,6 @@ echo "Generating a new fstab."
 genfstab -U /mnt >> /mnt/etc/fstab
 sed -i 's#,subvolid=258,subvol=/@/.snapshots/1/snapshot,subvol=@/.snapshots/1/snapshot##g' /mnt/etc/fstab
 
-# Create swapfile, set No_COW, add to fstab
-print "Create swapfile"
-truncate -s 0 /mnt/swap/swapfile
-chattr +C /mnt/swap/swapfile
-btrfs property set /mnt/swap/swapfile compression none
-dd if=/dev/zero of=/mnt/swap/swapfile bs=1M count=8192 status=progress
-chmod 600 /mnt/swap/swapfile
-mkswap /mnt/swap/swapfile
-swapon /mnt/swap/swapfile
-echo "/swap/swapfile none swap defaults 0 0" >> /mnt/etc/fstab
-
 # Setting up GRUB
 sed -i 's/^GRUB_GFXMODE=.*/GRUB_GFXMODE=3440x1440x32/' /mnt/etc/default/grub
 sed -i 's/^GRUB_DEFAULT=.*/GRUB_DEFAULT=saved/' /mnt/etc/default/grub
@@ -117,6 +106,17 @@ sed -i 's/^MODULES=.*/MODULES=\(btrfs nvidia nvidia_modeset nvidia_uvm nvidia_dr
 # Configuring the system.    
 arch-chroot /mnt /bin/bash -e <<EOF
     
+    # Create swapfile, set No_COW, add to fstab
+    echo "Creating swapfile."
+    truncate -s 0 /swap/swapfile
+    chattr +C /swap/swapfile
+    btrfs property set /swap/swapfile compression none
+    dd if=/dev/zero of=/swap/swapfile bs=1M count=8192 status=progress
+    chmod 600 /swap/swapfile
+    mkswap /swap/swapfile
+    swapon /swap/swapfile
+    echo "/swap/swapfile none swap defaults 0 0" >> /etc/fstab
+
     # Setting up timezone.
     ln -sf /usr/share/zoneinfo/$(curl -s http://ip-api.com/line?fields=timezone) /etc/localtime &>/dev/null
     
@@ -159,17 +159,6 @@ arch-chroot /mnt /bin/bash -e <<EOF
         gpasswd -a ${USER} audit
     fi
 EOF
-
-# Create swapfile, set No_COW, add to fstab
-print "Create swapfile"
-truncate -s 0 /swap/swapfile
-chattr +C /swap/swapfile
-btrfs property set /swap/swapfile compression none
-dd if=/dev/zero of=/swap/swapfile bs=1M count=8192 status=progress
-chmod 600 /swap/swapfile
-mkswap /swap/swapfile
-swapon /swap/swapfile
-echo "/swap/swapfile none swap defaults 0 0" >> /etc/fstab
 
 # Fetching .configs from git
 git clone https://github.com/andnix/arch_install.git
