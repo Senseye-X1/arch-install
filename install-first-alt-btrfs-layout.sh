@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env -S bash -e
 
 hostname="arch"
 keymap="sv-latin1"
