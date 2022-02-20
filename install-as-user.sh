@@ -22,10 +22,6 @@
 #sudo firewall-cmd --add-port=1025-65535/udp --permanent
 #sudo firewall-cmd --reload
 
-#print "Main packages."
-
-#sudo pacman -S accountsservice archlinux-wallpaper bspwm dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-gtk-greeter lightdm-gtk-greeter-settings lxappearance-gtk3 numlockx picom rofi sxhkd xautolock xorg zsh zsh-autosuggestions zsh-completions
-
 git clone https://aur.archlinux.org/paru.git
 cd paru
 makepkg -si --noconfirm
