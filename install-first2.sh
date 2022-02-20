@@ -18,32 +18,52 @@ mount $BTRFS /mnt
 #mkfs.btrfs -f /dev/mapper/linux--vg-arch
 #mount /dev/mapper/linux--vg-arch /mnt
 
-# Creating BTRFS subvolumes.
-print "Creating BTRFS subvolumes."
-#for volume in @ @home @root @opt @srv @snapshots @var_log @pkg @swap
-for volume in @ @home @root @opt @srv @snapshots @var @swap
-do
-    btrfs su cr /mnt/$volume
-done
+# Working Snapper rollback.
+echo "Creating BTRFS subvolumes."
+btrfs su cr /mnt/@ &>/dev/null
+btrfs su cr /mnt/@/.snapshots &>/dev/null
+mkdir -p /mnt/@/.snapshots/1 &>/dev/null
+btrfs su cr /mnt/@/.snapshots/1/snapshot &>/dev/null
+btrfs su cr /mnt/@/boot &>/dev/null
+btrfs su cr /mnt/@/home &>/dev/null
+btrfs su cr /mnt/@/root &>/dev/null
+btrfs su cr /mnt/@/srv &>/dev/null
+btrfs su cr /mnt/@/var &>/dev/null
+chattr +C /mnt/@/boot
+chattr +C /mnt/@/srv
+chattr +C /mnt/@/var
 
+#Set the default BTRFS Subvol to Snapshot 1 before pacstrapping
+btrfs subvolume set-default "$(btrfs subvolume list /mnt | grep "@/.snapshots/1/snapshot" | grep -oP '(?<=ID )[0-9]+')" /mnt
+
+cat << EOF >> /mnt/@/.snapshots/1/info.xml
+<?xml version="1.0"?>
+<snapshot>
+  <type>single</type>
+  <num>1</num>
+  <date>1999-03-31 0:00:00</date>
+  <description>First Root Filesystem</description>
+  <cleanup>number</cleanup>
+</snapshot>
+EOF
+
+chmod 600 /mnt/@/.snapshots/1/info.xml
+
+# Mounting the newly created subvolumes.
 umount /mnt
-mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@ $BTRFS /mnt
-mkdir -p /mnt/{boot,home,root,opt,srv,.snapshots,var,swap}
-#mkdir -p /mnt/{boot,home,root,opt,srv,.snapshots,var/log,var/cache/pacman/pkg,swap}
-mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@home $BTRFS /mnt/home
-mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@root $BTRFS /mnt/root
-mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@opt $BTRFS /mnt/opt
-mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@srv $BTRFS /mnt/srv
-mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@snapshots $BTRFS /mnt/.snapshots
-mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@var $BTRFS /mnt/var
-#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@var_log $BTRFS /mnt/var/log
-#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@pkg $BTRFS /mnt/var/cache/pacman/pkg
-mount -o defaults,noatime,subvol=@swap $BTRFS /mnt/swap
-chattr +C /mnt/var
-#chattr +C /mnt/var/log
-#chattr +C /mnt/cache/pacman/pkg
+echo "Mounting the newly created subvolumes."
+mount -o ssd,noatime,space_cache,compress=zstd:1 $BTRFS /mnt
+mkdir -p /mnt/{boot,root,home,.snapshots,srv,tmp,var}
+mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,nodev,nosuid,noexec,subvol=@/boot $BTRFS /mnt/boot
+mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,nodev,nosuid,subvol=@/root $BTRFS /mnt/root 
+mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,nodev,nosuid,subvol=@/home $BTRFS /mnt/home
+mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@/.snapshots $BTRFS /mnt/.snapshots
+mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@/srv $BTRFS /mnt/srv
+mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var $BTRFS /mnt/var
 
-mount $EFI /mnt/boot
+mkdir -p /mnt/boot/efi
+mount -o nodev,nosuid,noexec $EFI /mnt/boot/efi
+
 pacstrap /mnt base linux linux-firmware amd-ucode btrfs-progs git nano
 genfstab -U /mnt >> /mnt/etc/fstab
 arch-chroot /mnt
