@@ -9,7 +9,8 @@ username="andreas"
 password="password"
 
 loadkeys $keymap
-pacman -Syy
+pacman -Syu
+pacman -S --noconfirm curl
 timedatectl set-ntp true
 mkfs.fat -F 32 $EFI
 mkfs.btrfs -f $BTRFS
