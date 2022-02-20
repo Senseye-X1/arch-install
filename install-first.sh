@@ -18,6 +18,7 @@ mount $BTRFS /mnt
 
 # Creating BTRFS subvolumes.
 print "Creating BTRFS subvolumes."
+#for volume in @ @home @root @opt @srv @snapshots @var_log @pkg @swap
 for volume in @ @home @root @opt @srv @snapshots @var @swap
 do
     btrfs su cr /mnt/$volume
@@ -26,6 +27,7 @@ done
 umount /mnt
 mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@ $BTRFS /mnt
 mkdir -p /mnt/{boot,home,root,opt,srv,.snapshots,var,swap}
+#mkdir -p /mnt/{boot,home,root,opt,srv,.snapshots,var/log,var/cache/pacman/pkg}
 mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@home $BTRFS /mnt/home
 mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@root $BTRFS /mnt/root
 mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@opt $BTRFS /mnt/opt
@@ -44,25 +46,6 @@ chattr +C /mnt/var
 #btrfs subvolume create /mnt/@snapshots
 #btrfs subvolume create /mnt/@var_log
 #btrfs subvolume create /mnt/@pkg
-
-#for volume in @ @home @root @opt @srv @snapshots @var_log @pkg
-#do
-#    btrfs su cr /mnt/$volume
-#done
-
-#umount /mnt
-#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@ /dev/mapper/linux--vg-arch /mnt
-#mkdir -p /mnt/{boot,home,root,opt,srv,.snapshots,var/log,var/cache/pacman/pkg}
-#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@home /dev/mapper/linux--vg-arch /mnt/home
-#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@root /dev/mapper/linux--vg-arch /mnt/root
-#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@opt /dev/mapper/linux--vg-arch /mnt/opt
-#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@srv /dev/mapper/linux--vg-arch /mnt/srv
-#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@snapshots /dev/mapper/linux--vg-arch /mnt/.snapshots
-#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@var_log /dev/mapper/linux--vg-arch /mnt/var/log
-#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@pkg /dev/mapper/linux--vg-arch /mnt/var/cache/pacman/pkg
-#chattr +C /mnt/var/log
-#chattr +C /mnt/cache/pacman/pkg
-#swapon /dev/mapper/linux--vg-swap
 
 mount $EFI /mnt/boot
 pacstrap /mnt base linux linux-firmware amd-ucode btrfs-progs git nano
