@@ -1,5 +1,8 @@
 #!/usr/bin/env -S bash -e
 
+pacman -Syu
+pacman -S --noconfirm curl
+
 hostname="arch"
 keymap="sv-latin1"
 EFI="/dev/nvme1n1p1"
@@ -18,8 +21,6 @@ else
 fi
 
 loadkeys $keymap
-pacman -Syu
-pacman -S --noconfirm curl
 timedatectl set-ntp true
 mkfs.fat -F 32 $EFI
 mkfs.btrfs -f $BTRFS
