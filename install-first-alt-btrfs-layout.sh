@@ -103,10 +103,54 @@ echo "Configuring /etc/mkinitcpio for BTRFS and NVIDIA
 sed -i 's,#COMPRESSION=.*,COMPRESSION="zstd",g' /mnt/etc/mkinitcpio.conf
 sed -i 's/^MODULES=.*/MODULES=\(btrfs nvidia nvidia_modeset nvidia_uvm nvidia_drm\)/' /mnt/etc/mkinitcpio.conf
 
-arch-chroot /mnt
+# Configuring the system.    
+arch-chroot /mnt /bin/bash -e <<EOF
+    
+    # Setting up timezone.
+    ln -sf /usr/share/zoneinfo/$(curl -s http://ip-api.com/line?fields=timezone) /etc/localtime &>/dev/null
+    
+    # Setting up clock.
+    hwclock --systohc
+    
+    # Generating locales.my keys aren't even on 
+    echo "Generating locales."
+    locale-gen &>/dev/null
+    
+    # Generating a new initramfs.
+    echo "Creating a new initramfs."
+    chmod 600 /boot/initramfs-linux* &>/dev/null
+    mkinitcpio -P &>/dev/null
+
+    # Snapper configuration
+    umount /.snapshots
+    rm -r /.snapshots
+    snapper --no-dbus -c root create-config /
+    btrfs subvolume delete /.snapshots
+    mkdir /.snapshots
+    mount -a
+    chmod 750 /.snapshots
+
+    # Installing GRUB.
+    echo "Installing GRUB on /boot."
+    grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB &>/dev/null
+    
+    # Creating grub config file.
+    echo "Creating GRUB config file."
+    grub-mkconfig -o /boot/grub/grub.cfg &>/dev/null
+
+    # Adding user with sudo privilege
+    if [ -n "$username" ]; then
+        echo "Adding $username with root privilege."
+        useradd -m $username
+        usermod -aG wheel $username
+        passwd ${USER}
+        groupadd -r audit
+        gpasswd -a ${USER} audit
+    fi
+EOF
 
 # Create swapfile, set No_COW, add to fstab
-prinf "Create swapfile"
+print "Create swapfile"
 truncate -s 0 /swap/swapfile
 chattr +C /swap/swapfile
 btrfs property set /swap/swapfile compression none
@@ -114,7 +158,7 @@ dd if=/dev/zero of=/swap/swapfile bs=1M count=8192 status=progress
 chmod 600 /swap/swapfile
 mkswap /swap/swapfile
 swapon /swap/swapfile
-echo "/swap/swapfile none swap defaults 0 0" | sudo tee -a /etc/fstab
+echo "/swap/swapfile none swap defaults 0 0" >> /etc/fstab
 
 # Fetching .configs from git
 git clone https://github.com/andnix/arch_install.git
