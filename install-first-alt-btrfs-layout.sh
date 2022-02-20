@@ -64,8 +64,17 @@ mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,nodatacow,node
 mkdir -p /mnt/boot/efi
 mount -o nodev,nosuid,noexec $EFI /mnt/boot/efi
 
-pacstrap /mnt base linux linux-firmware amd-ucode btrfs-progs git nano
+pacstrap /mnt base linux linux-firmware amd-ucode btrfs-progs git nano alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto udiskie accountsservice archlinux-wallpaper bspwm dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-gtk-greeter lightdm-gtk-greeter-settings lxappearance-gtk3 picom rofi sxhkd xautolock xorg zsh zsh-autosuggestions zsh-completions nvidia nvidia-settings
+
+# Generating /etc/fstab.
+echo "Generating a new fstab."
 genfstab -U /mnt >> /mnt/etc/fstab
+sed -i 's#,subvolid=258,subvol=/@/.snapshots/1/snapshot,subvol=@/.snapshots/1/snapshot##g' /mnt/etc/fstab
+
+echo "" >> /mnt/etc/default/grub
+echo -e "# Booting with BTRFS subvolume\nGRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION=true" >> /mnt/etc/default/grub
+sed -i 's#rootflags=subvol=${rootsubvol}##g' /mnt/etc/grub.d/10_linux
+
 arch-chroot /mnt
 
 # Create swapfile, set No_COW, add to fstab
@@ -93,11 +102,17 @@ echo 'LANG=en_US.UTF-8' | tee -a /etc/locale.conf > /dev/null
 echo "KEYMAP=$keymap" | tee -a /etc/vconsole.conf > /dev/null
 localectl set-x11-keymap se
 echo "$hostname" | tee -a /etc/hostname > /dev/null
-echo "127.0.0.1	localhost\n::1		localhost\n127.0.1.1	$hostname.localdomain	$hostname" | tee -a /etc/hosts > /dev/null
+# Setting hosts file.
+echo "Setting hosts file."
+cat > /mnt/etc/hosts <<EOF
+127.0.0.1   localhost
+::1         localhost
+127.0.1.1   $hostname.localdomain   $hostname
+EOF
+
 echo "root:$password" | chpasswd
 
-pacman -S alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto udiskie accountsservice archlinux-wallpaper bspwm dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-gtk-greeter lightdm-gtk-greeter-settings lxappearance-gtk3 picom rofi sxhkd xautolock xorg zsh zsh-autosuggestions zsh-completions
-pacman -S --noconfirm nvidia nvidia-settings
+
 
 # Modules for BTRFS and NVIDIA
 sed -i 's/^MODULES=.*/MODULES=\(btrfs nvidia nvidia_modeset nvidia_uvm nvidia_drm\)/' /etc/mkinitcpio.conf
