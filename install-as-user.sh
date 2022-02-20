@@ -40,15 +40,19 @@ sudo systemctl enable lightdm
 
 #sudo mkdir /etc/pacman.d/hooks
 #echo '[Trigger]\nOperation = Upgrade\nOperation = Install\nOperation = Remove\nType = Path\nTarget = usr/lib/modules/*/vmlinuz\n\n[Action]\nDepends = rsync\nDescription = Backing up /boot...\nWhen = PreTransaction\nExec = /usr/bin/rsync -a --delete /boot /.bootbackup' | sudo tee -a /etc/pacman.d/hooks/50-bootbackup.hook > /dev/null
+
+# Use this if you need keyboard numlock enabled at boot.
+# Remember to install package numlockx with: pacman -S numlockx
 #echo '#!/bin/bash\n/usr/bin/numlockx on\nnvidia-settings --assign CurrentMetaMode="DPY-2: 2560x1440_144 @2560x1440 +440+0 {ViewPortIn=2560x1440, ViewPortOut=2560x1440+0+0, ForceCompositionPipeline=On, ForceFullCompositionPipeline=On}, DPY-3: 3440x1440_100 @3440x1440 +0+1440 {ViewPortIn=3440x1440, ViewPortOut=3440x1440+0+0, ForceCompositionPipeline=On, ForceFullCompositionPipeline=On}"' | sudo tee -a /etc/lightdm/monitor_numlock.sh > /dev/null
 #sudo chmod +x /etc/lightdm/monitor_numlock.sh
 #sudo sed -i 's/#greeter-setup-script=.*/greeter-setup-script=\/etc\/lightdm\/monitor_numlock.sh/' /etc/lightdm/lightdm.conf
 #echo '[greeter]\ncursor-theme-name = Adwaita\ncursor-theme-size = 16\ntheme-name = Arc-Dark\nicon-theme-name = Adwaita\nfont-name = Roboto 10\nindicators = ~spacer;~clock;~spacer;~language;~session;~a11y;~power' | sudo tee /etc/lightdm/lightdm-gtk-greeter.conf > /dev/null
 #echo 'Section "ServerFlags"\n    Option "DontVTSwitch" "True"\nEndSection' | sudo tee -a /etc/X11/xorg.conf > /dev/null
 
-bluetoothctl power on
-bluetoothctl pair DC:2C:26:FF:17:17
-bluetoothctl trust DC:2C:26:FF:17:17
+# Add Keychron K6 over bluetooth
+#bluetoothctl power on
+#bluetoothctl pair DC:2C:26:FF:17:17
+#bluetoothctl trust DC:2C:26:FF:17:17
 
 print "Populating .configs."
 mkdir ~/.config/{bspwm,dunst,gtk-3.0,kitty,picom,polybar,rofi,sxhkd}
