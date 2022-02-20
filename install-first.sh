@@ -134,9 +134,9 @@ echo '[greeter]\ncursor-theme-name = Adwaita\ncursor-theme-size = 16\ntheme-name
 echo 'Section "ServerFlags"\n    Option "DontVTSwitch" "True"\nEndSection' | tee -a /etc/X11/xorg.conf > /dev/null
 
 # Firewall config
-#sudo firewall-cmd --add-port=1025-65535/tcp --permanent
-#sudo firewall-cmd --add-port=1025-65535/udp --permanent
-#sudo firewall-cmd --reload
+#firewall-cmd --add-port=1025-65535/tcp --permanent
+#firewall-cmd --add-port=1025-65535/udp --permanent
+#firewall-cmd --reload
 
 # Enable Services
 systemctl enable NetworkManager
