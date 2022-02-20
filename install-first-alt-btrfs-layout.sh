@@ -5,6 +5,7 @@ pacman -S --noconfirm curl
 
 hostname="arch"
 keymap="sv-latin1"
+DISK="/dev/nvme1n1"
 EFI="/dev/nvme1n1p1"
 BTRFS="/dev/nvme1n1p2"
 
