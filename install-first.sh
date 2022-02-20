@@ -32,8 +32,12 @@ mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@opt $BTRFS
 mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@srv $BTRFS /mnt/srv
 mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@snapshots $BTRFS /mnt/.snapshots
 mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@var $BTRFS /mnt/var
+#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@var_log $BTRFS /mnt/var/log
+#mount -o noatime,compress=zstd:1,space_cache=v2,discard=async,subvol=@pkg $BTRFS /mnt/var/cache/pacman/pkg
 mount -o defaults,noatime,subvol=@swap $BTRFS /mnt/swap
 chattr +C /mnt/var
+#chattr +C /mnt/var/log
+#chattr +C /mnt/cache/pacman/pkg
 
 #btrfs subvolume create /mnt/@
 #btrfs subvolume create /mnt/@home
@@ -76,6 +80,7 @@ mkswap /swap/swapfile
 swapon /swap/swapfile
 echo "/swap/swapfile none swap defaults 0 0" | sudo tee -a /etc/fstab
 
+# Fetching .configs from git
 git clone https://github.com/andnix/arch_install.git
 #chmod +x /arch_install/install-as-root.sh
 chmod +x /arch_install/install-as-user.sh
@@ -92,7 +97,7 @@ echo 'arch' | tee -a /etc/hostname > /dev/null
 echo '127.0.0.1	localhost\n::1		localhost\n127.0.1.1	arch.localdomain	arch' | tee -a /etc/hosts > /dev/null
 echo "root:$password" | chpasswd
 
-pacman -S  alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs lvm2 networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto udiskie
+pacman -S alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs lvm2 networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto udiskie
 pacman -S --noconfirm nvidia nvidia-settings
 pacman -S accountsservice archlinux-wallpaper bspwm dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-gtk-greeter lightdm-gtk-greeter-settings lxappearance-gtk3 numlockx picom rofi sxhkd xautolock xorg zsh zsh-autosuggestions zsh-completions
 
@@ -137,9 +142,9 @@ mkdir /etc/pacman.d/hooks
 echo '[Trigger]\nOperation = Upgrade\nOperation = Install\nOperation = Remove\nType = Path\nTarget = usr/lib/modules/*/vmlinuz\n\n[Action]\nDepends = rsync\nDescription = Backing up /boot...\nWhen = PreTransaction\nExec = /usr/bin/rsync -a --delete /boot /.bootbackup' | tee -a /etc/pacman.d/hooks/50-bootbackup.hook > /dev/null
 
 # Monitor and LightDM setup.
-echo '#!/bin/bash\nnvidia-settings --assign CurrentMetaMode="DPY-2: 2560x1440_144 @2560x1440 +440+0 {ViewPortIn=2560x1440, ViewPortOut=2560x1440+0+0, ForceCompositionPipeline=On, ForceFullCompositionPipeline=On}, DPY-3: 3440x1440_100 @3440x1440 +0+1440 {ViewPortIn=3440x1440, ViewPortOut=3440x1440+0+0, ForceCompositionPipeline=On, ForceFullCompositionPipeline=On}"' | tee -a /etc/lightdm/monitor_numlock.sh > /dev/null
-chmod +x /etc/lightdm/monitor_numlock.sh
-sed -i 's/#greeter-setup-script=.*/greeter-setup-script=\/etc\/lightdm\/monitor_numlock.sh/' /etc/lightdm/lightdm.conf
+echo '#!/bin/bash\nnvidia-settings --assign CurrentMetaMode="DPY-2: 2560x1440_144 @2560x1440 +440+0 {ViewPortIn=2560x1440, ViewPortOut=2560x1440+0+0, ForceCompositionPipeline=On, ForceFullCompositionPipeline=On}, DPY-3: 3440x1440_100 @3440x1440 +0+1440 {ViewPortIn=3440x1440, ViewPortOut=3440x1440+0+0, ForceCompositionPipeline=On, ForceFullCompositionPipeline=On}"' | tee -a /etc/lightdm/monitor_setup.sh > /dev/null
+chmod +x /etc/lightdm/monitor_setup.sh
+sed -i 's/#greeter-setup-script=.*/greeter-setup-script=\/etc\/lightdm\/monitor_setup.sh/' /etc/lightdm/lightdm.conf
 echo '[greeter]\ncursor-theme-name = Adwaita\ncursor-theme-size = 16\ntheme-name = Arc-Dark\nicon-theme-name = Adwaita\nfont-name = Roboto 10\nindicators = ~spacer;~clock;~spacer;~language;~session;~a11y;~power' | tee /etc/lightdm/lightdm-gtk-greeter.conf > /dev/null
 
 # Disallow Ctrl+Alt+Fn switching for added security
@@ -149,7 +154,7 @@ echo 'Section "ServerFlags"\n    Option "DontVTSwitch" "True"\nEndSection' | tee
 systemctl enable NetworkManager
 systemctl enable fstrim.timer
 systemctl enable bluetooth
-systemctl enable firewalld
+#systemctl enable firewalld
 systemctl enable systemd-timesyncd
 #systemctl enable lightdm
 systemctl enable snapper-timeline.timer
