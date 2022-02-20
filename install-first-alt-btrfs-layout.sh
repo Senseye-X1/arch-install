@@ -7,6 +7,7 @@ BTRFS="/dev/nvme1n1p2"
 
 username="andreas"
 password="password"
+locale="en_US"
 
 loadkeys $keymap
 pacman -Syu
@@ -71,9 +72,36 @@ echo "Generating a new fstab."
 genfstab -U /mnt >> /mnt/etc/fstab
 sed -i 's#,subvolid=258,subvol=/@/.snapshots/1/snapshot,subvol=@/.snapshots/1/snapshot##g' /mnt/etc/fstab
 
+# Setting up GRUB
+sed -i 's/^GRUB_GFXMODE=.*/GRUB_GFXMODE=3440x1440x32/' /mnt/etc/default/grub
+sed -i 's/^GRUB_DEFAULT=.*/GRUB_DEFAULT=saved/' /mnt/etc/default/grub
+sed -i 's/\(^GRUB_CMDLINE_LINUX_DEFAULT=".*\)\(.\)$/\1 nvidia-drm.modeset=1\2/' /mnt/etc/default/grub
+sed -i 's/^#GRUB_SAVEDEFAULT=.*/GRUB_SAVEDEFAULT=true/' /mnt/etc/default/grub
+echo 'GRUB_DISABLE_OS_PROBER=false' >> /mnt/etc/default/grub
 echo "" >> /mnt/etc/default/grub
 echo -e "# Booting with BTRFS subvolume\nGRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION=true" >> /mnt/etc/default/grub
 sed -i 's#rootflags=subvol=${rootsubvol}##g' /mnt/etc/grub.d/10_linux
+
+echo "$hostname" > /mnt/etc/hostname
+# Setting hosts file.
+echo "Setting hosts file."
+cat > /mnt/etc/hosts <<EOF
+127.0.0.1   localhost
+::1         localhost
+127.0.1.1   $hostname.localdomain   $hostname
+EOF
+
+# Setting up locales.
+#read -r -p "Please insert the locale you use in this format (xx_XX): " locale
+echo "$locale.UTF-8 UTF-8"  > /mnt/etc/locale.gen
+echo "LANG=$locale.UTF-8" > /mnt/etc/locale.conf
+
+echo "KEYMAP=$keymap" > /mnt/etc/vconsole.conf > /dev/null
+
+# Configuring /etc/mkinitcpio.conf
+echo "Configuring /etc/mkinitcpio for BTRFS and NVIDIA
+sed -i 's,#COMPRESSION=.*,COMPRESSION="zstd",g' /mnt/etc/mkinitcpio.conf
+sed -i 's/^MODULES=.*/MODULES=\(btrfs nvidia nvidia_modeset nvidia_uvm nvidia_drm\)/' /mnt/etc/mkinitcpio.conf
 
 arch-chroot /mnt
 
@@ -96,38 +124,23 @@ chmod +x /arch_install/install-as-user.sh
 #timedatectl set-ntp true
 ln -sf /usr/share/zoneinfo/Europe/Stockholm /etc/localtime
 hwclock --systohc
-sed -i 's/#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
 locale-gen
-echo 'LANG=en_US.UTF-8' | tee -a /etc/locale.conf > /dev/null
-echo "KEYMAP=$keymap" | tee -a /etc/vconsole.conf > /dev/null
+
 localectl set-x11-keymap se
-echo "$hostname" | tee -a /etc/hostname > /dev/null
-# Setting hosts file.
-echo "Setting hosts file."
-cat > /mnt/etc/hosts <<EOF
-127.0.0.1   localhost
-::1         localhost
-127.0.1.1   $hostname.localdomain   $hostname
-EOF
+
 
 echo "root:$password" | chpasswd
 
 
 
-# Modules for BTRFS and NVIDIA
-sed -i 's/^MODULES=.*/MODULES=\(btrfs nvidia nvidia_modeset nvidia_uvm nvidia_drm\)/' /etc/mkinitcpio.conf
+
 
 # If using LVM
 #sed -i 's/\(^HOOKS.*block \)\(filesystems.*\)/\1lvm2 \2/' /etc/mkinitcpio.conf
 
 mkinitcpio -P
 
-# Setting up GRUB
-sed -i 's/^GRUB_GFXMODE=.*/GRUB_GFXMODE=3440x1440x32/' /etc/default/grub
-sed -i 's/^GRUB_DEFAULT=.*/GRUB_DEFAULT=saved/' /etc/default/grub
-sed -i 's/\(^GRUB_CMDLINE_LINUX_DEFAULT=".*\)\(.\)$/\1 nvidia-drm.modeset=1\2/' /etc/default/grub
-sed -i 's/^#GRUB_SAVEDEFAULT=.*/GRUB_SAVEDEFAULT=true/' /etc/default/grub
-echo 'GRUB_DISABLE_OS_PROBER=false' | tee -a /etc/default/grub > /dev/null
+
 
 grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
 grub-mkconfig -o /boot/grub/grub.cfg
