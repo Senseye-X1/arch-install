@@ -6,9 +6,9 @@ pacman -S --noconfirm curl
 hostname="arch"
 timezone="Europe/Stockholm"
 keymap="sv-latin1"
-DISK="/dev/nvme1n1"
-EFI="/dev/nvme1n1p1"
-BTRFS="/dev/nvme1n1p2"
+#DISK="/dev/nvme1n1"
+#EFI="/dev/nvme1n1p1"
+#BTRFS="/dev/nvme1n1p2"
 
 #username="andreas"
 #password="password"
@@ -40,11 +40,51 @@ while true; do
 done
 }
 
+Selecting the target for the installation.
+PS3="Select the disk where Arch Linux is going to be installed: "
+select ENTRY in $(lsblk -dpnoNAME|grep -P "/dev/sd|nvme|vd");
+do
+    DISK=$ENTRY
+    echo "Installing Arch Linux on $DISK."
+    break
+done
+
+# Deleting old partition scheme.
+read -r -p "This will delete the current partition table on $DISK. Do you agree [y/N]? " response
+response=${response,,}
+if [[ "$response" =~ ^(yes|y)$ ]]; then
+    wipefs -af "$DISK" &>/dev/null
+    sgdisk -Zo "$DISK" &>/dev/null
+else
+    echo "Quitting."
+    exit
+fi
+
+# Creating a new partition scheme.
+echo "Creating new partition scheme on $DISK."
+parted -s "$DISK" \
+    mklabel gpt \
+    mkpart ESP fat32 1MiB 512MiB \
+    set 1 esp on \
+    mkpart archroot 513MiB 100% \
+
+ESP="/dev/disk/by-partlabel/ESP"
+BTRFS="/dev/disk/by-partlabel/archroot"
+
+# Informing the Kernel of the changes.
+echo "Informing the Kernel about the disk changes."
+partprobe "$DISK"
+
+# Formatting the ESP as FAT32.
+echo "Formatting the EFI Partition as FAT32."
+mkfs.fat -F 32 $ESP &>/dev/null
+
+# Formatting the root partition as BTRFS.
+echo "Formatting the root partition as BTRFS."
+mkfs.btrfs $BTRFS &>/dev/null
+mount $BTRFS /mnt
 loadkeys $keymap
 #timedatectl set-ntp true
-mkfs.fat -F 32 $EFI
-mkfs.btrfs -f $BTRFS
-mount $BTRFS /mnt
 #mkfs.btrfs -f /dev/mapper/linux--vg-arch
 #mount /dev/mapper/linux--vg-arch /mnt
 
