@@ -50,6 +50,10 @@ sudo systemctl enable lightdm
 #bluetoothctl pair DC:2C:26:FF:17:17
 #bluetoothctl trust DC:2C:26:FF:17:17
 
+# Fetching .configs from git
+git clone https://github.com/andnix/arch_install.git
+#chmod +x /arch_install/install-as-root.sh
+
 print "Populating .configs."
 mkdir ~/.config/{bspwm,dunst,gtk-3.0,kitty,picom,polybar,rofi,sxhkd}
 install -m644 /arch_install/.zshrc ~/.zshrc
