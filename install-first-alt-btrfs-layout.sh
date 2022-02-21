@@ -64,6 +64,7 @@ btrfs su cr /mnt/@/home &>/dev/null
 btrfs su cr /mnt/@/root &>/dev/null
 btrfs su cr /mnt/@/srv &>/dev/null
 btrfs su cr /mnt/@/var &>/dev/null
+btrfs su cr /mnt/swap &>/dev/null
 chattr +C /mnt/@/boot
 chattr +C /mnt/@/srv
 chattr +C /mnt/@/var
@@ -88,13 +89,14 @@ chmod 600 /mnt/@/.snapshots/1/info.xml
 umount /mnt
 echo "Mounting the newly created subvolumes."
 mount -o ssd,noatime,space_cache,compress=zstd:1 $BTRFS /mnt
-mkdir -p /mnt/{boot,root,home,.snapshots,srv,tmp,var}
+mkdir -p /mnt/{boot,root,home,.snapshots,srv,var}
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,nodev,nosuid,noexec,subvol=@/boot $BTRFS /mnt/boot
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,nodev,nosuid,subvol=@/root $BTRFS /mnt/root 
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,nodev,nosuid,subvol=@/home $BTRFS /mnt/home
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@/.snapshots $BTRFS /mnt/.snapshots
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@/srv $BTRFS /mnt/srv
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var $BTRFS /mnt/var
+mount -o defaults,noatime,subvol=@swap $BTRFS /mnt/swap
 
 mkdir -p /mnt/boot/efi
 mount -o nodev,nosuid,noexec $EFI /mnt/boot/efi
@@ -140,6 +142,8 @@ echo "KEYMAP=$keymap" > /mnt/etc/vconsole.conf > /dev/null
 echo "Configuring /etc/mkinitcpio for BTRFS and NVIDIA
 sed -i 's,#COMPRESSION=.*,COMPRESSION="zstd",g' /mnt/etc/mkinitcpio.conf
 sed -i 's/^MODULES=.*/MODULES=\(btrfs nvidia nvidia_modeset nvidia_uvm nvidia_drm\)/' /mnt/etc/mkinitcpio.conf
+# If using LVM
+#sed -i 's/\(^HOOKS.*block \)\(filesystems.*\)/\1lvm2 \2/' /etc/mkinitcpio.conf
 
 # Configuring the system.    
 arch-chroot /mnt /bin/bash -e <<EOF
@@ -178,6 +182,8 @@ arch-chroot /mnt /bin/bash -e <<EOF
     mkdir /.snapshots
     mount -a
     chmod 750 /.snapshots
+    #chmod a+rx /.snapshots
+    #chown :$username /.snapshots
     sed -i 's/ALLOW_USERS=""/ALLOW_USERS="'"$username"'"/' /etc/snapper/configs/root
     sed -i 's/TIMELINE_LIMIT_HOURLY=.*/TIMELINE_LIMIT_HOURLY="5"/' /etc/snapper/configs/root
     sed -i 's/TIMELINE_LIMIT_DAILY=.*/TIMELINE_LIMIT_DAILY="7"/' /etc/snapper/configs/root
@@ -215,24 +221,6 @@ if [ -n "$username" ]; then
     print "Setting user password for $username." 
     echo "$username:$password" | arch-chroot /mnt chpasswd
 fi
-
-# If using LVM
-#sed -i 's/\(^HOOKS.*block \)\(filesystems.*\)/\1lvm2 \2/' /etc/mkinitcpio.conf
-
-grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB
-grub-mkconfig -o /boot/grub/grub.cfg
-
-print "Configuring Snapper."
-umount /.snapshots
-rm -r /.snapshots
-snapper --no-dbus -c root create-config /
-btrfs subvolume delete /.snapshots
-mkdir /.snapshots
-mount -a
-chmod 750 /.snapshots
-#chmod a+rx /.snapshots
-#chown :$username /.snapshots
-
 
 # Boot backup hook.
 print "Configuring /boot backup when pacman transactions are made."
@@ -275,8 +263,8 @@ sed -i 's/#FastConnectable.*/FastConnectable = true/' /etc/bluetooth/main.conf
 sed -i 's/#\(ReconnectAttempts=.*\)/\1/' /etc/bluetooth/main.conf
 sed -i 's/#\(ReconnectIntervals=.*\)/\1/' /etc/bluetooth/main.conf
 
-useradd -m $username
-echo "$username:$password" | chpasswd
-echo "$username ALL=(ALL) ALL" | tee -a /etc/sudoers.d/$username > /dev/null
+#useradd -m $username
+#echo "$username:$password" | chpasswd
+#echo "$username ALL=(ALL) ALL" | tee -a /etc/sudoers.d/$username > /dev/null
 
 print "Exit, umount -a, reboot.\nAfter reboot login as normal user and run install-as-user.sh."
