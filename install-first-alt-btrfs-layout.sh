@@ -22,8 +22,6 @@ else
     microcode=intel-ucode
 fi
 
-
-
 # Setting up a password for the user account (function).
 userpass_selector () {
 while true; do
@@ -41,9 +39,6 @@ while true; do
   echo "Passwords don't match, try again."
 done
 }
-
-# Setting password
-#read -r -p "Please enter password for the user account $username: " password
 
 loadkeys $keymap
 #timedatectl set-ntp true
@@ -64,7 +59,7 @@ btrfs su cr /mnt/@/home &>/dev/null
 btrfs su cr /mnt/@/root &>/dev/null
 btrfs su cr /mnt/@/srv &>/dev/null
 btrfs su cr /mnt/@/var &>/dev/null
-btrfs su cr /mnt/swap &>/dev/null
+btrfs su cr /mnt/@/swap &>/dev/null
 chattr +C /mnt/@/boot
 chattr +C /mnt/@/srv
 chattr +C /mnt/@/var
@@ -88,15 +83,15 @@ chmod 600 /mnt/@/.snapshots/1/info.xml
 # Mounting the newly created subvolumes.
 umount /mnt
 echo "Mounting the newly created subvolumes."
-mount -o ssd,noatime,space_cache,compress=zstd:1 $BTRFS /mnt
-mkdir -p /mnt/{boot,root,home,.snapshots,srv,var}
-mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,nodev,nosuid,noexec,subvol=@/boot $BTRFS /mnt/boot
-mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,nodev,nosuid,subvol=@/root $BTRFS /mnt/root 
-mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,nodev,nosuid,subvol=@/home $BTRFS /mnt/home
+mount -o ssd,noatime,space_cache=v2,compress=zstd:1 $BTRFS /mnt
+mkdir -p /mnt/{boot,root,home,.snapshots,srv,var,swap}
+mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@/boot $BTRFS /mnt/boot
+mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@/root $BTRFS /mnt/root 
+mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@/home $BTRFS /mnt/home
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@/.snapshots $BTRFS /mnt/.snapshots
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@/srv $BTRFS /mnt/srv
-mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,nodatacow,nodev,nosuid,noexec,subvol=@/var $BTRFS /mnt/var
-mount -o defaults,noatime,subvol=@swap $BTRFS /mnt/swap
+mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,nodatacow,subvol=@/var $BTRFS /mnt/var
+mount -o defaults,noatime,subvol=@/swap $BTRFS /mnt/swap
 
 mkdir -p /mnt/boot/efi
 mount -o nodev,nosuid,noexec $EFI /mnt/boot/efi
