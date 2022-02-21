@@ -195,7 +195,7 @@ arch-chroot /mnt /bin/bash -e <<EOF
     echo "/swap/swapfile none swap defaults 0 0" >> /etc/fstab
 
     # Setting up timezone.
-    echo "Seting up timezone."
+    echo "Setting up timezone."
     ln -sf /usr/share/zoneinfo/$timezone /etc/localtime &>/dev/null
     
     # Setting up clock.
@@ -288,6 +288,13 @@ systemctl enable btrfs-scrub@-.timer
 #systemctl enable btrfs-scrub@home.timer
 #systemctl enable btrfs-scrub@var.timer
 #systemctl enable btrfs-scrub@\\x2esnapshots.timer
+
+# Enabling various services.
+print "Enabling Reflector, automatic snapshots, BTRFS scrubbing and systemd-oomd."
+for service in reflector.timer snapper-timeline.timer snapper-cleanup.timer btrfs-scrub@-.timer btrfs-scrub@home.timer btrfs-scrub@var-log.timer btrfs-scrub@\\x2esnapshots.timer grub-btrfs.path systemd-oomd
+do
+    systemctl enable "$service" --root=/mnt &>/dev/null
+done
 
 # Fix Keychron Bluetooth Keyboard Connection
 sed -i 's/#AutoEnable=false/AutoEnable=true/' /etc/bluetooth/main.conf
