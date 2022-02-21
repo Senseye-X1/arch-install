@@ -171,13 +171,13 @@ EOF
 echo "$locale.UTF-8 UTF-8"  > /mnt/etc/locale.gen
 echo "LANG=$locale.UTF-8" > /mnt/etc/locale.conf
 
-echo "KEYMAP=$keymap" > /mnt/etc/vconsole.conf > /dev/null
+echo "KEYMAP=$keymap" > /mnt/etc/vconsole.conf
 
 # Configuring /etc/mkinitcpio.conf
 echo "Configuring /etc/mkinitcpio for BTRFS and NVIDIA
-sed -i 's,#COMPRESSION=.*,COMPRESSION="zstd",g' /mnt/etc/mkinitcpio.conf
+sed -i 's/#COMPRESSION=.*/COMPRESSION="zstd"/g' /mnt/etc/mkinitcpio.conf
 sed -i 's/^MODULES=.*/MODULES=\(btrfs nvidia nvidia_modeset nvidia_uvm nvidia_drm\)/' /mnt/etc/mkinitcpio.conf
-# If using LVM
+# If using LVM:
 #sed -i 's/\(^HOOKS.*block \)\(filesystems.*\)/\1lvm2 \2/' /etc/mkinitcpio.conf
 
 # Configuring the system.    
@@ -195,6 +195,7 @@ arch-chroot /mnt /bin/bash -e <<EOF
     echo "/swap/swapfile none swap defaults 0 0" >> /etc/fstab
 
     # Setting up timezone.
+    echo "Seting up timezone."
     ln -sf /usr/share/zoneinfo/$timezone /etc/localtime &>/dev/null
     
     # Setting up clock.
@@ -210,6 +211,7 @@ arch-chroot /mnt /bin/bash -e <<EOF
     mkinitcpio -P &>/dev/null
 
     # Snapper configuration
+    echo "Configuring Snapper."
     umount /.snapshots
     rm -r /.snapshots
     snapper --no-dbus -c root create-config /
@@ -238,11 +240,6 @@ arch-chroot /mnt /bin/bash -e <<EOF
     localectl set-x11-keymap se
 
 EOF
-
-# Fetching .configs from git
-git clone https://github.com/andnix/arch_install.git
-#chmod +x /arch_install/install-as-root.sh
-chmod +x /arch_install/install-as-user.sh
 
 # Setting root password.
 print "Setting root password."
@@ -287,7 +284,7 @@ systemctl enable snapper-timeline.timer
 systemctl enable snapper-cleanup.timer
 systemctl enable grub-btrfs.path
 systemctl enable btrfs-scrub@-.timer
-# BTRFS scrub should scrub the whole filesystem regardless
+# BTRFS scrub for root should scrub the whole filesystem regardless
 #systemctl enable btrfs-scrub@home.timer
 #systemctl enable btrfs-scrub@var.timer
 #systemctl enable btrfs-scrub@\\x2esnapshots.timer
@@ -301,5 +298,10 @@ sed -i 's/#\(ReconnectIntervals=.*\)/\1/' /etc/bluetooth/main.conf
 #useradd -m $username
 #echo "$username:$password" | chpasswd
 #echo "$username ALL=(ALL) ALL" | tee -a /etc/sudoers.d/$username > /dev/null
+
+# Fetching .configs from git
+git clone https://github.com/andnix/arch_install.git
+#chmod +x /arch_install/install-as-root.sh
+chmod +x /arch_install/install-as-user.sh
 
 print "Exit, umount -a, reboot.\nAfter reboot login as normal user and run install-as-user.sh."
