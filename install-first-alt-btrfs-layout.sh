@@ -136,7 +136,7 @@ mount -o defaults,noatime,subvol=@/swap $BTRFS /mnt/swap
 mkdir -p /mnt/boot/efi
 mount $ESP /mnt/boot/efi
 
-pacstrap /mnt base linux linux-firmware ${microcode} btrfs-progs git nano alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto udiskie accountsservice archlinux-wallpaper bspwm dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-gtk-greeter lightdm-gtk-greeter-settings lxappearance-gtk3 picom rofi sxhkd xautolock xorg zsh zsh-autosuggestions zsh-completions reflector nvidia nvidia-settings
+pacstrap /mnt base linux linux-firmware ${microcode} btrfs-progs git nano alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto udiskie accountsservice archlinux-wallpaper bspwm dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-gtk-greeter lightdm-gtk-greeter-settings lxappearance-gtk3 picom rofi sxhkd xautolock xorg zsh zsh-autosuggestions zsh-completions reflector zram-generator nvidia nvidia-settings
 
 # Generating /etc/fstab.
 echo "Generating a new fstab."
@@ -275,6 +275,13 @@ fi
 print "Configuring /boot backup when pacman transactions are made."
 mkdir /etc/pacman.d/hooks
 echo '[Trigger]\nOperation = Upgrade\nOperation = Install\nOperation = Remove\nType = Path\nTarget = usr/lib/modules/*/vmlinuz\n\n[Action]\nDepends = rsync\nDescription = Backing up /boot...\nWhen = PreTransaction\nExec = /usr/bin/rsync -a --delete /boot /.bootbackup' | tee -a /etc/pacman.d/hooks/50-bootbackup.hook > /dev/null
+
+# ZRAM configuration.
+print "Configuring ZRAM."
+cat > /mnt/etc/systemd/zram-generator.conf <<EOF
+[zram0]
+zram-size = min(ram, 8192)
+EOF
 
 # Monitor and LightDM setup.
 echo '#!/bin/bash\nnvidia-settings --assign CurrentMetaMode="DPY-2: 2560x1440_144 @2560x1440 +440+0 {ViewPortIn=2560x1440, ViewPortOut=2560x1440+0+0, ForceCompositionPipeline=On, ForceFullCompositionPipeline=On}, DPY-3: 3440x1440_100 @3440x1440 +0+1440 {ViewPortIn=3440x1440, ViewPortOut=3440x1440+0+0, ForceCompositionPipeline=On, ForceFullCompositionPipeline=On}"' | tee -a /etc/lightdm/monitor_setup.sh > /dev/null
