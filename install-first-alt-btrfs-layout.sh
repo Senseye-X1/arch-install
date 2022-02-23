@@ -99,7 +99,7 @@ btrfs su cr /mnt/@/home &>/dev/null
 btrfs su cr /mnt/@/root &>/dev/null
 btrfs su cr /mnt/@/srv &>/dev/null
 btrfs su cr /mnt/@/var &>/dev/null
-#btrfs su cr /mnt/@/swap &>/dev/null
+btrfs su cr /mnt/@/swap &>/dev/null
 chattr +C /mnt/@/boot
 chattr +C /mnt/@/srv
 chattr +C /mnt/@/var
@@ -124,20 +124,20 @@ chmod 600 /mnt/@/.snapshots/1/info.xml
 umount /mnt
 echo "Mounting the newly created subvolumes."
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1 $BTRFS /mnt
-mkdir -p /mnt/{boot,root,home,.snapshots,srv,var}
-#mkdir -p /mnt/{boot,root,home,.snapshots,srv,var,swap}
+#mkdir -p /mnt/{boot,root,home,.snapshots,srv,var}
+mkdir -p /mnt/{boot,root,home,.snapshots,srv,var,swap}
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@/boot $BTRFS /mnt/boot
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@/root $BTRFS /mnt/root 
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@/home $BTRFS /mnt/home
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@/.snapshots $BTRFS /mnt/.snapshots
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@/srv $BTRFS /mnt/srv
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,nodatacow,subvol=@/var $BTRFS /mnt/var
-#mount -o defaults,noatime,subvol=@/swap $BTRFS /mnt/swap
+mount -o defaults,noatime,subvol=@/swap $BTRFS /mnt/swap
 
 mkdir -p /mnt/boot/efi
 mount $ESP /mnt/boot/efi
 
-pacstrap /mnt base linux linux-firmware ${microcode} btrfs-progs git nano alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto udiskie accountsservice archlinux-wallpaper bspwm dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-gtk-greeter lightdm-gtk-greeter-settings lxappearance-gtk3 picom rofi sxhkd xautolock xorg zsh zsh-autosuggestions zsh-completions reflector zram-generator nvidia nvidia-settings
+pacstrap /mnt base linux linux-firmware ${microcode} btrfs-progs git nano alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto udiskie accountsservice archlinux-wallpaper bspwm dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-gtk-greeter lightdm-gtk-greeter-settings lxappearance-gtk3 picom rofi sxhkd xautolock xorg zsh zsh-autosuggestions zsh-completions reflector nvidia nvidia-settings
 
 # Generating /etc/fstab.
 echo "Generating a new fstab."
@@ -203,15 +203,15 @@ EOF
 arch-chroot /mnt /bin/bash -e <<EOF
     
     # Create swapfile, set No_COW, add to fstab
-    #echo "Creating swapfile."
-    #truncate -s 0 /swap/swapfile
-    #chattr +C /swap/swapfile
-    #btrfs property set /swap/swapfile compression none
-    #dd if=/dev/zero of=/swap/swapfile bs=1M count=8192 status=progress
-    #chmod 600 /swap/swapfile
-    #mkswap /swap/swapfile
-    #swapon /swap/swapfile
-    #echo "/swap/swapfile none swap defaults 0 0" >> /etc/fstab
+    echo "Creating swapfile."
+    truncate -s 0 /swap/swapfile
+    chattr +C /swap/swapfile
+    btrfs property set /swap/swapfile compression none
+    dd if=/dev/zero of=/swap/swapfile bs=1M count=8192 status=progress
+    chmod 600 /swap/swapfile
+    mkswap /swap/swapfile
+    swapon /swap/swapfile
+    echo "/swap/swapfile none swap defaults 0 0" >> /etc/fstab
 
     # Setting up timezone.
     echo "Setting up timezone."
@@ -278,12 +278,12 @@ mkdir /etc/pacman.d/hooks
 echo '[Trigger]\nOperation = Upgrade\nOperation = Install\nOperation = Remove\nType = Path\nTarget = usr/lib/modules/*/vmlinuz\n\n[Action]\nDepends = rsync\nDescription = Backing up /boot...\nWhen = PreTransaction\nExec = /usr/bin/rsync -a --delete /boot /.bootbackup' | tee -a /etc/pacman.d/hooks/50-bootbackup.hook > /dev/null
 
 # ZRAM configuration.
-print "Configuring ZRAM."
-cat > /mnt/etc/systemd/zram-generator.conf <<EOF
-[zram0]
-zram-fraction = 1
-max-zram-size = 8192
-EOF
+#print "Configuring ZRAM."
+#cat > /mnt/etc/systemd/zram-generator.conf <<EOF
+#[zram0]
+#zram-fraction = 1
+#max-zram-size = 8192
+#EOF
 
 # Monitor and LightDM setup.
 echo '#!/bin/bash\nnvidia-settings --assign CurrentMetaMode="DPY-2: 2560x1440_144 @2560x1440 +440+0 {ViewPortIn=2560x1440, ViewPortOut=2560x1440+0+0, ForceCompositionPipeline=On, ForceFullCompositionPipeline=On}, DPY-3: 3440x1440_100 @3440x1440 +0+1440 {ViewPortIn=3440x1440, ViewPortOut=3440x1440+0+0, ForceCompositionPipeline=On, ForceFullCompositionPipeline=On}"' | tee -a /etc/lightdm/monitor_setup.sh > /dev/null
@@ -317,7 +317,7 @@ systemctl enable btrfs-scrub@-.timer
 
 # Enabling various services.
 print "Enabling services."
-for service in NetworkManager fstrim.timer bluetooth systemd-timesyncd lightdm reflector.timer snapper-timeline.timer snapper-cleanup.timer btrfs-scrub@-.timer grub-btrfs.path systemd-oomd
+for service in NetworkManager fstrim.timer bluetooth systemd-timesyncd lightdm reflector.timer snapper-timeline.timer snapper-cleanup.timer btrfs-scrub@-.timer grub-btrfs.path
 do
     systemctl enable "$service" --root=/mnt &>/dev/null
 done
