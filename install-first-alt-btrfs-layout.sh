@@ -99,7 +99,7 @@ btrfs su cr /mnt/@/home &>/dev/null
 btrfs su cr /mnt/@/root &>/dev/null
 btrfs su cr /mnt/@/srv &>/dev/null
 btrfs su cr /mnt/@/var &>/dev/null
-btrfs su cr /mnt/@/swap &>/dev/null
+#btrfs su cr /mnt/@/swap &>/dev/null
 chattr +C /mnt/@/boot
 chattr +C /mnt/@/srv
 chattr +C /mnt/@/var
@@ -124,14 +124,15 @@ chmod 600 /mnt/@/.snapshots/1/info.xml
 umount /mnt
 echo "Mounting the newly created subvolumes."
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1 $BTRFS /mnt
-mkdir -p /mnt/{boot,root,home,.snapshots,srv,var,swap}
+mkdir -p /mnt/{boot,root,home,.snapshots,srv,var}
+#mkdir -p /mnt/{boot,root,home,.snapshots,srv,var,swap}
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@/boot $BTRFS /mnt/boot
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@/root $BTRFS /mnt/root 
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@/home $BTRFS /mnt/home
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@/.snapshots $BTRFS /mnt/.snapshots
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@/srv $BTRFS /mnt/srv
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,nodatacow,subvol=@/var $BTRFS /mnt/var
-mount -o defaults,noatime,subvol=@/swap $BTRFS /mnt/swap
+#mount -o defaults,noatime,subvol=@/swap $BTRFS /mnt/swap
 
 mkdir -p /mnt/boot/efi
 mount $ESP /mnt/boot/efi
@@ -202,15 +203,15 @@ EOF
 arch-chroot /mnt /bin/bash -e <<EOF
     
     # Create swapfile, set No_COW, add to fstab
-    echo "Creating swapfile."
-    truncate -s 0 /swap/swapfile
-    chattr +C /swap/swapfile
-    btrfs property set /swap/swapfile compression none
-    dd if=/dev/zero of=/swap/swapfile bs=1M count=8192 status=progress
-    chmod 600 /swap/swapfile
-    mkswap /swap/swapfile
-    swapon /swap/swapfile
-    echo "/swap/swapfile none swap defaults 0 0" >> /etc/fstab
+    #echo "Creating swapfile."
+    #truncate -s 0 /swap/swapfile
+    #chattr +C /swap/swapfile
+    #btrfs property set /swap/swapfile compression none
+    #dd if=/dev/zero of=/swap/swapfile bs=1M count=8192 status=progress
+    #chmod 600 /swap/swapfile
+    #mkswap /swap/swapfile
+    #swapon /swap/swapfile
+    #echo "/swap/swapfile none swap defaults 0 0" >> /etc/fstab
 
     # Setting up timezone.
     echo "Setting up timezone."
