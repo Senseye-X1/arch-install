@@ -280,7 +280,8 @@ echo '[Trigger]\nOperation = Upgrade\nOperation = Install\nOperation = Remove\nT
 print "Configuring ZRAM."
 cat > /mnt/etc/systemd/zram-generator.conf <<EOF
 [zram0]
-zram-size = min(ram, 8192)
+zram-fraction = 1
+max-zram-size = 8192
 EOF
 
 # Monitor and LightDM setup.
@@ -315,7 +316,7 @@ systemctl enable btrfs-scrub@-.timer
 
 # Enabling various services.
 print "Enabling Reflector, automatic snapshots, BTRFS scrubbing and systemd-oomd."
-for service in NetworkManager fstrim.timer bluetooth firewalld systemd-timesyncd lightdm reflector.timer snapper-timeline.timer snapper-cleanup.timer btrfs-scrub@-.timer grub-btrfs.path
+for service in NetworkManager fstrim.timer bluetooth firewalld systemd-timesyncd lightdm reflector.timer snapper-timeline.timer snapper-cleanup.timer btrfs-scrub@-.timer grub-btrfs.path systemd-oomd
 do
     systemctl enable "$service" --root=/mnt &>/dev/null
 done
