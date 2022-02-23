@@ -40,7 +40,7 @@ while true; do
 done
 }
 
-Selecting the target for the installation.
+# Selecting the target for the installation.
 PS3="Select the disk where Arch Linux is going to be installed: "
 select ENTRY in $(lsblk -dpnoNAME|grep -P "/dev/sd|nvme|vd");
 do
