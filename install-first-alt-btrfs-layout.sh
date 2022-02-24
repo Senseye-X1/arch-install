@@ -6,13 +6,9 @@ pacman -S --noconfirm curl
 hostname="arch"
 timezone="Europe/Stockholm"
 keymap="sv-latin1"
-#DISK="/dev/nvme1n1"
-#EFI="/dev/nvme1n1p1"
-#BTRFS="/dev/nvme1n1p2"
-
+locale="en_US"
 #username="andreas"
 #password="password"
-locale="en_US"
 
 # Checking the microcode to install.
 CPU=$(grep vendor_id /proc/cpuinfo)
@@ -168,7 +164,6 @@ EOF
 #read -r -p "Please insert the locale you use in this format (xx_XX): " locale
 echo "$locale.UTF-8 UTF-8"  > /mnt/etc/locale.gen
 echo "LANG=$locale.UTF-8" > /mnt/etc/locale.conf
-
 echo "KEYMAP=$keymap" > /mnt/etc/vconsole.conf
 
 # Configuring /etc/mkinitcpio.conf
@@ -285,11 +280,11 @@ echo '[Trigger]\nOperation = Upgrade\nOperation = Install\nOperation = Remove\nT
 # Monitor and LightDM setup.
 echo '#!/bin/bash\nnvidia-settings --assign CurrentMetaMode="DPY-2: 2560x1440_144 @2560x1440 +440+0 {ViewPortIn=2560x1440, ViewPortOut=2560x1440+0+0, ForceCompositionPipeline=On, ForceFullCompositionPipeline=On}, DPY-3: 3440x1440_100 @3440x1440 +0+1440 {ViewPortIn=3440x1440, ViewPortOut=3440x1440+0+0, ForceCompositionPipeline=On, ForceFullCompositionPipeline=On}"' | tee -a /etc/lightdm/monitor_setup.sh > /dev/null
 chmod +x /etc/lightdm/monitor_setup.sh
-sed -i 's/#greeter-setup-script=.*/greeter-setup-script=\/etc\/lightdm\/monitor_setup.sh/' /etc/lightdm/lightdm.conf
-echo '[greeter]\ncursor-theme-name = Adwaita\ncursor-theme-size = 16\ntheme-name = Arc-Dark\nicon-theme-name = Adwaita\nfont-name = Roboto 10\nindicators = ~spacer;~clock;~spacer;~language;~session;~a11y;~power' | tee /etc/lightdm/lightdm-gtk-greeter.conf > /dev/null
+sed -i 's/#greeter-setup-script=.*/greeter-setup-script=\/etc\/lightdm\/monitor_setup.sh/' /mnt/etc/lightdm/lightdm.conf
+echo '[greeter]\ncursor-theme-name = Adwaita\ncursor-theme-size = 16\ntheme-name = Arc-Dark\nicon-theme-name = Adwaita\nfont-name = Roboto 10\nindicators = ~spacer;~clock;~spacer;~language;~session;~a11y;~power' | tee /mnt/etc/lightdm/lightdm-gtk-greeter.conf > /dev/null
 
 # Disallow Ctrl+Alt+Fn switching for added security
-echo 'Section "ServerFlags"\n    Option "DontVTSwitch" "True"\nEndSection' | tee -a /etc/X11/xorg.conf > /dev/null
+echo 'Section "ServerFlags"\n    Option "DontVTSwitch" "True"\nEndSection' | tee -a /mnt/etc/X11/xorg.conf > /dev/null
 
 # Firewall config
 #firewall-cmd --add-port=1025-65535/tcp --permanent
@@ -320,10 +315,10 @@ do
 done
 
 # Fix Keychron Bluetooth Keyboard Connection
-sed -i 's/#AutoEnable=false/AutoEnable=true/' /etc/bluetooth/main.conf
-sed -i 's/#FastConnectable.*/FastConnectable = true/' /etc/bluetooth/main.conf
-sed -i 's/#\(ReconnectAttempts=.*\)/\1/' /etc/bluetooth/main.conf
-sed -i 's/#\(ReconnectIntervals=.*\)/\1/' /etc/bluetooth/main.conf
+sed -i 's/#AutoEnable=false/AutoEnable=true/' /mnt/etc/bluetooth/main.conf
+sed -i 's/#FastConnectable.*/FastConnectable = true/' /mnt/etc/bluetooth/main.conf
+sed -i 's/#\(ReconnectAttempts=.*\)/\1/' /mnt/etc/bluetooth/main.conf
+sed -i 's/#\(ReconnectIntervals=.*\)/\1/' /mnt/etc/bluetooth/main.conf
 
 #useradd -m $username
 #echo "$username:$password" | chpasswd
@@ -332,6 +327,6 @@ sed -i 's/#\(ReconnectIntervals=.*\)/\1/' /etc/bluetooth/main.conf
 # Fetching .configs from git
 git clone https://github.com/andnix/arch_install.git
 #chmod +x /arch_install/install-as-root.sh
-chmod +x /arch_install/install-as-user.sh
+chmod +x /mnt/arch_install/install-as-user.sh
 
 print "Exit, umount -a, reboot.\nAfter reboot login as normal user and run install-as-user.sh."
