@@ -268,7 +268,7 @@ fi
 #print "Configuring /boot backup when pacman transactions are made."
 mkdir /mnt/etc/pacman.d/hooks
 #echo '[Trigger]\nOperation = Upgrade\nOperation = Install\nOperation = Remove\nType = Path\nTarget = usr/lib/modules/*/vmlinuz\n\n[Action]\nDepends = rsync\nDescription = Backing up /boot...\nWhen = PreTransaction\nExec = /usr/bin/rsync -a --delete /boot /.bootbackup' | tee -a /etc/pacman.d/hooks/50-bootbackup.hook > /dev/null
-cat << EOF >> /mnt/etc/pacman.d/hooks/50-bootbackup.hook
+cat << EOF > /mnt/etc/pacman.d/hooks/50-bootbackup.hook
 [Trigger]
 Operation = Upgrade
 Operation = Install
