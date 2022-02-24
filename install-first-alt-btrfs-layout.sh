@@ -79,7 +79,6 @@ mkfs.fat -F 32 $ESP &>/dev/null
 echo "Formatting the root partition as BTRFS."
 mkfs.btrfs $BTRFS &>/dev/null
 mount $BTRFS /mnt
-loadkeys $keymap
 
 # Working Snapper rollback.
 echo "Creating BTRFS subvolumes."
@@ -342,5 +341,7 @@ sed -i 's/#\(ReconnectIntervals=.*\)/\1/' /mnt/etc/bluetooth/main.conf
 #git clone https://github.com/Senseye-X1/arch_install.git
 #chmod +x /mnt/arch_install/install-as-root.sh
 #chmod +x /mnt/arch_install/install-as-user.sh
+
+loadkeys $keymap
 
 print "Exit, umount -a, reboot.\nAfter reboot login as normal user and run install-as-user.sh."
