@@ -170,7 +170,7 @@ echo "Configuring /etc/mkinitcpio for BTRFS and NVIDIA
 sed -i 's/#COMPRESSION=.*/COMPRESSION="zstd"/g' /mnt/etc/mkinitcpio.conf
 sed -i 's/^MODULES=.*/MODULES=\(btrfs nvidia nvidia_modeset nvidia_uvm nvidia_drm\)/' /mnt/etc/mkinitcpio.conf
 # If using LVM:
-#sed -i 's/\(^HOOKS.*block \)\(filesystems.*\)/\1lvm2 \2/' /etc/mkinitcpio.conf
+#sed -i 's/\(^HOOKS.*block \)\(filesystems.*\)/\1lvm2 \2/' /mnt/etc/mkinitcpio.conf
 
 cat > /mnt/etc/pacman.d/hooks/nvidia.hook <<EOF
 [Trigger]
@@ -217,7 +217,7 @@ arch-chroot /mnt /bin/bash -e <<EOF
     
     # Generating a new initramfs.
     echo "Creating a new initramfs."
-    chmod 600 /boot/initramfs-linux* &>/dev/null
+    #chmod 600 /boot/initramfs-linux* &>/dev/null
     mkinitcpio -P &>/dev/null
 
     # Snapper configuration
