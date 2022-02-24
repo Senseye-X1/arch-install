@@ -325,8 +325,8 @@ sed -i 's/#\(ReconnectIntervals=.*\)/\1/' /mnt/etc/bluetooth/main.conf
 #echo "$username ALL=(ALL) ALL" | tee -a /etc/sudoers.d/$username > /dev/null
 
 # Fetching .configs from git
-#git clone https://github.com/andnix/arch_install.git
-#chmod +x /arch_install/install-as-root.sh
+#git clone https://github.com/Senseye-X1/arch_install.git
+#chmod +x /mnt/arch_install/install-as-root.sh
 #chmod +x /mnt/arch_install/install-as-user.sh
 
 print "Exit, umount -a, reboot.\nAfter reboot login as normal user and run install-as-user.sh."
