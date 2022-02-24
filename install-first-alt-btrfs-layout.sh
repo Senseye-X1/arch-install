@@ -68,8 +68,8 @@ parted -s "$DISK" \
     set 1 esp on \
     mkpart archroot 513MiB 100% \
 
-ESP="/dev/disk/by-partlabel/ESP"
-BTRFS="/dev/disk/by-partlabel/archroot"
+ESP=$(findfs LABEL=ESP)
+BTRFS=$(findfs LABEL=archroot)
 
 # Informing the Kernel of the changes.
 echo "Informing the Kernel about the disk changes."
@@ -84,9 +84,6 @@ echo "Formatting the root partition as BTRFS."
 mkfs.btrfs $BTRFS &>/dev/null
 mount $BTRFS /mnt
 loadkeys $keymap
-#timedatectl set-ntp true
-#mkfs.btrfs -f /dev/mapper/linux--vg-arch
-#mount /dev/mapper/linux--vg-arch /mnt
 
 # Working Snapper rollback.
 echo "Creating BTRFS subvolumes."
