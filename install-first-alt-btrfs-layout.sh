@@ -323,7 +323,7 @@ systemctl enable btrfs-scrub@-.timer
 
 # Enabling various services.
 print "Enabling services."
-for service in NetworkManager fstrim.timer bluetooth systemd-timesyncd lightdm reflector.timer snapper-timeline.timer snapper-cleanup.timer btrfs-scrub@-.timer grub-btrfs.path
+for service in NetworkManager fstrim.timer bluetooth systemd-timesyncd lightdm reflector.timer snapper-timeline.timer snapper-cleanup.timer btrfs-scrub@-.timer btrfs-scrub@home.timer btrfs-scrub@var.timer btrfs-scrub@\\x2esnapshots.timer grub-btrfs.path
 do
     systemctl enable "$service" --root=/mnt &>/dev/null
 done
