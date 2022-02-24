@@ -62,7 +62,7 @@ parted -s "$DISK" \
     mklabel gpt \
     mkpart ESP fat32 1MiB 512MiB \
     set 1 esp on \
-    mkpart archroot 513MiB 100% \
+    mkpart archroot 512MiB 100% \
 
 ESP=$(findfs LABEL=ESP)
 BTRFS=$(findfs LABEL=archroot)
