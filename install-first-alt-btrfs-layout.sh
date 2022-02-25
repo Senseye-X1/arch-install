@@ -3,12 +3,7 @@
 pacman -Syu
 pacman -S --noconfirm curl
 
-#hostname="arch"
 timezone="Europe/Stockholm"
-#keymap="sv-latin1"
-#locale="en_US"
-#username="andreas"
-#password="password"
 
 # Microcode detector (function).
 microcode_detector () {
@@ -253,7 +248,7 @@ locale_selector
 keyboard_selector
 
 # Configuring /etc/mkinitcpio.conf
-echo "Configuring /etc/mkinitcpio for BTRFS and NVIDIA
+echo "Configuring /etc/mkinitcpio for BTRFS and NVIDIA."
 #sed -i 's/#COMPRESSION=.*/COMPRESSION="zstd"/g' /mnt/etc/mkinitcpio.conf
 sed -i 's/^MODULES=.*/MODULES=\(btrfs nvidia nvidia_modeset nvidia_uvm nvidia_drm\)/' /mnt/etc/mkinitcpio.conf
 # If using LVM add lvm2 to pacstrap and uncomment below.
