@@ -40,6 +40,16 @@ while true; do
 done
 }
 
+# Setting up the hostname (function).
+hostname_selector () {
+    read -r -p "Please enter the hostname: " hostname
+    if [ -z "$hostname" ]; then
+        print "You need to enter a hostname in order to continue."
+        hostname_selector
+    fi
+    echo "$hostname" > /mnt/etc/hostname
+}
+
 # Selecting the target for the installation.
 PS3="Select the disk where Arch Linux is going to be installed: "
 select ENTRY in $(lsblk -dpnoNAME|grep -P "/dev/sd|nvme|vd");
