@@ -282,6 +282,21 @@ When = PreTransaction
 Exec = /usr/bin/rsync -a --delete /boot /.bootbackup
 EOF
 
+cat << EOF > /mnt/etc/pacman.d/hooks/06-postbootbackup.hook
+[Trigger]
+Operation = Upgrade
+Operation = Install
+Operation = Remove
+Type = Path
+Target = usr/lib/modules/*/vmlinuz
+
+[Action]
+Depends = rsync
+Description = Backing up /boot...
+When = PostTransaction
+Exec = /usr/bin/rsync -a --delete /boot /.bootbackup
+EOF
+
 # ZRAM configuration.
 #print "Configuring ZRAM."
 #cat > /mnt/etc/systemd/zram-generator.conf <<EOF
