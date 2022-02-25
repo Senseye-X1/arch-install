@@ -436,13 +436,9 @@ sed -i 's/#FastConnectable.*/FastConnectable = true/' /mnt/etc/bluetooth/main.co
 sed -i 's/#\(ReconnectAttempts=.*\)/\1/' /mnt/etc/bluetooth/main.conf
 sed -i 's/#\(ReconnectIntervals=.*\)/\1/' /mnt/etc/bluetooth/main.conf
 
-#useradd -m $username
-#echo "$username:$password" | chpasswd
-#echo "$username ALL=(ALL) ALL" | tee -a /etc/sudoers.d/$username > /dev/null
-
 # Fetching .configs from git
 #git clone https://github.com/Senseye-X1/arch_install.git
 #chmod +x /mnt/arch_install/install-as-root.sh
 #chmod +x /mnt/arch_install/install-as-user.sh
 
-print "umount -a\nreboot\nAfter reboot login as normal user and run install-as-user.sh."
+print "umount -a\nreboot\n\nAfter reboot login as normal user and run install-as-user.sh."
