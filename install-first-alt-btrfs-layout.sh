@@ -416,4 +416,4 @@ sed -i 's/#\(ReconnectIntervals=.*\)/\1/' /mnt/etc/bluetooth/main.conf
 
 loadkeys $keymap
 
-print "Exit, umount -a, reboot.\nAfter reboot login as normal user and run install-as-user.sh."
+print "umount -a\nreboot\nAfter reboot login as normal user and run install-as-user.sh."
