@@ -67,11 +67,11 @@ keyboard_selector () {
 }
 
 # Selecting the target for the installation.
-PS3="Select the disk where Arch Linux is going to be installed: "
+PS3="Please select the disk where Arch Linux is going to be installed: "
 select ENTRY in $(lsblk -dpnoNAME|grep -P "/dev/sd|nvme|vd");
 do
     DISK=$ENTRY
-    echo "Installing Arch Linux on $DISK."
+    print "Installing Arch Linux on $DISK."
     break
 done
 
@@ -79,30 +79,31 @@ done
 read -r -p "This will delete the current partition table on $DISK. Do you agree [y/N]? " response
 response=${response,,}
 if [[ "$response" =~ ^(yes|y)$ ]]; then
+    print "Wiping $DISK."
     wipefs -af "$DISK" &>/dev/null
     sgdisk -Zo "$DISK" &>/dev/null
 else
-    echo "Quitting."
+    print "Quitting."
     exit
 fi
 
 # Creating a new partition scheme.
-echo "Creating new partition scheme on $DISK."
+print "Creating the partitions on $DISK."
 parted -s "$DISK" \
     mklabel gpt \
-    mkpart ESP fat32 1MiB 512MiB \
+    mkpart ESP fat32 1MiB 513MiB \
     set 1 esp on \
-    mkpart archroot 512MiB 100% \
+    mkpart archroot 513MiB 100% \
 
 ESP=$(findfs LABEL=ESP)
 BTRFS=$(findfs LABEL=archroot)
 
 # Informing the Kernel of the changes.
-echo "Informing the Kernel about the disk changes."
+print "Informing the Kernel about the disk changes."
 partprobe "$DISK"
 
 # Formatting the ESP as FAT32.
-echo "Formatting the EFI Partition as FAT32."
+print "Formatting the EFI Partition as FAT32."
 mkfs.fat -F 32 $ESP &>/dev/null
 
 # Formatting the root partition as BTRFS.
