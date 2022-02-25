@@ -80,11 +80,11 @@ echo "Formatting the root partition as BTRFS."
 mkfs.btrfs $BTRFS &>/dev/null
 mount $BTRFS /mnt
 
+### Creating BTRFS subvolumes with Snapper rollback nested layout.
 # Working Snapper rollback.
 echo "Creating BTRFS subvolumes."
 btrfs su cr /mnt/@ &>/dev/null
 btrfs su cr /mnt/@/.snapshots &>/dev/null
-mkdir -p /mnt/@/.snapshots/1 &>/dev/null
 btrfs su cr /mnt/@/.snapshots/1/snapshot &>/dev/null
 btrfs su cr /mnt/@/boot &>/dev/null
 btrfs su cr /mnt/@/home &>/dev/null
@@ -92,9 +92,14 @@ btrfs su cr /mnt/@/root &>/dev/null
 btrfs su cr /mnt/@/srv &>/dev/null
 btrfs su cr /mnt/@/var &>/dev/null
 btrfs su cr /mnt/@/swap &>/dev/null
-chattr +C /mnt/@/boot
-chattr +C /mnt/@/srv
-chattr +C /mnt/@/var
+
+#print "Creating BTRFS subvolumes."
+#for volume in @ @/.snapshots @/.snapshots/1/snapshot @boot @home @root @srv @var @swap
+#do
+#    btrfs su cr /mnt/$volume
+#done
+
+mkdir -p /mnt/@/.snapshots/1 &>/dev/null
 
 #Set the default BTRFS Subvol to Snapshot 1 before pacstrapping
 btrfs subvolume set-default "$(btrfs subvolume list /mnt | grep "@/.snapshots/1/snapshot" | grep -oP '(?<=ID )[0-9]+')" /mnt
@@ -125,9 +130,35 @@ mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@/.snap
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@/srv $BTRFS /mnt/srv
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,nodatacow,subvol=@/var $BTRFS /mnt/var
 mount -o defaults,noatime,subvol=@/swap $BTRFS /mnt/swap
-
+chattr +C /mnt/@/boot
+chattr +C /mnt/@/srv
+chattr +C /mnt/@/var
 mkdir -p /mnt/boot/efi
 mount $ESP /mnt/boot/efi
+### End creating BTRFS subvolumes with Snapper rollback nested layout.
+
+### Creating BTRFS subvolumes for Snapper manual flat layout.
+#print "Creating BTRFS subvolumes."
+#for volume in @ @home @root @srv @snapshots @var_log @var_pkgs @swap
+#do
+#    btrfs su cr /mnt/$volume
+#done
+
+# Mounting the newly created subvolumes.
+umount /mnt
+print "Mounting the newly created subvolumes."
+mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@ $BTRFS /mnt
+mkdir -p /mnt/{home,root,srv,.snapshots,/var/log,/var/cache/pacman/pkg,boot,swap}
+mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@home $BTRFS /mnt/home
+mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@root $BTRFS /mnt/root
+mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@srv $BTRFS /mnt/srv
+mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@snapshots $BTRFS /mnt/.snapshots
+mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@var_log $BTRFS /mnt/var/log
+mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@var_pkgs $BTRFS /mnt/var/cache/pacman/pkg
+mount -o defaults,noatime,subvol=@/swap $BTRFS /mnt/swap
+chattr +C /mnt/var/log
+mount $ESP /mnt/boot/
+### End creating BTRFS subvolumes for Snapper manual flat layout.
 
 pacstrap /mnt base linux linux-firmware ${microcode} btrfs-progs git nano alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto udiskie accountsservice archlinux-wallpaper bspwm dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-gtk-greeter lightdm-gtk-greeter-settings lxappearance-gtk3 picom rofi sxhkd xautolock xorg zsh zsh-autosuggestions zsh-completions reflector nvidia nvidia-settings
 
@@ -267,7 +298,7 @@ fi
 #print "Configuring /boot backup when pacman transactions are made."
 mkdir /mnt/etc/pacman.d/hooks
 #echo '[Trigger]\nOperation = Upgrade\nOperation = Install\nOperation = Remove\nType = Path\nTarget = usr/lib/modules/*/vmlinuz\n\n[Action]\nDepends = rsync\nDescription = Backing up /boot...\nWhen = PreTransaction\nExec = /usr/bin/rsync -a --delete /boot /.bootbackup' | tee -a /etc/pacman.d/hooks/04-bootbackup.hook > /dev/null
-cat << EOF > /mnt/etc/pacman.d/hooks/04-bootbackup.hook
+cat > /mnt/etc/pacman.d/hooks/04-bootbackup.hook <<EOF
 [Trigger]
 Operation = Upgrade
 Operation = Install
@@ -282,7 +313,7 @@ When = PreTransaction
 Exec = /usr/bin/rsync -a --delete /boot /.bootbackup
 EOF
 
-cat << EOF > /mnt/etc/pacman.d/hooks/06-postbootbackup.hook
+cat > /mnt/etc/pacman.d/hooks/06-postbootbackup.hook <<EOF
 [Trigger]
 Operation = Upgrade
 Operation = Install
