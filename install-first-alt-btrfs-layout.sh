@@ -410,7 +410,11 @@ indicators = ~spacer;~clock;~spacer;~language;~session;~a11y;~power
 EOF
 
 # Disallow Ctrl+Alt+Fn switching for added security
-echo 'Section "ServerFlags"\n    Option "DontVTSwitch" "True"\nEndSection' | tee -a /mnt/etc/X11/xorg.conf > /dev/null
+cat >> /mnt/etc/X11/xorg.conf <<EOF
+Section "ServerFlags"
+    Option "DontVTSwitch" "True"
+EndSection
+EOF
 
 # Firewall config
 #firewall-cmd --add-port=1025-65535/tcp --permanent
