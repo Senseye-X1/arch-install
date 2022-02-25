@@ -259,28 +259,10 @@ keyboard_selector
 
 # Configuring /etc/mkinitcpio.conf
 echo "Configuring /etc/mkinitcpio for BTRFS and NVIDIA
-sed -i 's/#COMPRESSION=.*/COMPRESSION="zstd"/g' /mnt/etc/mkinitcpio.conf
+#sed -i 's/#COMPRESSION=.*/COMPRESSION="zstd"/g' /mnt/etc/mkinitcpio.conf
 sed -i 's/^MODULES=.*/MODULES=\(btrfs nvidia nvidia_modeset nvidia_uvm nvidia_drm\)/' /mnt/etc/mkinitcpio.conf
-# If using LVM:
+# If using LVM add lvm2 to pacstrap and uncomment below.
 #sed -i 's/\(^HOOKS.*block \)\(filesystems.*\)/\1lvm2 \2/' /mnt/etc/mkinitcpio.conf
-
-cat > /mnt/etc/pacman.d/hooks/nvidia.hook <<EOF
-[Trigger]
-Operation=Install
-Operation=Upgrade
-Operation=Remove
-Type=Package
-Target=nvidia
-Target=linux
-# Change the linux part above and in the Exec line if a different kernel is used
-
-[Action]
-Description=Update Nvidia module in initcpio
-Depends=mkinitcpio
-When=PostTransaction
-NeedsTargets
-Exec=/bin/sh -c 'while read -r trg; do case $trg in linux) exit 0; esac; done; /usr/bin/mkinitcpio -P'
-EOF
 
 # Configuring the system.    
 arch-chroot /mnt /bin/bash -e <<EOF
@@ -355,9 +337,29 @@ if [ -n "$username" ]; then
     echo "$username:$password" | arch-chroot /mnt chpasswd
 fi
 
-# Boot backup hook.
+# Creating pacman hooks.
+mkdir -p /mnt/etc/pacman.d/hooks
+
+# Update initramfs after an NVIDIA driver upgrade.
+cat > /mnt/etc/pacman.d/hooks/nvidia.hook <<EOF
+[Trigger]
+Operation=Install
+Operation=Upgrade
+Operation=Remove
+Type=Package
+Target=nvidia
+Target=linux
+
+[Action]
+Description=Update Nvidia module in initcpio
+Depends=mkinitcpio
+When=PostTransaction
+NeedsTargets
+Exec=/bin/sh -c 'while read -r trg; do case $trg in linux) exit 0; esac; done; /usr/bin/mkinitcpio -P'
+EOF
+
+# Pre-snapshot boot backup hook.
 #print "Configuring /boot backup when pacman transactions are made."
-mkdir /mnt/etc/pacman.d/hooks
 #echo '[Trigger]\nOperation = Upgrade\nOperation = Install\nOperation = Remove\nType = Path\nTarget = usr/lib/modules/*/vmlinuz\n\n[Action]\nDepends = rsync\nDescription = Backing up /boot...\nWhen = PreTransaction\nExec = /usr/bin/rsync -a --delete /boot /.bootbackup' | tee -a /etc/pacman.d/hooks/04-bootbackup.hook > /dev/null
 cat > /mnt/etc/pacman.d/hooks/04-bootbackup.hook <<EOF
 [Trigger]
@@ -374,6 +376,7 @@ When = PreTransaction
 Exec = /usr/bin/rsync -a --delete /boot /.bootbackup
 EOF
 
+# Post-snapshot boot backup hook.
 cat > /mnt/etc/pacman.d/hooks/06-postbootbackup.hook <<EOF
 [Trigger]
 Operation = Upgrade
@@ -398,7 +401,11 @@ EOF
 #EOF
 
 # Monitor and LightDM setup.
-echo '#!/bin/bash\nnvidia-settings --assign CurrentMetaMode="DPY-2: 2560x1440_144 @2560x1440 +440+0 {ViewPortIn=2560x1440, ViewPortOut=2560x1440+0+0, ForceCompositionPipeline=On, ForceFullCompositionPipeline=On}, DPY-3: 3440x1440_100 @3440x1440 +0+1440 {ViewPortIn=3440x1440, ViewPortOut=3440x1440+0+0, ForceCompositionPipeline=On, ForceFullCompositionPipeline=On}"' | tee -a /etc/lightdm/monitor_setup.sh > /dev/null
+cat > /mnt/etc/lightdm/monitor_setup.sh <<EOF
+#!/bin/bash
+nvidia-settings --assign CurrentMetaMode="DPY-2: 2560x1440_144 @2560x1440 +440+0 {ViewPortIn=2560x1440, ViewPortOut=2560x1440+0+0, ForceCompositionPipeline=On, ForceFullCompositionPipeline=On}, DPY-3: 3440x1440_100 @3440x1440 +0+1440 {ViewPortIn=3440x1440, ViewPortOut=3440x1440+0+0, ForceCompositionPipeline=On, ForceFullCompositionPipeline=On}"
+EOF
+
 chmod +x /mnt/etc/lightdm/monitor_setup.sh
 sed -i 's/#greeter-setup-script=.*/greeter-setup-script=\/etc\/lightdm\/monitor_setup.sh/' /mnt/etc/lightdm/lightdm.conf
 
