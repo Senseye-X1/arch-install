@@ -5,8 +5,8 @@ pacman -S --noconfirm curl
 
 #hostname="arch"
 timezone="Europe/Stockholm"
-keymap="sv-latin1"
-locale="en_US"
+#keymap="sv-latin1"
+#locale="en_US"
 #username="andreas"
 #password="password"
 
@@ -48,6 +48,27 @@ hostname_selector () {
         hostname_selector
     fi
     echo "$hostname" > /mnt/etc/hostname
+}
+
+# Setting up the locale (function).
+locale_selector () {
+    read -r -p "Please insert the locale you use (format: xx_XX or enter empty to use en_US): " locale
+    if [ -z "$locale" ]; then
+        print "en_US will be used as default locale."
+        locale="en_US"
+    fi
+    echo "$locale.UTF-8 UTF-8"  > /mnt/etc/locale.gen
+    echo "LANG=$locale.UTF-8" > /mnt/etc/locale.conf
+}
+
+# Setting up the keyboard layout (function).
+keyboard_selector () {
+    read -r -p "Please insert the keyboard layout you use (enter empty to use sv-latin1 keyboard layout): " kblayout
+    if [ -z "$kblayout" ]; then
+        print "sv-latin1 keyboard layout will be used by default."
+        kblayout="sv-latin1"
+    fi
+    echo "KEYMAP=$kblayout" > /mnt/etc/vconsole.conf
 }
 
 # Selecting the target for the installation.
@@ -95,17 +116,16 @@ mkfs.btrfs $BTRFS &>/dev/null
 mount $BTRFS /mnt
 
 ### Creating BTRFS subvolumes with Snapper rollback nested layout.
-# Working Snapper rollback.
-echo "Creating BTRFS subvolumes."
-btrfs su cr /mnt/@ &>/dev/null
-btrfs su cr /mnt/@/.snapshots &>/dev/null
-btrfs su cr /mnt/@/.snapshots/1/snapshot &>/dev/null
-btrfs su cr /mnt/@/boot &>/dev/null
-btrfs su cr /mnt/@/home &>/dev/null
-btrfs su cr /mnt/@/root &>/dev/null
-btrfs su cr /mnt/@/srv &>/dev/null
-btrfs su cr /mnt/@/var &>/dev/null
-btrfs su cr /mnt/@/swap &>/dev/null
+#echo "Creating BTRFS subvolumes."
+#btrfs su cr /mnt/@ &>/dev/null
+#btrfs su cr /mnt/@/.snapshots &>/dev/null
+#btrfs su cr /mnt/@/.snapshots/1/snapshot &>/dev/null
+#btrfs su cr /mnt/@/boot &>/dev/null
+#btrfs su cr /mnt/@/home &>/dev/null
+#btrfs su cr /mnt/@/root &>/dev/null
+#btrfs su cr /mnt/@/srv &>/dev/null
+#btrfs su cr /mnt/@/var &>/dev/null
+#btrfs su cr /mnt/@/swap &>/dev/null
 
 #print "Creating BTRFS subvolumes."
 #for volume in @ @/.snapshots @/.snapshots/1/snapshot @boot @home @root @srv @var @swap
@@ -113,62 +133,62 @@ btrfs su cr /mnt/@/swap &>/dev/null
 #    btrfs su cr /mnt/$volume
 #done
 
-mkdir -p /mnt/@/.snapshots/1 &>/dev/null
+#mkdir -p /mnt/@/.snapshots/1 &>/dev/null
 
-#Set the default BTRFS Subvol to Snapshot 1 before pacstrapping
-btrfs subvolume set-default "$(btrfs subvolume list /mnt | grep "@/.snapshots/1/snapshot" | grep -oP '(?<=ID )[0-9]+')" /mnt
+## Set the default BTRFS Subvol to Snapshot 1 before pacstrapping
+#btrfs subvolume set-default "$(btrfs subvolume list /mnt | grep "@/.snapshots/1/snapshot" | grep -oP '(?<=ID )[0-9]+')" /mnt
 
-cat << EOF >> /mnt/@/.snapshots/1/info.xml
-<?xml version="1.0"?>
-<snapshot>
-  <type>single</type>
-  <num>1</num>
-  <date>1999-03-31 0:00:00</date>
-  <description>First Root Filesystem</description>
-  <cleanup>number</cleanup>
-</snapshot>
-EOF
+#cat << EOF >> /mnt/@/.snapshots/1/info.xml
+#<?xml version="1.0"?>
+#<snapshot>
+#  <type>single</type>
+#  <num>1</num>
+#  <date>1999-03-31 0:00:00</date>
+#  <description>First Root Filesystem</description>
+#  <cleanup>number</cleanup>
+#</snapshot>
+#EOF
 
-chmod 600 /mnt/@/.snapshots/1/info.xml
+#chmod 600 /mnt/@/.snapshots/1/info.xml
 
-# Mounting the newly created subvolumes.
-umount /mnt
-echo "Mounting the newly created subvolumes."
-mount -o ssd,noatime,space_cache=v2,compress=zstd:1 $BTRFS /mnt
-#mkdir -p /mnt/{boot,root,home,.snapshots,srv,var}
-mkdir -p /mnt/{boot,root,home,.snapshots,srv,var,swap}
-mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@/boot $BTRFS /mnt/boot
-mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@/root $BTRFS /mnt/root 
-mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@/home $BTRFS /mnt/home
-mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@/.snapshots $BTRFS /mnt/.snapshots
-mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@/srv $BTRFS /mnt/srv
-mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,nodatacow,subvol=@/var $BTRFS /mnt/var
-mount -o defaults,noatime,subvol=@/swap $BTRFS /mnt/swap
-chattr +C /mnt/@/boot
-chattr +C /mnt/@/srv
-chattr +C /mnt/@/var
-mkdir -p /mnt/boot/efi
-mount $ESP /mnt/boot/efi
+## Mounting the newly created subvolumes.
+#umount /mnt
+#echo "Mounting the newly created subvolumes."
+#mount -o ssd,noatime,space_cache=v2,compress=zstd:1 $BTRFS /mnt
+##mkdir -p /mnt/{boot,root,home,.snapshots,srv,var}
+#mkdir -p /mnt/{boot,root,home,.snapshots,srv,var,swap}
+#mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@/boot $BTRFS /mnt/boot
+#mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@/root $BTRFS /mnt/root 
+#mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@/home $BTRFS /mnt/home
+#mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@/.snapshots $BTRFS /mnt/.snapshots
+#mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@/srv $BTRFS /mnt/srv
+#mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,nodatacow,subvol=@/var $BTRFS /mnt/var
+#mount -o defaults,noatime,subvol=@/swap $BTRFS /mnt/swap
+#chattr +C /mnt/@/boot
+#chattr +C /mnt/@/srv
+#chattr +C /mnt/@/var
+#mkdir -p /mnt/boot/efi
+#mount $ESP /mnt/boot/efi
 
-# Checking the microcode to install.
-microcode_detector
+## Checking the microcode to install.
+#microcode_detector
 
-pacstrap /mnt base linux linux-firmware $microcode btrfs-progs git nano alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto udiskie accountsservice archlinux-wallpaper bspwm dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-gtk-greeter lightdm-gtk-greeter-settings lxappearance-gtk3 picom rofi sxhkd xautolock xorg zsh zsh-autosuggestions zsh-completions reflector nvidia nvidia-settings
+#pacstrap /mnt base linux linux-firmware $microcode btrfs-progs git nano alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto udiskie accountsservice archlinux-wallpaper bspwm dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-gtk-greeter lightdm-gtk-greeter-settings lxappearance-gtk3 picom rofi sxhkd xautolock xorg zsh zsh-autosuggestions zsh-completions reflector nvidia nvidia-settings
 
-# Generating /etc/fstab.
-echo "Generating a new fstab."
-genfstab -U /mnt >> /mnt/etc/fstab
-sed -i 's#,subvolid=258,subvol=/@/.snapshots/1/snapshot,subvol=@/.snapshots/1/snapshot##g' /mnt/etc/fstab
+## Generating /etc/fstab.
+#echo "Generating a new fstab."
+#genfstab -U /mnt >> /mnt/etc/fstab
+#sed -i 's#,subvolid=258,subvol=/@/.snapshots/1/snapshot,subvol=@/.snapshots/1/snapshot##g' /mnt/etc/fstab
 
-# Setting up GRUB
-sed -i 's/^GRUB_GFXMODE=.*/GRUB_GFXMODE=3440x1440x32/' /mnt/etc/default/grub
-sed -i 's/^GRUB_DEFAULT=.*/GRUB_DEFAULT=saved/' /mnt/etc/default/grub
-sed -i 's/\(^GRUB_CMDLINE_LINUX_DEFAULT=".*\)\(.\)$/\1 nvidia-drm.modeset=1\2/' /mnt/etc/default/grub
-sed -i 's/^#GRUB_SAVEDEFAULT=.*/GRUB_SAVEDEFAULT=true/' /mnt/etc/default/grub
-echo 'GRUB_DISABLE_OS_PROBER=false' >> /mnt/etc/default/grub
-echo "" >> /mnt/etc/default/grub
-echo -e "# Booting with BTRFS subvolume\nGRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION=true" >> /mnt/etc/default/grub
-sed -i 's#rootflags=subvol=${rootsubvol}##g' /mnt/etc/grub.d/10_linux
+## Setting up GRUB
+#sed -i 's/^GRUB_GFXMODE=.*/GRUB_GFXMODE=3440x1440x32/' /mnt/etc/default/grub
+#sed -i 's/^GRUB_DEFAULT=.*/GRUB_DEFAULT=saved/' /mnt/etc/default/grub
+#sed -i 's/\(^GRUB_CMDLINE_LINUX_DEFAULT=".*\)\(.\)$/\1 nvidia-drm.modeset=1\2/' /mnt/etc/default/grub
+#sed -i 's/^#GRUB_SAVEDEFAULT=.*/GRUB_SAVEDEFAULT=true/' /mnt/etc/default/grub
+#echo 'GRUB_DISABLE_OS_PROBER=false' >> /mnt/etc/default/grub
+#echo "" >> /mnt/etc/default/grub
+#echo -e "# Booting with BTRFS subvolume\nGRUB_BTRFS_OVERRIDE_BOOT_PARTITION_DETECTION=true" >> /mnt/etc/default/grub
+#sed -i 's#rootflags=subvol=${rootsubvol}##g' /mnt/etc/grub.d/10_linux
 
 ### End creating BTRFS subvolumes with Snapper rollback nested layout.
 
@@ -197,8 +217,6 @@ mount $ESP /mnt/boot/
 # Checking the microcode to install.
 microcode_detector
 
-hostname_selector
-
 pacstrap /mnt base linux linux-firmware $microcode btrfs-progs git nano alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto udiskie accountsservice archlinux-wallpaper bspwm dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-gtk-greeter lightdm-gtk-greeter-settings lxappearance-gtk3 picom rofi sxhkd xautolock xorg zsh zsh-autosuggestions zsh-completions reflector nvidia nvidia-settings
 
 # Generating /etc/fstab.
@@ -217,7 +235,10 @@ echo 'GRUB_DISABLE_OS_PROBER=false' >> /mnt/etc/default/grub
 read -r -p "Please enter name for a user account (enter empty to not create one): " username
 userpass_selector
 
-echo "$hostname" > /mnt/etc/hostname
+# Setting up the hostname.
+hostname_selector
+
+#echo "$hostname" > /mnt/etc/hostname
 # Setting hosts file.
 echo "Setting hosts file."
 cat > /mnt/etc/hosts <<EOF
@@ -226,11 +247,15 @@ cat > /mnt/etc/hosts <<EOF
 127.0.1.1   $hostname.localdomain   $hostname
 EOF
 
+locale_selector
+
 # Setting up locales.
 #read -r -p "Please insert the locale you use in this format (xx_XX): " locale
-echo "$locale.UTF-8 UTF-8"  > /mnt/etc/locale.gen
-echo "LANG=$locale.UTF-8" > /mnt/etc/locale.conf
-echo "KEYMAP=$keymap" > /mnt/etc/vconsole.conf
+#echo "$locale.UTF-8 UTF-8"  > /mnt/etc/locale.gen
+#echo "LANG=$locale.UTF-8" > /mnt/etc/locale.conf
+#echo "KEYMAP=$keymap" > /mnt/etc/vconsole.conf
+
+keyboard_selector
 
 # Configuring /etc/mkinitcpio.conf
 echo "Configuring /etc/mkinitcpio for BTRFS and NVIDIA
@@ -374,9 +399,18 @@ EOF
 
 # Monitor and LightDM setup.
 echo '#!/bin/bash\nnvidia-settings --assign CurrentMetaMode="DPY-2: 2560x1440_144 @2560x1440 +440+0 {ViewPortIn=2560x1440, ViewPortOut=2560x1440+0+0, ForceCompositionPipeline=On, ForceFullCompositionPipeline=On}, DPY-3: 3440x1440_100 @3440x1440 +0+1440 {ViewPortIn=3440x1440, ViewPortOut=3440x1440+0+0, ForceCompositionPipeline=On, ForceFullCompositionPipeline=On}"' | tee -a /etc/lightdm/monitor_setup.sh > /dev/null
-chmod +x /etc/lightdm/monitor_setup.sh
+chmod +x /mnt/etc/lightdm/monitor_setup.sh
 sed -i 's/#greeter-setup-script=.*/greeter-setup-script=\/etc\/lightdm\/monitor_setup.sh/' /mnt/etc/lightdm/lightdm.conf
-echo '[greeter]\ncursor-theme-name = Adwaita\ncursor-theme-size = 16\ntheme-name = Arc-Dark\nicon-theme-name = Adwaita\nfont-name = Roboto 10\nindicators = ~spacer;~clock;~spacer;~language;~session;~a11y;~power' | tee /mnt/etc/lightdm/lightdm-gtk-greeter.conf > /dev/null
+
+cat > /mnt/etc/lightdm/lightdm-gtk-greeter.conf <<EOF
+[greeter]
+cursor-theme-name = Adwaita
+cursor-theme-size = 16
+theme-name = Arc-Dark
+icon-theme-name = Adwaita
+font-name = Roboto 10
+indicators = ~spacer;~clock;~spacer;~language;~session;~a11y;~power
+EOF
 
 # Disallow Ctrl+Alt+Fn switching for added security
 echo 'Section "ServerFlags"\n    Option "DontVTSwitch" "True"\nEndSection' | tee -a /mnt/etc/X11/xorg.conf > /dev/null
@@ -385,22 +419,6 @@ echo 'Section "ServerFlags"\n    Option "DontVTSwitch" "True"\nEndSection' | tee
 #firewall-cmd --add-port=1025-65535/tcp --permanent
 #firewall-cmd --add-port=1025-65535/udp --permanent
 #firewall-cmd --reload
-
-# Enable Services
-systemctl enable NetworkManager
-systemctl enable fstrim.timer
-systemctl enable bluetooth
-#systemctl enable firewalld
-systemctl enable systemd-timesyncd
-#systemctl enable lightdm
-systemctl enable snapper-timeline.timer
-systemctl enable snapper-cleanup.timer
-systemctl enable grub-btrfs.path
-systemctl enable btrfs-scrub@-.timer
-# BTRFS scrub for root should scrub the whole filesystem regardless
-#systemctl enable btrfs-scrub@home.timer
-#systemctl enable btrfs-scrub@var.timer
-#systemctl enable btrfs-scrub@\\x2esnapshots.timer
 
 # Enabling various services.
 print "Enabling services."
@@ -425,7 +443,5 @@ sed -i 's/#\(ReconnectIntervals=.*\)/\1/' /mnt/etc/bluetooth/main.conf
 #git clone https://github.com/Senseye-X1/arch_install.git
 #chmod +x /mnt/arch_install/install-as-root.sh
 #chmod +x /mnt/arch_install/install-as-user.sh
-
-loadkeys $keymap
 
 print "umount -a\nreboot\nAfter reboot login as normal user and run install-as-user.sh."
