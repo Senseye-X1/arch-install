@@ -238,7 +238,6 @@ userpass_selector
 # Setting up the hostname.
 hostname_selector
 
-#echo "$hostname" > /mnt/etc/hostname
 # Setting hosts file.
 echo "Setting hosts file."
 cat > /mnt/etc/hosts <<EOF
@@ -247,14 +246,10 @@ cat > /mnt/etc/hosts <<EOF
 127.0.1.1   $hostname.localdomain   $hostname
 EOF
 
+# Setting up locale.
 locale_selector
 
-# Setting up locales.
-#read -r -p "Please insert the locale you use in this format (xx_XX): " locale
-#echo "$locale.UTF-8 UTF-8"  > /mnt/etc/locale.gen
-#echo "LANG=$locale.UTF-8" > /mnt/etc/locale.conf
-#echo "KEYMAP=$keymap" > /mnt/etc/vconsole.conf
-
+# Setting up keyboard layout.
 keyboard_selector
 
 # Configuring /etc/mkinitcpio.conf
