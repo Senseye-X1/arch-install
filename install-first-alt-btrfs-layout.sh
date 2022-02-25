@@ -10,13 +10,17 @@ locale="en_US"
 #username="andreas"
 #password="password"
 
-# Checking the microcode to install.
-CPU=$(grep vendor_id /proc/cpuinfo)
-if [[ $CPU == *"AuthenticAMD"* ]]; then
-    microcode=amd-ucode
-else
-    microcode=intel-ucode
-fi
+# Microcode detector (function).
+microcode_detector () {
+    CPU=$(grep vendor_id /proc/cpuinfo)
+    if [[ $CPU == *"AuthenticAMD"* ]]; then
+        print "An AMD CPU has been detected, the AMD microcode will be installed."
+        microcode="amd-ucode"
+    else
+        print "An Intel CPU has been detected, the Intel microcode will be installed."
+        microcode="intel-ucode"
+    fi
+}
 
 # Setting up a password for the user account (function).
 userpass_selector () {
@@ -136,6 +140,9 @@ chattr +C /mnt/@/var
 mkdir -p /mnt/boot/efi
 mount $ESP /mnt/boot/efi
 
+# Checking the microcode to install.
+microcode_detector
+
 pacstrap /mnt base linux linux-firmware $microcode btrfs-progs git nano alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto udiskie accountsservice archlinux-wallpaper bspwm dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-gtk-greeter lightdm-gtk-greeter-settings lxappearance-gtk3 picom rofi sxhkd xautolock xorg zsh zsh-autosuggestions zsh-completions reflector nvidia nvidia-settings
 
 # Generating /etc/fstab.
@@ -156,11 +163,11 @@ sed -i 's#rootflags=subvol=${rootsubvol}##g' /mnt/etc/grub.d/10_linux
 ### End creating BTRFS subvolumes with Snapper rollback nested layout.
 
 ### Creating BTRFS subvolumes for Snapper manual flat layout.
-#print "Creating BTRFS subvolumes."
-#for volume in @ @home @root @srv @snapshots @var_log @var_pkgs @swap
-#do
-#    btrfs su cr /mnt/$volume
-#done
+print "Creating BTRFS subvolumes."
+for volume in @ @home @root @srv @snapshots @log @pkg @swap
+do
+    btrfs su cr /mnt/$volume
+done
 
 # Mounting the newly created subvolumes.
 umount /mnt
@@ -171,11 +178,14 @@ mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@home $
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@root $BTRFS /mnt/root
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@srv $BTRFS /mnt/srv
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@snapshots $BTRFS /mnt/.snapshots
-mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@var_log $BTRFS /mnt/var/log
-mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@var_pkgs $BTRFS /mnt/var/cache/pacman/pkg
+mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@log $BTRFS /mnt/var/log
+mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@pkg $BTRFS /mnt/var/cache/pacman/pkg
 mount -o defaults,noatime,subvol=@/swap $BTRFS /mnt/swap
 chattr +C /mnt/var/log
 mount $ESP /mnt/boot/
+
+# Checking the microcode to install.
+microcode_detector
 
 pacstrap /mnt base linux linux-firmware $microcode btrfs-progs git nano alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto udiskie accountsservice archlinux-wallpaper bspwm dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-gtk-greeter lightdm-gtk-greeter-settings lxappearance-gtk3 picom rofi sxhkd xautolock xorg zsh zsh-autosuggestions zsh-completions reflector nvidia nvidia-settings
 
@@ -382,7 +392,9 @@ systemctl enable btrfs-scrub@-.timer
 
 # Enabling various services.
 print "Enabling services."
-for service in NetworkManager fstrim.timer bluetooth systemd-timesyncd lightdm reflector.timer snapper-timeline.timer snapper-cleanup.timer btrfs-scrub@-.timer btrfs-scrub@home.timer btrfs-scrub@var.timer btrfs-scrub@\\x2esnapshots.timer grub-btrfs.path
+# Use this instead if nested BTRFS layout:
+#for service in NetworkManager fstrim.timer bluetooth systemd-timesyncd lightdm reflector.timer snapper-timeline.timer snapper-cleanup.timer btrfs-scrub@-.timer btrfs-scrub@home.timer btrfs-scrub@var.timer btrfs-scrub@\\x2esnapshots.timer grub-btrfs.path
+for service in NetworkManager fstrim.timer bluetooth systemd-timesyncd lightdm reflector.timer snapper-timeline.timer snapper-cleanup.timer btrfs-scrub@-.timer btrfs-scrub@home.timer btrfs-scrub@log.timer btrfs-scrub@\\x2esnapshots.timer grub-btrfs.path
 do
     systemctl enable "$service" --root=/mnt &>/dev/null
 done
