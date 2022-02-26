@@ -461,8 +461,8 @@ cp .zshrc /home/$username/
 chown -R $username:$username /home/$username/.config
 chown -R $username:$username /home/$username/.scripts
 chown $username:$username /home/$username/.zshrc
-chmod -R +x /home/$username/.config/bspwm/
-chmod -R +x /home/$username/.config/sxhkd/
+chmod +x /home/$username/.config/bspwm/bspwmrc
+chmod +x /home/$username/.config/polybar/launch.sh
 chmod -R +x /home/$username/.scripts
 
 cat >> /home/$username/.Xresources <<EOF
