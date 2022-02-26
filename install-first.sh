@@ -457,10 +457,10 @@ cd arch_install
 #cp IosevkaTermNerdFontComplete.ttf /home/$NEW_USER/.local/share/fonts/
 cp -R .config /home/$username/
 cp -R .scripts /home/$username/
-#cp .gtkrc-2.0 /home/$username/
+cp .zshrc /home/$username/
 chown -R $username:$username /home/$username/.config
 chown -R $username:$username /home/$username/.scripts
-#chown $username:$username /home/$username/.gtkrc-2.0
+chown $username:$username /home/$username/.zshrc
 chmod -R +x /home/$username/.config/bspwm/
 chmod -R +x /home/$username/.config/sxhkd/
 chmod -R +x /home/$username/.scripts
