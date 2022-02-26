@@ -12,4 +12,26 @@
   blue:    #42A5F5ff;
   purple:  #BA68C8ff;
   cyan:    #4DD0E1ff;
+  white: #FFFFFF;
+  black: #000000;
+  pink: #d81b60;
+  darkpurple: #5e35b1;
+  indigo: #3949ab;
+  lightblue: #039be5;
+  teal: #00897b;
+  lightgreen: #7cb342;
+  lime: #c0ca33;
+  amber: #ffb300;
+  orange: #fb8c00;
+  darkorange: #f4511e;
+  brown: #6d4c41;
+  grey: #757575;
+  bluegrey: #546e7a;
 }
+
+/*  red: #e53935;
+  purple: #8e24aa;
+  blue: #1e88e5;
+  cyan: #00acc1;
+  green: #43a047;
+  yellow: #fdd835; */
