@@ -444,6 +444,13 @@ sed -i 's/#\(ReconnectIntervals=.*\)/\1/' /mnt/etc/bluetooth/main.conf
 #chmod +x /mnt/arch_install/install-as-user.sh
 
 arch-chroot /mnt /bin/bash -e <<EOF
+git clone https://aur.archlinux.org/paru.git
+cd paru
+makepkg -si --noconfirm
+cd ..
+
+paru polybar
+
 git clone https://github.com/Senseye-X1/arch_install.git
 cd arch_install
 #mkdir -p /home/$NEW_USER/.local/share/fonts
