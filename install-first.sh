@@ -443,4 +443,22 @@ sed -i 's/#\(ReconnectIntervals=.*\)/\1/' /mnt/etc/bluetooth/main.conf
 #chmod +x /mnt/arch_install/install-as-root.sh
 #chmod +x /mnt/arch_install/install-as-user.sh
 
-print "umount -a\nreboot\n\nAfter reboot login as normal user and run install-as-user.sh."
+arch-chroot /mnt /bin/bash -e <<EOF
+git clone https://github.com/Senseye-X1/arch_install.git
+cd arch_install
+#mkdir -p /home/$NEW_USER/.local/share/fonts
+#cp IosevkaTermNerdFontComplete.ttf /home/$NEW_USER/.local/share/fonts/
+cp -R .config /home/$username/
+cp -R .scripts /home/$username/
+#cp .gtkrc-2.0 /home/$username/
+chown -R $username:$username /home/$username/.config
+chown -R $username:$username /home/$username/.scripts
+#chown $username:$username /home/$username/.gtkrc-2.0
+chmod -R +x /home/$username/.config/bspwm/
+chmod -R +x /home/$username/.config/sxhkd/
+chmod -R +x /home/$username/.scripts
+cd ..
+rm -rf arch_install
+EOF
+
+print "umount -a\nreboot\n\nAfter reboot login as $username"
