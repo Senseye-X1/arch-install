@@ -274,6 +274,8 @@ arch-chroot /mnt /bin/bash -e <<EOF
     echo "Setting up timezone."
     ln -sf /usr/share/zoneinfo/$timezone /etc/localtime &>/dev/null
     
+    timedatectl set-ntp true
+    
     # Setting up clock.
     hwclock --systohc
     
@@ -312,7 +314,6 @@ arch-chroot /mnt /bin/bash -e <<EOF
     echo "Creating GRUB config file."
     grub-mkconfig -o /boot/grub/grub.cfg &>/dev/null
 
-    timedatectl set-ntp true
     localectl set-x11-keymap se
 EOF
 
