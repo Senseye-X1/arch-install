@@ -401,16 +401,17 @@ EOF
 
 chmod +x /mnt/etc/lightdm/monitor_setup.sh
 sed -i 's/#greeter-setup-script=.*/greeter-setup-script=\/etc\/lightdm\/monitor_setup.sh/' /mnt/etc/lightdm/lightdm.conf
+sed -i 's/#greeter-session=.*/greeter-session=lightdm-slick-greeter/' /etc/lightdm/lightdm.conf
 
-cat > /mnt/etc/lightdm/lightdm-gtk-greeter.conf <<EOF
-[greeter]
-cursor-theme-name = Adwaita
-cursor-theme-size = 16
-theme-name = Arc-Dark
-icon-theme-name = Adwaita
-font-name = Roboto 10
-indicators = ~spacer;~clock;~spacer;~language;~session;~a11y;~power
-EOF
+#cat > /mnt/etc/lightdm/lightdm-gtk-greeter.conf <<EOF
+#[greeter]
+#cursor-theme-name = Adwaita
+#cursor-theme-size = 16
+#theme-name = Arc-Dark
+#icon-theme-name = Adwaita
+#font-name = Roboto 10
+#indicators = ~spacer;~clock;~spacer;~language;~session;~a11y;~power
+#EOF
 
 # Disallow Ctrl+Alt+Fn switching for added security
 cat >> /mnt/etc/X11/xorg.conf <<EOF
@@ -454,8 +455,6 @@ paru polybar
 
 git clone https://github.com/Senseye-X1/arch_install.git
 cd arch_install
-#mkdir -p /home/$NEW_USER/.local/share/fonts
-#cp IosevkaTermNerdFontComplete.ttf /home/$NEW_USER/.local/share/fonts/
 cp -R .config /home/$username/
 cp -R .scripts /home/$username/
 cp .zshrc /home/$username/
