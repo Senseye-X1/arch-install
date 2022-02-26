@@ -464,6 +464,19 @@ chown $username:$username /home/$username/.zshrc
 chmod -R +x /home/$username/.config/bspwm/
 chmod -R +x /home/$username/.config/sxhkd/
 chmod -R +x /home/$username/.scripts
+
+cat >> /home/$username/.Xresources <<EOF
+Xcursor.theme: Adwaita
+Xcursor.size: 16
+EOF
+chown $username:$username /home/$username/.Xresources
+
+cat >> /home/$username/.xprofile <<EOF
+setxkbmap se
+xrdb ~/.Xresources
+EOF
+chown $username:$username /home/$username/.xprofile
+
 cd ..
 rm -rf arch_install
 EOF
