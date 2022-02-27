@@ -1,7 +1,7 @@
 #!/usr/bin/env -S bash -e
 
-pacman -Syu
-pacman -S --noconfirm curl
+#pacman -Syu
+#pacman -S --noconfirm curl
 
 timezone="Europe/Stockholm"
 
