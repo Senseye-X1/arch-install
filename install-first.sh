@@ -63,6 +63,7 @@ keyboard_selector () {
         printf "sv-latin1 keyboard layout will be used by default."
         kblayout="sv-latin1"
     fi
+    loadkeys sv-latin1
     echo "KEYMAP=$kblayout" > /mnt/etc/vconsole.conf
 }
 
@@ -228,6 +229,9 @@ sed -i 's/^#GRUB_SAVEDEFAULT=.*/GRUB_SAVEDEFAULT=true/' /mnt/etc/default/grub
 echo 'GRUB_DISABLE_OS_PROBER=false' >> /mnt/etc/default/grub
 ### End creating BTRFS subvolumes for Snapper manual flat layout.
 
+# Setting up keyboard layout.
+keyboard_selector
+
 # Setting username and password.
 read -r -p "Please enter name for a user account (enter empty to not create one): " username
 userpass_selector
@@ -245,9 +249,6 @@ EOF
 
 # Setting up locale.
 locale_selector
-
-# Setting up keyboard layout.
-keyboard_selector
 
 # Fix function keys on Keychron keyboards using Apple driver.
 cat >> /mnt/etc/modprobe.d/hid_apple.conf <<EOF
@@ -313,7 +314,7 @@ arch-chroot /mnt /bin/bash -e <<EOF
     echo "Creating GRUB config file."
     grub-mkconfig -o /boot/grub/grub.cfg &>/dev/null
 
-    localectl set-x11-keymap se
+    #localectl set-x11-keymap se
 EOF
 
 # Setting root password.
