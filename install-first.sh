@@ -469,12 +469,12 @@ cd arch_install
 cp -R \.config "/home/$username/"
 cp -R \.scripts "/home/$username/"
 cp \.zshrc /home/$username/
-chown -R "$username:$username" "/home/$username/\.config"
-chown -R "$username:$username" "/home/$username/\.scripts"
+chown -R "$username:$username" /home/$username/\.config
+chown -R "$username:$username" /home/$username/\.scripts
 chown "$username:$username" /home/$username/\.zshrc
-chmod +x "/home/$username/\.config/bspwm/bspwmrc"
-chmod +x "/home/$username/\.config/polybar/launch.sh"
-chmod -R +x "/home/$username/\.scripts"
+chmod +x /home/$username/\.config/bspwm/bspwmrc
+chmod +x /home/$username/\.config/polybar/launch.sh
+chmod -R +x /home/$username/\.scripts
 cd /
 #rm -rf /arch_install
 EOF
