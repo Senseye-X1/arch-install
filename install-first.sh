@@ -63,7 +63,7 @@ keyboard_selector () {
         printf "sv-latin1 keyboard layout will be used by default."
         kblayout="sv-latin1"
     fi
-    loadkeys sv-latin1
+    loadkeys $kblayout
     echo "KEYMAP=$kblayout" > /mnt/etc/vconsole.conf
 }
 
