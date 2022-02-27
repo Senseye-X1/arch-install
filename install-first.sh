@@ -286,7 +286,7 @@ arch-chroot /mnt /bin/bash -e <<EOF
     echo "Setting up timezone."
     ln -sf /usr/share/zoneinfo/Europe/Stockholm /etc/localtime &>/dev/null
     
-    timedatectl set-ntp true
+    #timedatectl set-ntp true
     
     # Setting up clock.
     hwclock --systohc
@@ -456,6 +456,9 @@ sed -i 's/#\(ReconnectIntervals=.*\)/\1/' /mnt/etc/bluetooth/main.conf
 
 # User-specific configuration.
 arch-chroot /mnt /bin/bash -e <<EOF
+
+timedatectl set-ntp true
+
 #git clone https://aur.archlinux.org/paru.git
 #cd paru
 #makepkg -si --noconfirm
