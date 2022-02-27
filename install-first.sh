@@ -449,18 +449,19 @@ sed -i 's/#\(ReconnectAttempts=.*\)/\1/' /mnt/etc/bluetooth/main.conf
 sed -i 's/#\(ReconnectIntervals=.*\)/\1/' /mnt/etc/bluetooth/main.conf
 
 # User-specific configuration.
-arch-chroot /mnt
+arch-chroot /mnt /bin/bash -e <<EOF
 #git clone https://aur.archlinux.org/paru.git
 #cd paru
 #makepkg -si --noconfirm
 #cd ..
 
 #paru polybar
+#cd /home/$username
 echo "\nClone dotfiles and setup for $username."
 git clone https://github.com/Senseye-X1/arch_install.git
 cd arch_install
-cp -R .config /home/$username/
-cp -R .scripts /home/$username/
+cp -R config /home/$username/
+cp -R scripts /home/$username/
 cp .zshrc /home/$username/
 chown -R $username:$username /home/$username/.config
 chown -R $username:$username /home/$username/.scripts
@@ -470,26 +471,26 @@ chmod +x /home/$username/.config/polybar/launch.sh
 chmod -R +x /home/$username/.scripts
 cd /
 #rm -rf arch_install
-exit
+EOF
 
-cat >> home/$username/.Xresources <<EOF
+cat >> /mnt/home/$username/.Xresources <<EOF
 Xcursor.theme: Adwaita
 Xcursor.size: 16
 EOF
 
-cat >> home/$username/.xprofile <<EOF
+cat >> /mnt/home/$username/.xprofile <<EOF
 setxkbmap se
 xrdb ~/.Xresources
 EOF
 
-cat >> home/$username/userChrome.css <<EOF
+cat >> /mnt/home/$username/userChrome.css <<EOF
 #contentAreaContextMenu {
   margin-top: 5px !important;
   margin-left: 5px !important;
 }
 EOF
 
-chown "$username:$username" home/$username/userChrome.css
+chown "$username:$username" /home/$username/userChrome.css
 chown "$username:$username" /home/$username/.xprofile
 chown "$username:$username" /home/$username/.Xresources
 
