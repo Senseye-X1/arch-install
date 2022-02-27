@@ -461,10 +461,10 @@ echo "\nClone dotfiles and setup for $username."
 git clone https://github.com/Senseye-X1/arch_install.git
 cd arch_install
 cp -R config /home/$username/
-cp -R scripts /home/$username/
+cp -R \.scripts /home/$username/
 cp .zshrc /home/$username/
 chown -R $username:$username /home/$username/.config
-chown -R $username:$username /home/$username/.scripts
+chown -R $username:$username /home/$username/\.scripts
 chown $username:$username /home/$username/.zshrc
 chmod +x /home/$username/.config/bspwm/bspwmrc
 chmod +x /home/$username/.config/polybar/launch.sh
