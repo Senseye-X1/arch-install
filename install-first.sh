@@ -39,8 +39,9 @@ done
 hostname_selector () {
     read -r -p "Please enter the hostname: " hostname
     if [ -z "$hostname" ]; then
+        echo
         echo "You need to enter a hostname in order to continue."
-        hostname_selector
+        read -r -p "Please enter the hostname: " hostname
     fi
     echo "$hostname" > /mnt/etc/hostname
 }
@@ -49,6 +50,7 @@ hostname_selector () {
 locale_selector () {
     read -r -p "Please insert the locale you use (format: xx_XX or enter empty to use en_US): " locale
     if [ -z "$locale" ]; then
+        echo
         echo "en_US will be used as default locale."
         locale="en_US"
     fi
@@ -60,6 +62,7 @@ locale_selector () {
 keyboard_selector () {
     read -r -p "Please insert the keyboard layout you use (enter empty to use sv-latin1 keyboard layout): " kblayout
     if [ -z "$kblayout" ]; then
+        echo
         echo "sv-latin1 keyboard layout will be used by default."
         kblayout="sv-latin1"
     fi
@@ -77,9 +80,11 @@ do
 done
 
 # Deleting old partition scheme.
+echo
 read -r -p "This will delete the current partition table on $DISK. Do you agree [y/N]? " response
 response=${response,,}
 if [[ "$response" =~ ^(yes|y)$ ]]; then
+    echo
     echo "Wiping $DISK."
     wipefs -af "$DISK" &>/dev/null
     sgdisk -Zo "$DISK" &>/dev/null
@@ -89,7 +94,7 @@ else
 fi
 
 # Creating a new partition scheme.
-printf "Creating the partitions on $DISK."
+echo "Creating the partitions on $DISK."
 parted -s "$DISK" \
     mklabel gpt \
     mkpart ESP fat32 1MiB 513MiB \
@@ -100,11 +105,11 @@ ESP=$(findfs PARTLABEL=ESP)
 BTRFS=$(findfs PARTLABEL=ARCHROOT)
 
 # Informing the Kernel of the changes.
-printf "Informing the Kernel about the disk changes."
+echo "Informing the Kernel about the disk changes."
 partprobe "$DISK"
 
 # Formatting the ESP as FAT32.
-printf "Formatting the EFI Partition as FAT32."
+exho "Formatting the EFI Partition as FAT32."
 mkfs.fat -F 32 $ESP &>/dev/null
 
 # Formatting the root partition as BTRFS.
@@ -190,7 +195,7 @@ mount $BTRFS /mnt
 ### End creating BTRFS subvolumes with Snapper rollback nested layout.
 
 ### Creating BTRFS subvolumes for Snapper manual flat layout.
-printf "Creating BTRFS subvolumes."
+echo "Creating BTRFS subvolumes."
 for volume in @ @home @root @srv @snapshots @log @pkg @swap
 do
     btrfs su cr /mnt/$volume
@@ -198,7 +203,7 @@ done
 
 # Mounting the newly created subvolumes.
 umount /mnt
-printf "Mounting the newly created subvolumes."
+echo "Mounting the newly created subvolumes."
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@ $BTRFS /mnt
 mkdir -p /mnt/{home,root,srv,.snapshots,/var/log,/var/cache/pacman/pkg,boot,swap}
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@home $BTRFS /mnt/home
@@ -233,6 +238,7 @@ echo 'GRUB_DISABLE_OS_PROBER=false' >> /mnt/etc/default/grub
 keyboard_selector
 
 # Setting username and password.
+echo
 read -r -p "Please enter name for a user account (enter empty to not create one): " username
 userpass_selector
 
@@ -256,7 +262,7 @@ options hid_apple fnmode=2
 EOF
 
 # Configuring /etc/mkinitcpio.conf
-echo "Configuring /etc/mkinitcpio for BTRFS and NVIDIA."
+echo "Configuring mkinitcpio for BTRFS and NVIDIA."
 #sed -i 's/#COMPRESSION=.*/COMPRESSION="zstd"/g' /mnt/etc/mkinitcpio.conf
 sed -i 's/^MODULES=.*/MODULES=\(btrfs nvidia nvidia_modeset nvidia_uvm nvidia_drm\)/' /mnt/etc/mkinitcpio.conf
 # If using LVM add lvm2 to pacstrap and uncomment below.
@@ -307,7 +313,7 @@ arch-chroot /mnt /bin/bash -e <<EOF
     #chown :$username /.snapshots
 
     # Installing GRUB.
-    echo "Installing GRUB on /boot."
+    echo "Installing GRUB."
     grub-install --target=x86_64-efi --efi-directory=/boot --bootloader-id=GRUB &>/dev/null
     
     # Creating grub config file.
@@ -318,15 +324,15 @@ arch-chroot /mnt /bin/bash -e <<EOF
 EOF
 
 # Setting root password.
-printf "Setting root password."
+echo "Setting root password."
 echo "root:$password" | arch-chroot /mnt chpasswd
 
 # Adding user/password, change shell if not zsh.
 if [ -n "$username" ]; then
-    printf "Adding the user $username to the system with root privilege."
+    echo "Adding the user $username to the system with root privilege."
     arch-chroot /mnt useradd -m -G wheel -s /usr/bin/zsh "$username"
     sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/' /mnt/etc/sudoers
-    printf "Setting user password for $username." 
+    echo "Setting user password for $username." 
     echo "$username:$password" | arch-chroot /mnt chpasswd
 fi
 
@@ -360,7 +366,7 @@ Exec=/bin/sh -c 'while read -r trg; do case $trg in linux) exit 0; esac; done; /
 EOF
 
 # Pre-snapshot boot backup hook.
-printf "Configuring /boot backup when pacman transactions are made."
+echo "Configuring boot backup when pacman transactions are made."
 #echo '[Trigger]\nOperation = Upgrade\nOperation = Install\nOperation = Remove\nType = Path\nTarget = usr/lib/modules/*/vmlinuz\n\n[Action]\nDepends = rsync\nDescription = Backing up /boot...\nWhen = PreTransaction\nExec = /usr/bin/rsync -a --delete /boot /.bootbackup' | tee -a /etc/pacman.d/hooks/04-bootbackup.hook > /dev/null
 cat > /mnt/etc/pacman.d/hooks/04-bootbackup.hook <<EOF
 [Trigger]
@@ -434,7 +440,7 @@ EOF
 #firewall-cmd --reload
 
 # Enabling various services.
-printf "Enabling services."
+echo "Enabling services."
 # Use this instead if nested BTRFS layout:
 #for service in NetworkManager fstrim.timer bluetooth systemd-timesyncd lightdm reflector.timer snapper-timeline.timer snapper-cleanup.timer btrfs-scrub@-.timer btrfs-scrub@home.timer btrfs-scrub@var.timer btrfs-scrub@\\x2esnapshots.timer grub-btrfs.path
 for service in NetworkManager fstrim.timer bluetooth systemd-timesyncd lightdm reflector.timer snapper-timeline.timer snapper-cleanup.timer btrfs-scrub@-.timer btrfs-scrub@home.timer btrfs-scrub@log.timer btrfs-scrub@\\x2esnapshots.timer grub-btrfs.path
@@ -457,17 +463,17 @@ arch-chroot /mnt /bin/bash -e <<EOF
 
 #paru polybar
 #cd /home/$username
-echo "\nClone dotfiles and setup for $username."
+echo "Clone dotfiles for $username."
 git clone https://github.com/Senseye-X1/arch_install.git
 cd arch_install
-cp -R config /home/$username/
-cp -R \.scripts /home/$username/
+cp -R \.config "/home/$username/"
+cp -R \.scripts "/home/$username/"
 cp \.zshrc /home/$username/
 chown -R "$username:$username" "/home/$username/.config"
 chown -R "$username:$username" "/home/$username/\.scripts"
 chown "$username:$username" "/home/$username/\.zshrc"
-chmod +x "/home/$username/.config/bspwm/bspwmrc"
-chmod +x "/home/$username/.config/polybar/launch.sh"
+chmod +x "/home/$username/\.config/bspwm/bspwmrc"
+chmod +x "/home/$username/\.config/polybar/launch.sh"
 chmod -R +x "/home/$username/\.scripts"
 cd /
 #rm -rf arch_install
@@ -491,9 +497,9 @@ cat >> /mnt/home/$username/userChrome.css <<EOF
 EOF
 
 arch-chroot /mnt /bin/bash -e <<EOF
-chown "$username:$username" /home/$username/userChrome.css
-chown "$username:$username" /home/$username/.xprofile
-chown "$username:$username" /home/$username/.Xresources
+chown "$username:$username" "/home/$username/userChrome.css"
+chown "$username:$username" "/home/$username/.xprofile"
+chown "$username:$username" "/home/$username/.Xresources"
 EOF
 
-printf "\nAll done!\numount -a\nreboot\n\nAfter reboot login as $username.\n"
+echo -e "\nAll done!\numount -a\nreboot\n\nAfter reboot login as user $username."
