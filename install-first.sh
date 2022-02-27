@@ -471,7 +471,7 @@ cp -R \.scripts "/home/$username/"
 cp \.zshrc /home/$username/
 chown -R "$username:$username" "/home/$username/\.config"
 chown -R "$username:$username" "/home/$username/\.scripts"
-chown "$username:$username" "/home/$username/\.zshrc"
+chown "$username:$username" /home/$username/\.zshrc
 chmod +x "/home/$username/\.config/bspwm/bspwmrc"
 chmod +x "/home/$username/\.config/polybar/launch.sh"
 chmod -R +x "/home/$username/\.scripts"
