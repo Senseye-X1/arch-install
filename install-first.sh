@@ -109,7 +109,7 @@ echo "Informing the Kernel about the disk changes."
 partprobe "$DISK"
 
 # Formatting the ESP as FAT32.
-exho "Formatting the EFI Partition as FAT32."
+echo "Formatting the EFI Partition as FAT32."
 mkfs.fat -F 32 $ESP &>/dev/null
 
 # Formatting the root partition as BTRFS.
