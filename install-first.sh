@@ -9,10 +9,10 @@ timezone="Europe/Stockholm"
 microcode_detector () {
     CPU=$(grep vendor_id /proc/cpuinfo)
     if [[ $CPU == *"AuthenticAMD"* ]]; then
-        print "An AMD CPU has been detected, the AMD microcode will be installed."
+        printf "An AMD CPU has been detected, the AMD microcode will be installed."
         microcode="amd-ucode"
     else
-        print "An Intel CPU has been detected, the Intel microcode will be installed."
+        printf "An Intel CPU has been detected, the Intel microcode will be installed."
         microcode="intel-ucode"
     fi
 }
@@ -23,7 +23,7 @@ while true; do
   read -r -s -p "Set a user password for $username: " password
 	while [ -z "$password" ]; do
 	echo
-	print "You need to enter a password for $username."
+	printf "You need to enter a password for $username."
 	read -r -s -p "Set a user password for $username: " password
 	[ -n "$password" ] && break
 	done
@@ -39,7 +39,7 @@ done
 hostname_selector () {
     read -r -p "Please enter the hostname: " hostname
     if [ -z "$hostname" ]; then
-        print "You need to enter a hostname in order to continue."
+        printf "You need to enter a hostname in order to continue."
         hostname_selector
     fi
     echo "$hostname" > /mnt/etc/hostname
@@ -49,7 +49,7 @@ hostname_selector () {
 locale_selector () {
     read -r -p "Please insert the locale you use (format: xx_XX or enter empty to use en_US): " locale
     if [ -z "$locale" ]; then
-        print "en_US will be used as default locale."
+        printf "en_US will be used as default locale."
         locale="en_US"
     fi
     echo "$locale.UTF-8 UTF-8"  > /mnt/etc/locale.gen
@@ -60,7 +60,7 @@ locale_selector () {
 keyboard_selector () {
     read -r -p "Please insert the keyboard layout you use (enter empty to use sv-latin1 keyboard layout): " kblayout
     if [ -z "$kblayout" ]; then
-        print "sv-latin1 keyboard layout will be used by default."
+        printf "sv-latin1 keyboard layout will be used by default."
         kblayout="sv-latin1"
     fi
     echo "KEYMAP=$kblayout" > /mnt/etc/vconsole.conf
@@ -71,7 +71,7 @@ PS3="Please select the disk where Arch Linux is going to be installed: "
 select ENTRY in $(lsblk -dpnoNAME|grep -P "/dev/sd|nvme|vd");
 do
     DISK=$ENTRY
-    print "Installing Arch Linux on $DISK."
+    printf "Installing Arch Linux on $DISK."
     break
 done
 
@@ -79,11 +79,11 @@ done
 read -r -p "This will delete the current partition table on $DISK. Do you agree [y/N]? " response
 response=${response,,}
 if [[ "$response" =~ ^(yes|y)$ ]]; then
-    print "Wiping $DISK."
+    printf "Wiping $DISK."
     wipefs -af "$DISK" &>/dev/null
     sgdisk -Zo "$DISK" &>/dev/null
 else
-    print "Quitting."
+    printf "Quitting."
     exit
 fi
 
