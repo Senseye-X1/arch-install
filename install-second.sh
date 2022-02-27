@@ -1,12 +1,14 @@
 #!/bin/bash
 
+localectl set-x11-keymap se
+
+sudo systemctl enable lightdm
+
 git clone https://aur.archlinux.org/paru.git
 cd paru
 makepkg -si --noconfirm
 cd
 
 paru polybar
-
-sudo systemctl enable lightdm
 
 echo "All done!
