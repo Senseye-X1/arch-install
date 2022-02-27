@@ -409,7 +409,7 @@ EOF
 
 chmod +x /mnt/etc/lightdm/monitor_setup.sh
 sed -i 's/#greeter-setup-script=.*/greeter-setup-script=\/etc\/lightdm\/monitor_setup.sh/' /mnt/etc/lightdm/lightdm.conf
-sed -i 's/#greeter-session=.*/greeter-session=lightdm-slick-greeter/' /etc/lightdm/lightdm.conf
+sed -i 's/#greeter-session=.*/greeter-session=lightdm-slick-greeter/' /mnt/etc/lightdm/lightdm.conf
 
 #cat > /mnt/etc/lightdm/lightdm-gtk-greeter.conf <<EOF
 #[greeter]
