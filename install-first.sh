@@ -109,7 +109,7 @@ mkfs.fat -F 32 $ESP &>/dev/null
 
 # Formatting the root partition as BTRFS.
 echo "Formatting the root partition as BTRFS."
-mkfs.btrfs $BTRFS &>/dev/null
+mkfs.btrfs -f $BTRFS &>/dev/null
 mount $BTRFS /mnt
 
 ### Creating BTRFS subvolumes with Snapper rollback nested layout.
