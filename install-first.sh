@@ -3,7 +3,7 @@
 #pacman -Syu
 #pacman -S --noconfirm curl
 
-timezone="Europe/Stockholm"
+#timezone="Europe/Stockholm"
 
 # Microcode detector (function).
 microcode_detector () {
@@ -284,7 +284,7 @@ arch-chroot /mnt /bin/bash -e <<EOF
 
     # Setting up timezone.
     echo "Setting up timezone."
-    ln -sf /usr/share/zoneinfo/$timezone /etc/localtime &>/dev/null
+    ln -sf /usr/share/zoneinfo/Europe/Stockholm /etc/localtime &>/dev/null
     
     timedatectl set-ntp true
     
