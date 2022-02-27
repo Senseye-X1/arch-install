@@ -71,7 +71,7 @@ PS3="Please select the disk where Arch Linux is going to be installed: "
 select ENTRY in $(lsblk -dpnoNAME|grep -P "/dev/sd|nvme|vd");
 do
     DISK=$ENTRY
-    printf "Installing Arch Linux on $DISK."
+    echo "Installing Arch Linux on $DISK."
     break
 done
 
@@ -79,11 +79,11 @@ done
 read -r -p "This will delete the current partition table on $DISK. Do you agree [y/N]? " response
 response=${response,,}
 if [[ "$response" =~ ^(yes|y)$ ]]; then
-    printf "Wiping $DISK."
+    echo "Wiping $DISK."
     wipefs -af "$DISK" &>/dev/null
     sgdisk -Zo "$DISK" &>/dev/null
 else
-    printf "Quitting."
+    echo "Quitting."
     exit
 fi
 
