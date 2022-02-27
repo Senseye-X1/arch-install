@@ -449,7 +449,7 @@ sed -i 's/#\(ReconnectAttempts=.*\)/\1/' /mnt/etc/bluetooth/main.conf
 sed -i 's/#\(ReconnectIntervals=.*\)/\1/' /mnt/etc/bluetooth/main.conf
 
 # User-specific configuration.
-arch-chroot /mnt /bin/bash -e <<EOF
+arch-chroot /mnt
 #git clone https://aur.archlinux.org/paru.git
 #cd paru
 #makepkg -si --noconfirm
@@ -470,7 +470,7 @@ chmod +x /home/$username/.config/polybar/launch.sh
 chmod -R +x /home/$username/.scripts
 cd /
 #rm -rf arch_install
-EOF
+exit
 
 cat >> /mnt/home/$username/.Xresources <<EOF
 Xcursor.theme: Adwaita
