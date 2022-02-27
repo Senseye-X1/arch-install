@@ -368,7 +368,7 @@ EOF
 # Pre-snapshot boot backup hook.
 echo "Configuring boot backup when pacman transactions are made."
 #echo '[Trigger]\nOperation = Upgrade\nOperation = Install\nOperation = Remove\nType = Path\nTarget = usr/lib/modules/*/vmlinuz\n\n[Action]\nDepends = rsync\nDescription = Backing up /boot...\nWhen = PreTransaction\nExec = /usr/bin/rsync -a --delete /boot /.bootbackup' | tee -a /etc/pacman.d/hooks/04-bootbackup.hook > /dev/null
-cat > /mnt/etc/pacman.d/hooks/04-bootbackup.hook <<EOF
+cat > /mnt/etc/pacman.d/hooks/04-prebootbackup.hook <<EOF
 [Trigger]
 Operation = Upgrade
 Operation = Install
@@ -469,14 +469,14 @@ cd arch_install
 cp -R \.config "/home/$username/"
 cp -R \.scripts "/home/$username/"
 cp \.zshrc /home/$username/
-chown -R "$username:$username" "/home/$username/.config"
+chown -R "$username:$username" "/home/$username/\.config"
 chown -R "$username:$username" "/home/$username/\.scripts"
 chown "$username:$username" "/home/$username/\.zshrc"
 chmod +x "/home/$username/\.config/bspwm/bspwmrc"
 chmod +x "/home/$username/\.config/polybar/launch.sh"
 chmod -R +x "/home/$username/\.scripts"
 cd /
-#rm -rf arch_install
+#rm -rf /arch_install
 EOF
 
 cat >> /mnt/home/$username/.Xresources <<EOF
@@ -502,4 +502,4 @@ chown "$username:$username" "/home/$username/.xprofile"
 chown "$username:$username" "/home/$username/.Xresources"
 EOF
 
-echo -e "\nAll done!\numount -a\nreboot\n\nAfter reboot login as user $username."
+echo -e "All done!\numount -a\nreboot\n\nAfter reboot login as user $username."
