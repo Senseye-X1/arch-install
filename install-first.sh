@@ -321,7 +321,7 @@ EOF
 print "Setting root password."
 echo "root:$password" | arch-chroot /mnt chpasswd
 
-# Setting user password.
+# Adding user/password, change shell if not zsh.
 if [ -n "$username" ]; then
     print "Adding the user $username to the system with root privilege."
     arch-chroot /mnt useradd -m -G wheel -s /usr/bin/zsh "$username"
