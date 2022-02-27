@@ -472,27 +472,25 @@ cd /
 #rm -rf arch_install
 exit
 
-cat >> /mnt/home/$username/.Xresources <<EOF
+cat >> home/$username/.Xresources <<EOF
 Xcursor.theme: Adwaita
 Xcursor.size: 16
 EOF
 
-cat >> /mnt/home/$username/.xprofile <<EOF
+cat >> home/$username/.xprofile <<EOF
 setxkbmap se
 xrdb ~/.Xresources
 EOF
 
-cat >> /mnt/home/$username/userChrome.css <<EOF
+cat >> home/$username/userChrome.css <<EOF
 #contentAreaContextMenu {
   margin-top: 5px !important;
   margin-left: 5px !important;
 }
 EOF
 
-arch-chroot /mnt /bin/bash -e <<EOF
 chown "$username:$username" home/$username/userChrome.css
 chown "$username:$username" /home/$username/.xprofile
 chown "$username:$username" /home/$username/.Xresources
-EOF
 
-printf "All done!\numount -a\nreboot\n\nAfter reboot login as $username.\n"
+printf "\nAll done!\numount -a\nreboot\n\nAfter reboot login as $username.\n"
