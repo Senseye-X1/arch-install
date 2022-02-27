@@ -212,7 +212,7 @@ mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@srv $B
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@snapshots $BTRFS /mnt/.snapshots
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@log $BTRFS /mnt/var/log
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@pkg $BTRFS /mnt/var/cache/pacman/pkg
-mount -o defaults,noatime,subvol=@swap $BTRFS /mnt/swap
+mount -o subvol=@swap $BTRFS /mnt/swap
 chattr +C /mnt/var/log
 mount $ESP /mnt/boot/
 
