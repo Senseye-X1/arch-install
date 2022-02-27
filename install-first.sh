@@ -490,8 +490,10 @@ cat >> /mnt/home/$username/userChrome.css <<EOF
 }
 EOF
 
+arch-chroot /mnt /bin/bash -e <<EOF
 chown "$username:$username" /home/$username/userChrome.css
 chown "$username:$username" /home/$username/.xprofile
 chown "$username:$username" /home/$username/.Xresources
+EOF
 
 printf "\nAll done!\numount -a\nreboot\n\nAfter reboot login as $username.\n"
