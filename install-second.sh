@@ -1,4 +1,4 @@
-
+#!/usr/bin/env -S bash -e
 
 git clone https://aur.archlinux.org/paru.git
 cd paru
