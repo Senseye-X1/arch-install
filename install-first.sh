@@ -93,10 +93,10 @@ parted -s "$DISK" \
     mklabel gpt \
     mkpart ESP fat32 1MiB 513MiB \
     set 1 esp on \
-    mkpart archroot 513MiB 100% \
+    mkpart ARCHROOT 513MiB 100% \
 
 ESP=$(findfs LABEL=ESP)
-BTRFS=$(findfs LABEL=archroot)
+BTRFS=$(findfs LABEL=ARCHROOT)
 
 # Informing the Kernel of the changes.
 printf "Informing the Kernel about the disk changes."
