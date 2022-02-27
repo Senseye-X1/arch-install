@@ -330,7 +330,7 @@ if [ -n "$username" ]; then
     echo "$username:$password" | arch-chroot /mnt chpasswd
 fi
 
-# Creating pacman hooks.
+# Creating pacman hooks directory.
 mkdir -p /mnt/etc/pacman.d/hooks
 
 # Update initramfs after an NVIDIA driver upgrade.
@@ -352,7 +352,7 @@ Exec=/bin/sh -c 'while read -r trg; do case $trg in linux) exit 0; esac; done; /
 EOF
 
 # Pre-snapshot boot backup hook.
-#print "Configuring /boot backup when pacman transactions are made."
+print "Configuring /boot backup when pacman transactions are made."
 #echo '[Trigger]\nOperation = Upgrade\nOperation = Install\nOperation = Remove\nType = Path\nTarget = usr/lib/modules/*/vmlinuz\n\n[Action]\nDepends = rsync\nDescription = Backing up /boot...\nWhen = PreTransaction\nExec = /usr/bin/rsync -a --delete /boot /.bootbackup' | tee -a /etc/pacman.d/hooks/04-bootbackup.hook > /dev/null
 cat > /mnt/etc/pacman.d/hooks/04-bootbackup.hook <<EOF
 [Trigger]
@@ -440,11 +440,7 @@ sed -i 's/#FastConnectable.*/FastConnectable = true/' /mnt/etc/bluetooth/main.co
 sed -i 's/#\(ReconnectAttempts=.*\)/\1/' /mnt/etc/bluetooth/main.conf
 sed -i 's/#\(ReconnectIntervals=.*\)/\1/' /mnt/etc/bluetooth/main.conf
 
-# Fetching .configs from git
-#git clone https://github.com/Senseye-X1/arch_install.git
-#chmod +x /mnt/arch_install/install-as-root.sh
-#chmod +x /mnt/arch_install/install-as-user.sh
-
+# User-specific configuration.
 arch-chroot /mnt /bin/bash -e <<EOF
 git clone https://aur.archlinux.org/paru.git
 cd paru
@@ -464,6 +460,9 @@ chown $username:$username /home/$username/.zshrc
 chmod +x /home/$username/.config/bspwm/bspwmrc
 chmod +x /home/$username/.config/polybar/launch.sh
 chmod -R +x /home/$username/.scripts
+cd ..
+rm -rf arch_install
+EOF
 
 cat >> /home/$username/.Xresources <<EOF
 Xcursor.theme: Adwaita
@@ -477,8 +476,4 @@ xrdb ~/.Xresources
 EOF
 chown $username:$username /home/$username/.xprofile
 
-cd ..
-rm -rf arch_install
-EOF
-
-print "umount -a\nreboot\n\nAfter reboot login as $username"
+print "All done!\numount -a\nreboot\n\nAfter reboot login as $username"
