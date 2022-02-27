@@ -320,7 +320,6 @@ arch-chroot /mnt /bin/bash -e <<EOF
     echo "Creating GRUB config file."
     grub-mkconfig -o /boot/grub/grub.cfg &>/dev/null
 
-    #localectl set-x11-keymap se
 EOF
 
 # Setting root password.
