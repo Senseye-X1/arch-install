@@ -299,12 +299,6 @@ arch-chroot /mnt /bin/bash -e <<EOF
     chmod 750 /.snapshots
     #chmod a+rx /.snapshots
     #chown :$username /.snapshots
-    sed -i 's/ALLOW_USERS=""/ALLOW_USERS="'"$username"'"/' /etc/snapper/configs/root
-    sed -i 's/TIMELINE_LIMIT_HOURLY=.*/TIMELINE_LIMIT_HOURLY="5"/' /etc/snapper/configs/root
-    sed -i 's/TIMELINE_LIMIT_DAILY=.*/TIMELINE_LIMIT_DAILY="7"/' /etc/snapper/configs/root
-    sed -i 's/TIMELINE_LIMIT_WEEKLY=.*/TIMELINE_LIMIT_WEEKLY="0"/' /etc/snapper/configs/root
-    sed -i 's/TIMELINE_LIMIT_MONTHLY=.*/TIMELINE_LIMIT_MONTHLY="0"/' /etc/snapper/configs/root
-    sed -i 's/TIMELINE_LIMIT_YEARLY=.*/TIMELINE_LIMIT_YEARLY="0"/' /etc/snapper/configs/root
 
     # Installing GRUB.
     echo "Installing GRUB on /boot."
@@ -329,6 +323,14 @@ if [ -n "$username" ]; then
     print "Setting user password for $username." 
     echo "$username:$password" | arch-chroot /mnt chpasswd
 fi
+
+# Setting snapshot limits.
+sed -i 's/ALLOW_USERS=""/ALLOW_USERS="'"$username"'"/' /mnt/etc/snapper/configs/root
+sed -i 's/TIMELINE_LIMIT_HOURLY=.*/TIMELINE_LIMIT_HOURLY="5"/' /mnt/etc/snapper/configs/root
+sed -i 's/TIMELINE_LIMIT_DAILY=.*/TIMELINE_LIMIT_DAILY="7"/' /mnt/etc/snapper/configs/root
+sed -i 's/TIMELINE_LIMIT_WEEKLY=.*/TIMELINE_LIMIT_WEEKLY="0"/' /mnt/etc/snapper/configs/root
+sed -i 's/TIMELINE_LIMIT_MONTHLY=.*/TIMELINE_LIMIT_MONTHLY="0"/' /mnt/etc/snapper/configs/root
+sed -i 's/TIMELINE_LIMIT_YEARLY=.*/TIMELINE_LIMIT_YEARLY="0"/' /mnt/etc/snapper/configs/root
 
 # Creating pacman hooks directory.
 mkdir -p /mnt/etc/pacman.d/hooks
