@@ -9,10 +9,10 @@ timezone="Europe/Stockholm"
 microcode_detector () {
     CPU=$(grep vendor_id /proc/cpuinfo)
     if [[ $CPU == *"AuthenticAMD"* ]]; then
-        printf "An AMD CPU has been detected, the AMD microcode will be installed."
+        echo "An AMD CPU has been detected, the AMD microcode will be installed."
         microcode="amd-ucode"
     else
-        printf "An Intel CPU has been detected, the Intel microcode will be installed."
+        echo "An Intel CPU has been detected, the Intel microcode will be installed."
         microcode="intel-ucode"
     fi
 }
@@ -23,7 +23,7 @@ while true; do
   read -r -s -p "Set a user password for $username: " password
 	while [ -z "$password" ]; do
 	echo
-	printf "You need to enter a password for $username."
+	echo "You need to enter a password for $username."
 	read -r -s -p "Set a user password for $username: " password
 	[ -n "$password" ] && break
 	done
@@ -39,7 +39,7 @@ done
 hostname_selector () {
     read -r -p "Please enter the hostname: " hostname
     if [ -z "$hostname" ]; then
-        printf "You need to enter a hostname in order to continue."
+        echo "You need to enter a hostname in order to continue."
         hostname_selector
     fi
     echo "$hostname" > /mnt/etc/hostname
@@ -49,7 +49,7 @@ hostname_selector () {
 locale_selector () {
     read -r -p "Please insert the locale you use (format: xx_XX or enter empty to use en_US): " locale
     if [ -z "$locale" ]; then
-        printf "en_US will be used as default locale."
+        echo "en_US will be used as default locale."
         locale="en_US"
     fi
     echo "$locale.UTF-8 UTF-8"  > /mnt/etc/locale.gen
@@ -60,7 +60,7 @@ locale_selector () {
 keyboard_selector () {
     read -r -p "Please insert the keyboard layout you use (enter empty to use sv-latin1 keyboard layout): " kblayout
     if [ -z "$kblayout" ]; then
-        printf "sv-latin1 keyboard layout will be used by default."
+        echo "sv-latin1 keyboard layout will be used by default."
         kblayout="sv-latin1"
     fi
     loadkeys $kblayout
