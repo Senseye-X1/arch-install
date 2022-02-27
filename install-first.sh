@@ -249,6 +249,11 @@ locale_selector
 # Setting up keyboard layout.
 keyboard_selector
 
+# Fix function keys on Keychron keyboards using Apple driver.
+cat >> /mnt/etc/modprobe.d/hid_apple.conf <<EOF
+options hid_apple fnmode=2
+EOF
+
 # Configuring /etc/mkinitcpio.conf
 echo "Configuring /etc/mkinitcpio for BTRFS and NVIDIA."
 #sed -i 's/#COMPRESSION=.*/COMPRESSION="zstd"/g' /mnt/etc/mkinitcpio.conf
