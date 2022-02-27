@@ -468,7 +468,7 @@ timedatectl set-ntp true
 echo "Clone dotfiles for $username."
 git clone https://github.com/Senseye-X1/arch_install.git
 cd arch_install
-cp /arch_install/install-second.sh /home/$username
+cp /arch_install/install-second.sh /home/$username/
 chown "$username:$username" /home/$username/install-second.sh
 chmod +x /home/$username/install-second.sh
 cp -R \.config "/home/$username/"
