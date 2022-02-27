@@ -88,7 +88,7 @@ else
 fi
 
 # Creating a new partition scheme.
-print "Creating the partitions on $DISK."
+printf "Creating the partitions on $DISK."
 parted -s "$DISK" \
     mklabel gpt \
     mkpart ESP fat32 1MiB 513MiB \
@@ -99,11 +99,11 @@ ESP=$(findfs LABEL=ESP)
 BTRFS=$(findfs LABEL=archroot)
 
 # Informing the Kernel of the changes.
-print "Informing the Kernel about the disk changes."
+printf "Informing the Kernel about the disk changes."
 partprobe "$DISK"
 
 # Formatting the ESP as FAT32.
-print "Formatting the EFI Partition as FAT32."
+printf "Formatting the EFI Partition as FAT32."
 mkfs.fat -F 32 $ESP &>/dev/null
 
 # Formatting the root partition as BTRFS.
@@ -189,7 +189,7 @@ mount $BTRFS /mnt
 ### End creating BTRFS subvolumes with Snapper rollback nested layout.
 
 ### Creating BTRFS subvolumes for Snapper manual flat layout.
-print "Creating BTRFS subvolumes."
+printf "Creating BTRFS subvolumes."
 for volume in @ @home @root @srv @snapshots @log @pkg @swap
 do
     btrfs su cr /mnt/$volume
@@ -197,7 +197,7 @@ done
 
 # Mounting the newly created subvolumes.
 umount /mnt
-print "Mounting the newly created subvolumes."
+printf "Mounting the newly created subvolumes."
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@ $BTRFS /mnt
 mkdir -p /mnt/{home,root,srv,.snapshots,/var/log,/var/cache/pacman/pkg,boot,swap}
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@home $BTRFS /mnt/home
@@ -317,15 +317,15 @@ arch-chroot /mnt /bin/bash -e <<EOF
 EOF
 
 # Setting root password.
-print "Setting root password."
+printf "Setting root password."
 echo "root:$password" | arch-chroot /mnt chpasswd
 
 # Adding user/password, change shell if not zsh.
 if [ -n "$username" ]; then
-    print "Adding the user $username to the system with root privilege."
+    printf "Adding the user $username to the system with root privilege."
     arch-chroot /mnt useradd -m -G wheel -s /usr/bin/zsh "$username"
     sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/' /mnt/etc/sudoers
-    print "Setting user password for $username." 
+    printf "Setting user password for $username." 
     echo "$username:$password" | arch-chroot /mnt chpasswd
 fi
 
@@ -359,7 +359,7 @@ Exec=/bin/sh -c 'while read -r trg; do case $trg in linux) exit 0; esac; done; /
 EOF
 
 # Pre-snapshot boot backup hook.
-print "Configuring /boot backup when pacman transactions are made."
+printf "Configuring /boot backup when pacman transactions are made."
 #echo '[Trigger]\nOperation = Upgrade\nOperation = Install\nOperation = Remove\nType = Path\nTarget = usr/lib/modules/*/vmlinuz\n\n[Action]\nDepends = rsync\nDescription = Backing up /boot...\nWhen = PreTransaction\nExec = /usr/bin/rsync -a --delete /boot /.bootbackup' | tee -a /etc/pacman.d/hooks/04-bootbackup.hook > /dev/null
 cat > /mnt/etc/pacman.d/hooks/04-bootbackup.hook <<EOF
 [Trigger]
@@ -433,7 +433,7 @@ EOF
 #firewall-cmd --reload
 
 # Enabling various services.
-print "Enabling services."
+printf "Enabling services."
 # Use this instead if nested BTRFS layout:
 #for service in NetworkManager fstrim.timer bluetooth systemd-timesyncd lightdm reflector.timer snapper-timeline.timer snapper-cleanup.timer btrfs-scrub@-.timer btrfs-scrub@home.timer btrfs-scrub@var.timer btrfs-scrub@\\x2esnapshots.timer grub-btrfs.path
 for service in NetworkManager fstrim.timer bluetooth systemd-timesyncd lightdm reflector.timer snapper-timeline.timer snapper-cleanup.timer btrfs-scrub@-.timer btrfs-scrub@home.timer btrfs-scrub@log.timer btrfs-scrub@\\x2esnapshots.timer grub-btrfs.path
@@ -491,4 +491,4 @@ cat >> /mnt/home/$username/userChrome.css <<EOF
 EOF
 chown $username:$username /mnt/home/$username/userChrome.css
 
-print "All done!\numount -a\nreboot\n\nAfter reboot login as $username"
+printf "All done!\numount -a\nreboot\n\nAfter reboot login as $username"
