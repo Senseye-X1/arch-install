@@ -95,8 +95,8 @@ parted -s "$DISK" \
     set 1 esp on \
     mkpart ARCHROOT 513MiB 100% \
 
-ESP=$(findfs LABEL=ESP)
-BTRFS=$(findfs LABEL=ARCHROOT)
+ESP=$(findfs PARTLABEL=ESP)
+BTRFS=$(findfs PARTLABEL=ARCHROOT)
 
 # Informing the Kernel of the changes.
 printf "Informing the Kernel about the disk changes."
