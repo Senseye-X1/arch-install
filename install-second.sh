@@ -1,5 +1,6 @@
 #!/bin/bash
 
+timedatectl set-ntp true
 localectl set-x11-keymap se
 
 sudo systemctl enable lightdm
