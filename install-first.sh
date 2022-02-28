@@ -467,22 +467,24 @@ timedatectl set-ntp true
 #cd /home/$username
 echo "Clone dotfiles for $username."
 git clone https://github.com/Senseye-X1/arch_install.git
+chown -R "$username:$username" arch_install
 cd arch_install
-cp /arch_install/install-second.sh /home/$username/
-chown "$username:$username" /home/$username/install-second.sh
+cp install-second.sh /home/$username/
+#chown "$username:$username" /home/$username/install-second.sh
+cp -R dotfiles /home/$username/
 chmod +x /home/$username/install-second.sh
-cp -R \.config "/home/$username/"
-cp -R \.scripts "/home/$username/"
+cp -RT \.config "/home/$username/dotfiles"
+cp -R \.scripts "/home/$username/dotfiles"
 #chown -R "$username:$username" dotfiles
 #cp -RT dotfiles "/home/$username"
 #chown -R "$username:$username" /home/$username/dotfiles
 cp \.zshrc /home/$username/
-chown -R "$username:$username" /home/$username/\.config
-chown -R "$username:$username" /home/$username/\.scripts
-chown "$username:$username" /home/$username/\.zshrc
-chmod +x /home/$username/\.config/bspwm/bspwmrc
-chmod +x /home/$username/\.config/polybar/launch.sh
-chmod -R +x /home/$username/\.scripts
+#chown -R "$username:$username" /home/$username/\.config
+#chown -R "$username:$username" /home/$username/\.scripts
+#chown "$username:$username" /home/$username/\.zshrc
+chmod +x /home/$username/dotfiles/bspwm/\.config/bspwm/bspwmrc
+chmod +x /home/$username/dotfiles/polybar/\.config/polybar/launch.sh
+chmod -R +x /home/$username/dotfiles/\.scripts
 cd /
 #rm -rf /arch_install
 EOF
