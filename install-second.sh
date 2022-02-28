@@ -15,4 +15,4 @@ cd
 
 paru polybar
 
-echo "All done!
+echo "All done!"
