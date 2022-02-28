@@ -464,11 +464,12 @@ timedatectl set-ntp true
 #cd ..
 
 #paru polybar
-#cd /home/$username
 echo "Clone dotfiles for $username."
-git clone https://github.com/Senseye-X1/arch_install.git
-chown -R "$username:$username" arch_install
-cd arch_install
+cd /home/$username
+#git clone https://github.com/Senseye-X1/arch_install.git
+git clone https://github.com/Senseye-X1/dotfiles.git
+chown -R "$username:$username" /home/$username/dotfiles
+#cd arch_install
 cp install-second.sh /home/$username/
 #chown "$username:$username" /home/$username/install-second.sh
 cp -R dotfiles /home/$username/
@@ -489,27 +490,27 @@ cd /
 #rm -rf /arch_install
 EOF
 
-cat >> /mnt/home/$username/.Xresources <<EOF
-Xcursor.theme: Adwaita
-Xcursor.size: 16
-EOF
+#cat >> /mnt/home/$username/.Xresources <<EOF
+#Xcursor.theme: Adwaita
+#Xcursor.size: 16
+#EOF
 
-cat >> /mnt/home/$username/.xprofile <<EOF
-setxkbmap se
-xrdb ~/.Xresources
-EOF
+#cat >> /mnt/home/$username/.xprofile <<EOF
+#setxkbmap se
+#xrdb ~/.Xresources
+#EOF
 
-cat >> /mnt/home/$username/userChrome.css <<EOF
-#contentAreaContextMenu {
-  margin-top: 5px !important;
-  margin-left: 5px !important;
-}
-EOF
+#cat >> /mnt/home/$username/userChrome.css <<EOF
+##contentAreaContextMenu {
+#  margin-top: 5px !important;
+#  margin-left: 5px !important;
+#}
+#EOF
 
-arch-chroot /mnt /bin/bash -e <<EOF
-chown "$username:$username" "/home/$username/userChrome.css"
-chown "$username:$username" "/home/$username/.xprofile"
-chown "$username:$username" "/home/$username/.Xresources"
-EOF
+#arch-chroot /mnt /bin/bash -e <<EOF
+#chown "$username:$username" "/home/$username/userChrome.css"
+#chown "$username:$username" "/home/$username/.xprofile"
+#chown "$username:$username" "/home/$username/.Xresources"
+#EOF
 
 echo -e "All done!\numount -a\nreboot\n\nAfter reboot login as user $username."
