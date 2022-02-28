@@ -473,6 +473,9 @@ chown "$username:$username" /home/$username/install-second.sh
 chmod +x /home/$username/install-second.sh
 cp -R \.config "/home/$username/"
 cp -R \.scripts "/home/$username/"
+#chown -R "$username:$username" dotfiles
+#cp -RT dotfiles "/home/$username"
+#chown -R "$username:$username" /home/$username/dotfiles
 cp \.zshrc /home/$username/
 chown -R "$username:$username" /home/$username/\.config
 chown -R "$username:$username" /home/$username/\.scripts
