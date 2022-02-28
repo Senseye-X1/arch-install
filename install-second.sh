@@ -5,6 +5,9 @@ localectl set-x11-keymap se
 
 sudo systemctl enable lightdm
 
+cd
+mkdir builds
+cd builds
 git clone https://aur.archlinux.org/paru.git
 cd paru
 makepkg -si --noconfirm
