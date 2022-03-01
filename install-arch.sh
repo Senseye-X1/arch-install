@@ -220,7 +220,7 @@ mount $ESP /mnt/boot/
 microcode_detector
 
 # Install packages.
-pacstrap /mnt base linux linux-firmware $microcode btrfs-progs git nano alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto udiskie accountsservice archlinux-wallpaper bspwm dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-slick-greeter lxappearance-gtk3 picom rofi sxhkd stow xautolock xorg zsh zsh-autosuggestions zsh-completions reflector nvidia nvidia-settings
+pacstrap /mnt base linux linux-firmware $microcode btrfs-progs git nano alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto udiskie accountsservice archlinux-wallpaper bspwm dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-gtk-greeter lxappearance-gtk3 picom rofi sxhkd stow xautolock xorg zsh zsh-autosuggestions zsh-completions reflector nvidia nvidia-settings
 
 # Generating /etc/fstab.
 echo "Generating a new fstab."
@@ -414,17 +414,17 @@ EOF
 
 chmod +x /mnt/etc/lightdm/monitor_setup.sh
 sed -i 's/#greeter-setup-script=.*/greeter-setup-script=\/etc\/lightdm\/monitor_setup.sh/' /mnt/etc/lightdm/lightdm.conf
-sed -i 's/#greeter-session=.*/greeter-session=lightdm-slick-greeter/' /mnt/etc/lightdm/lightdm.conf
+#sed -i 's/#greeter-session=.*/greeter-session=lightdm-slick-greeter/' /mnt/etc/lightdm/lightdm.conf
 
-#cat > /mnt/etc/lightdm/lightdm-gtk-greeter.conf <<EOF
-#[greeter]
-#cursor-theme-name = Adwaita
-#cursor-theme-size = 16
-#theme-name = Arc-Dark
-#icon-theme-name = Adwaita
-#font-name = Roboto 10
-#indicators = ~spacer;~clock;~spacer;~language;~session;~a11y;~power
-#EOF
+cat > /mnt/etc/lightdm/lightdm-gtk-greeter.conf <<EOF
+[greeter]
+cursor-theme-name = Adwaita
+cursor-theme-size = 16
+theme-name = Arc-Dark
+icon-theme-name = Adwaita
+font-name = Roboto 10
+indicators = ~spacer;~clock;~spacer;~language;~session;~a11y;~power
+EOF
 
 # Disallow Ctrl+Alt+Fn switching for added security
 cat >> /mnt/etc/X11/xorg.conf <<EOF
