@@ -543,4 +543,4 @@ chmod +x "/home/$username/install-dotfiles.sh"
 #chown "$username:$username" "/home/$username/.Xresources"
 EOF
 
-echo -e "All done!\numount -a\nreboot\n\nAfter reboot login as user $username and run install-dotfiles.sh"
+echo -e "All done!\numount -a\nreboot\n\nAfter reboot login as user $username and run ./install-dotfiles.sh"
