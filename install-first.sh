@@ -286,7 +286,7 @@ arch-chroot /mnt /bin/bash -e <<EOF
     echo "Setting up timezone."
     ln -sf /usr/share/zoneinfo/Europe/Stockholm /etc/localtime &>/dev/null
     
-    #timedatectl set-ntp true
+    timedatectl set-ntp true
     
     # Setting up clock.
     hwclock --systohc
@@ -454,9 +454,9 @@ sed -i 's/#\(ReconnectAttempts=.*\)/\1/' /mnt/etc/bluetooth/main.conf
 sed -i 's/#\(ReconnectIntervals=.*\)/\1/' /mnt/etc/bluetooth/main.conf
 
 # User-specific configuration.
-arch-chroot /mnt /bin/bash -e <<EOF
+#arch-chroot /mnt /bin/bash -e <<EOF
 
-timedatectl set-ntp true
+#timedatectl set-ntp true
 
 #git clone https://aur.archlinux.org/paru.git
 #cd paru
@@ -464,29 +464,32 @@ timedatectl set-ntp true
 #cd ..
 
 #paru polybar
-echo "Clone dotfiles for $username."
-cd /home/$username
+#echo "Clone dotfiles for $username."
+#cd /home/$username
+#git clone https://github.com/Senseye-X1/dotfiles.git
+#chown -R "$username:$username" /home/$username/dotfiles
+#chmod +x /home/$username/dotfiles/install-second.sh
+#chmod +x /home/$username/dotfiles/bspwm/\.config/bspwm/bspwmrc
+#chmod +x /home/$username/dotfiles/polybar/\.config/polybar/launch.sh
+#chmod -R +x /home/$username/dotfiles/scripts/\.scripts
+
 #git clone https://github.com/Senseye-X1/arch_install.git
-git clone https://github.com/Senseye-X1/dotfiles.git
-chown -R "$username:$username" /home/$username/dotfiles
 #cd arch_install
-cp install-second.sh /home/$username/
+#cp install-second.sh /home/$username/
 #chown "$username:$username" /home/$username/install-second.sh
-cp -R dotfiles /home/$username/
-chmod +x /home/$username/install-second.sh
-cp -RT \.config "/home/$username/dotfiles"
-cp -R \.scripts "/home/$username/dotfiles"
+#cp -R dotfiles /home/$username/
+
+#cp -RT \.config "/home/$username/dotfiles"
+#cp -R \.scripts "/home/$username/dotfiles"
 #chown -R "$username:$username" dotfiles
 #cp -RT dotfiles "/home/$username"
 #chown -R "$username:$username" /home/$username/dotfiles
-cp \.zshrc /home/$username/
+#cp \.zshrc /home/$username/
 #chown -R "$username:$username" /home/$username/\.config
 #chown -R "$username:$username" /home/$username/\.scripts
 #chown "$username:$username" /home/$username/\.zshrc
-chmod +x /home/$username/dotfiles/bspwm/\.config/bspwm/bspwmrc
-chmod +x /home/$username/dotfiles/polybar/\.config/polybar/launch.sh
-chmod -R +x /home/$username/dotfiles/\.scripts
-cd /
+
+#cd /
 #rm -rf /arch_install
 EOF
 
