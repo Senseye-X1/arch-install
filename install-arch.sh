@@ -330,7 +330,7 @@ echo "root:$password" | arch-chroot /mnt chpasswd
 if [ -n "$username" ]; then
     echo "Adding the user $username to the system with root privilege."
     arch-chroot /mnt useradd -m -G wheel -s /usr/bin/zsh "$username"
-    sed -i 's/# %wheel ALL=(ALL) ALL/%wheel ALL=(ALL) ALL/' /mnt/etc/sudoers
+    sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /mnt/etc/sudoers
     echo "Setting user password for $username." 
     echo "$username:$password" | arch-chroot /mnt chpasswd
 fi
