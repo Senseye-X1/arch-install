@@ -528,7 +528,7 @@ cd paru
 makepkg -si --noconfirm
 cd
 
-paru polybar
+paru -S polybar --removemake
 
 sudo systemctl enable lightdm
 
