@@ -503,17 +503,44 @@ sed -i 's/#\(ReconnectIntervals=.*\)/\1/' /mnt/etc/bluetooth/main.conf
 #xrdb ~/.Xresources
 #EOF
 
-#cat >> /mnt/home/$username/userChrome.css <<EOF
-##contentAreaContextMenu {
-#  margin-top: 5px !important;
-#  margin-left: 5px !important;
-#}
-#EOF
+cat > /mnt/home/$username/install-dotfiles.sh <<EOF
+#!/usr/bin/env -S bash -e
 
-#arch-chroot /mnt /bin/bash -e <<EOF
+timedatectl set-ntp true
+localectl set-x11-keymap se
+
+cd
+git clone https://github.com/Senseye-X1/dotfiles.git
+chmod +x /home/$username/dotfiles/bspwm/\.config/bspwm/bspwmrc
+chmod +x /home/$username/dotfiles/polybar/\.config/polybar/launch.sh
+chmod -R +x /home/$username/dotfiles/scripts/\.scripts
+#chmod +x '/home/'$username'/dotfiles/bspwm/.config/bspwm/bspwmrc'
+#chmod +x '/home/'$username'/dotfiles/polybar/.config/polybar/launch.sh'
+#chmod -R +x '/home/'$username'/dotfiles/scripts/.scripts'
+cd dotfiles
+stow '*/'
+
+cd
+mkdir builds
+cd builds
+git clone https://aur.archlinux.org/paru.git
+cd paru
+makepkg -si --noconfirm
+cd
+
+paru polybar
+
+sudo systemctl enable lightdm
+
+echo -e "All done!\nReboot and login."
+EOF
+
+arch-chroot /mnt /bin/bash -e <<EOF
+chown "$username:$username" "/home/$username/install-dotfiles.sh"
+chmod +x "/home/$username/install-dotfiles.sh"
 #chown "$username:$username" "/home/$username/userChrome.css"
 #chown "$username:$username" "/home/$username/.xprofile"
 #chown "$username:$username" "/home/$username/.Xresources"
-#EOF
+EOF
 
-echo -e "All done!\numount -a\nreboot\n\nAfter reboot login as user $username."
+echo -e "All done!\numount -a\nreboot\n\nAfter reboot login as user $username and run install-dotfiles.sh"
