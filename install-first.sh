@@ -491,7 +491,7 @@ sed -i 's/#\(ReconnectIntervals=.*\)/\1/' /mnt/etc/bluetooth/main.conf
 
 #cd /
 #rm -rf /arch_install
-EOF
+#EOF
 
 #cat >> /mnt/home/$username/.Xresources <<EOF
 #Xcursor.theme: Adwaita
