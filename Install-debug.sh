@@ -329,7 +329,7 @@ echo "root:$password" | arch-chroot /mnt chpasswd
 # Adding user/password, change shell if not zsh.
 if [ -n "$username" ]; then
     echo "Adding the user $username to the system with root privilege."
-    arch-chroot /mnt useradd -m -G wheel -s /usr/bin/zsh "$username"
+    arch-chroot /mnt useradd -m -G wheel "$username"
     sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /mnt/etc/sudoers
     echo "Setting user password for $username." 
     echo "$username:$password" | arch-chroot /mnt chpasswd
@@ -442,7 +442,7 @@ EOF
 echo "Enabling services."
 # Use this instead if nested BTRFS layout:
 #for service in NetworkManager fstrim.timer bluetooth systemd-timesyncd lightdm reflector.timer snapper-timeline.timer snapper-cleanup.timer btrfs-scrub@-.timer btrfs-scrub@home.timer btrfs-scrub@var.timer btrfs-scrub@\\x2esnapshots.timer grub-btrfs.path
-for service in NetworkManager fstrim.timer bluetooth systemd-timesyncd reflector.timer snapper-timeline.timer snapper-cleanup.timer btrfs-scrub@-.timer btrfs-scrub@home.timer btrfs-scrub@log.timer btrfs-scrub@\\x2esnapshots.timer grub-btrfs.path
+for service in NetworkManager fstrim.timer bluetooth systemd-timesyncd reflector.timer firewalld snapper-timeline.timer snapper-cleanup.timer btrfs-scrub@-.timer btrfs-scrub@home.timer btrfs-scrub@log.timer btrfs-scrub@\\x2esnapshots.timer grub-btrfs.path
 do
     systemctl enable "$service" --root=/mnt &>/dev/null
 done
@@ -518,7 +518,13 @@ chmod -R +x dotfiles/scripts/\.scripts
 #chmod +x '/home/'$username'/dotfiles/polybar/.config/polybar/launch.sh'
 #chmod -R +x '/home/'$username'/dotfiles/scripts/.scripts'
 cd dotfiles
-stow */
+stow bspwm
+stow kitty
+stow picom
+stow polybar
+stow rofi
+stow scripts
+stow sxhkd
 
 cd
 mkdir builds
