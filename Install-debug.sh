@@ -220,7 +220,7 @@ mount $ESP /mnt/boot/
 microcode_detector
 
 # Install packages.
-pacstrap /mnt base linux linux-firmware $microcode btrfs-progs git nano alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto udiskie accountsservice archlinux-wallpaper bspwm dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-gtk-greeter lxappearance-gtk3 picom rofi sxhkd stow xautolock xorg zsh zsh-autosuggestions zsh-completions reflector nvidia nvidia-settings
+pacstrap /mnt base linux linux-firmware $microcode btrfs-progs git nano alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto udiskie accountsservice archlinux-wallpaper bspwm dunst feh firefox geany kitty light-locker lightdm-gtk-greeter picom rofi sxhkd stow xautolock xorg reflector nvidia nvidia-settings
 
 # Generating /etc/fstab.
 echo "Generating a new fstab."
