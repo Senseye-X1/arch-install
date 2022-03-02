@@ -12,6 +12,5 @@ Debugging: normal shell for user, no stow gtkrc2/gtk3/picom/x, enabled firewalld
 
 removed gnome-themes-extra, lxappearance-gtk3, zsh
 
-could rofi cause it?
-
-try dmenu?
+could rofi cause it? 
+No errors so far with dmenu. 
