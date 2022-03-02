@@ -1,6 +1,6 @@
 # arch-install
 
-bash <(curl -s https://raw.githubusercontent.com/Senseye-X1/arch-install/main/install-arch.sh)
+bash <(curl -s https://raw.githubusercontent.com/Senseye-X1/arch-install/main/install.sh)
 
 When done, reboot
 
