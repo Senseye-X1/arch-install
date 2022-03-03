@@ -530,7 +530,7 @@ cd
 
 paru -S polybar --removemake
 
-sudo systemctl enable lightdm
+sudo systemctl enable lightdm.service
 
 echo -e "All done!\nReboot and login."
 EOF
