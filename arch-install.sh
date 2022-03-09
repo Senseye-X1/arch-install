@@ -546,10 +546,8 @@ stow */
 #cd builds
 #cd /tmp
 git clone https://aur.archlinux.org/paru.git /tmp/paru
-cd /tmp/paru
-makepkg -si --noconfirm
+cd /tmp/paru;makepkg -si --noconfirm;cd
 
-cd
 paru -S polybar --removemake
 
 sudo systemctl enable lightdm.service
@@ -558,16 +556,17 @@ sudo systemctl enable lightdm.service
 EOF
 
 if [ "$winmanager" -eq "dwm" ]
-sed -i 's/paru -S polybar --removemake/#paru -S polybar --removemake/' /home/$username/install-dotfiles.sh
+sed -i 's/\(^paru -S polybar --removemake\)/#\1/' /home/$username/install-dotfiles.sh
+sed -i 's/\(^cd.*makepkg -si --noconfirm.*\)/#\1/' /home/$username/install-dotfiles.sh
 sed -i 's/\(^git clone.*paru.git.*\)/#\1/' /home/$username/install-dotfiles.sh
 
 cat >> /mnt/home/$username/install-dotfiles.sh <<EOF
 #DWMDIR="/home/$username/suckless/dwm-flexipatch"
 #cd
-mkdir -p /home/$username/suckless/dwm-flexipatch
+#mkdir -p /home/$username/suckless/dwm-flexipatch
 #cd suckless
 git clone https://github.com/bakkeby/dwm-flexipatch.git /home/$username/suckless/dwm-flexipatch
-cd /home/$username/suckless/dwm-flexipatch
+
 
 for patch in BAR_STATUSCMD_PATCH AUTOSTART_PATCH ATTACHBOTTOM_PATCH ALWAYSCENTER_PATCH CYCLELAYOUTS_PATCH FIBONACCI_DWINDLE_LAYOUT SCRATCHPADS_PATCH BAR_HEIGHT_PATCH ROTATESTACK_PATCH VANITYGAPS_PATCH
 do
@@ -575,7 +574,9 @@ do
 done
 
 # Win-key as modkey.
-sed -i 's/#define MODKEY Mod1Mask/#define MODKEY Mod4Mask/' /home/$username/suckless/dwm-flexipatch/config.def.h
+sed -i 's/#define MODKEY Mod1Mask/#define MODKEY Mod4Mask/' /mnt/home/$username/suckless/dwm-flexipatch/config.def.h
+cd /home/$username/suckless/dwm-flexipatch;make;sudo make install;cd
+
 sudo cat > /usr/share/xsessions/dwm.desktop <<EOF
 [Desktop Entry]
 Encoding=UTF-8
