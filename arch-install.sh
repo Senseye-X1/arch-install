@@ -5,6 +5,15 @@
 
 #timezone="Europe/Stockholm"
 
+# Selecting the window manager for the installation.
+PS3="Please select the window manager: "
+select WMENTRY in bspwm dwm;
+do
+    winmanager=$WMENTRY
+    echo "Installing $winmanager."
+    break
+done
+
 # Microcode detector (function).
 microcode_detector () {
     CPU=$(grep vendor_id /proc/cpuinfo)
