@@ -5,15 +5,6 @@
 
 #timezone="Europe/Stockholm"
 
-# Selecting the window manager for the installation.
-PS3="Please select the window manager: "
-select WMENTRY in bspwm dwm;
-do
-    winmanager=$WMENTRY
-    echo "Installing $winmanager."
-    break
-done
-
 # Microcode detector (function).
 microcode_detector () {
     CPU=$(grep vendor_id /proc/cpuinfo)
@@ -229,7 +220,28 @@ mount $ESP /mnt/boot/
 microcode_detector
 
 # Install packages.
-pacstrap /mnt base linux linux-firmware $microcode btrfs-progs git nano alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto ttf-iosevka-nerd udiskie accountsservice archlinux-wallpaper bspwm dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-gtk-greeter lxappearance-gtk3 picom rofi sxhkd stow xautolock xorg zsh zsh-autosuggestions zsh-completions reflector nvidia nvidia-settings
+pacstrap /mnt base linux linux-firmware ${microcode} btrfs-progs git nano alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto ttf-iosevka-nerd udiskie accountsservice archlinux-wallpaper dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-gtk-greeter lxappearance-gtk3 picom rofi stow xautolock xorg zsh zsh-autosuggestions zsh-completions reflector nvidia nvidia-settings
+
+# Selecting the window manager for the installation.
+PS3="Please select the window manager: "
+select WMENTRY in bspwm dwm;
+do
+    case $WMENTRY in 
+        "bspwm")
+	winmanager="bspwm"
+        echo "Installing $WMENTRY."
+	pacstrap /mnt bspwm sxhkd
+        ;;
+        "dwm")
+        winmanager="dwm"
+        echo "Installing $WMENTRY."
+        ;;
+        *)
+        winmanager=""
+        echo "No window manager selected."
+        ;;
+    esac
+done
 
 # Generating /etc/fstab.
 echo "Generating a new fstab."
@@ -542,8 +554,23 @@ paru -S polybar --removemake
 
 sudo systemctl enable lightdm.service
 
-echo -e "All done!\nReboot and login."
+#echo -e "All done!\nReboot and login."
 EOF
+
+if [ "$winmanager" -eq "dwm" ]
+cat >> /mnt/home/$username/install-dotfiles.sh <<EOF
+#cd
+mkdir -p /home/$username/suckless/dwm-flexipatch
+#cd suckless
+git clone https://github.com/bakkeby/dwm-flexipatch.git /home/$username/suckless/dwm-flexipatch
+cd /home/$username/suckless/dwm-flexipatch
+
+for patch in BAR_STATUSCMD_PATCH
+do
+    sed -i 's/\(.*'"$patch"'\).*/\1 1/' /home/$username/suckless/dwm-flexipatch/patches.def.h
+done
+EOF
+fi
 
 arch-chroot /mnt /bin/bash -e <<EOF
 chown "$username:$username" "/home/$username/install-dotfiles.sh"
