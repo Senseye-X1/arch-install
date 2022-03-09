@@ -576,6 +576,13 @@ done
 
 # Win-key as modkey.
 sed -i 's/#define MODKEY Mod1Mask/#define MODKEY Mod4Mask/' /home/$username/suckless/dwm-flexipatch/config.def.h
+sudo cat > /usr/share/xsessions/dwm.desktop <<EOF
+[Desktop Entry]
+Name=dwm
+Comment=Dynamic window manager
+Exec=dwm
+Type=XSession
+EOF
 EOF
 fi
 
