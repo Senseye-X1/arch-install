@@ -530,26 +530,26 @@ cat > /mnt/home/$username/install-dotfiles.sh <<EOF
 timedatectl set-ntp true
 localectl set-x11-keymap se
 
-cd
-git clone https://github.com/Senseye-X1/dotfiles.git
-chmod +x dotfiles/bspwm/\.config/bspwm/bspwmrc
-chmod +x dotfiles/polybar/\.config/polybar/launch.sh
-chmod -R +x dotfiles/scripts/\.scripts
+#cd
+git clone https://github.com/Senseye-X1/dotfiles.git $HOME/dotfiles
+chmod +x $HOME/dotfiles/bspwm/\.config/bspwm/bspwmrc
+chmod +x $HOME/dotfiles/polybar/\.config/polybar/launch.sh
+chmod -R +x $HOME/dotfiles/scripts/\.scripts
 #chmod +x '/home/'$username'/dotfiles/bspwm/.config/bspwm/bspwmrc'
 #chmod +x '/home/'$username'/dotfiles/polybar/.config/polybar/launch.sh'
 #chmod -R +x '/home/'$username'/dotfiles/scripts/.scripts'
-cd dotfiles
+cd $HOME/dotfiles
 stow */
 
 #cd
 #mkdir builds
 #cd builds
-cd /tmp
-git clone https://aur.archlinux.org/paru.git
-cd paru
+#cd /tmp
+git clone https://aur.archlinux.org/paru.git /tmp/paru
+cd /tmp/paru
 makepkg -si --noconfirm
-cd
 
+cd
 paru -S polybar --removemake
 
 sudo systemctl enable lightdm.service
@@ -558,17 +558,24 @@ sudo systemctl enable lightdm.service
 EOF
 
 if [ "$winmanager" -eq "dwm" ]
+sed -i 's/paru -S polybar --removemake/#paru -S polybar --removemake/' /home/$username/install-dotfiles.sh
+sed -i 's/\(^git clone.*paru.git.*\)/#\1/' $HOME/install-dotfiles.sh
+
 cat >> /mnt/home/$username/install-dotfiles.sh <<EOF
+#DWMDIR="/home/$username/suckless/dwm-flexipatch"
 #cd
 mkdir -p /home/$username/suckless/dwm-flexipatch
 #cd suckless
 git clone https://github.com/bakkeby/dwm-flexipatch.git /home/$username/suckless/dwm-flexipatch
 cd /home/$username/suckless/dwm-flexipatch
 
-for patch in BAR_STATUSCMD_PATCH
+for patch in BAR_STATUSCMD_PATCH AUTOSTART_PATCH ATTACHBOTTOM_PATCH ALWAYSCENTER_PATCH CYCLELAYOUTS_PATCH FIBONACCI_DWINDLE_LAYOUT SCRATCHPADS_PATCH BAR_HEIGHT_PATCH ROTATESTACK_PATCH VANITYGAPS_PATCH
 do
     sed -i 's/\(.*'"$patch"'\).*/\1 1/' /home/$username/suckless/dwm-flexipatch/patches.def.h
 done
+
+# Win-key as modkey.
+sed -i 's/#define MODKEY Mod1Mask/#define MODKEY Mod4Mask/' /home/$username/suckless/dwm-flexipatch/config.def.h
 EOF
 fi
 
