@@ -520,9 +520,10 @@ chmod -R +x dotfiles/scripts/\.scripts
 cd dotfiles
 stow */
 
-cd
-mkdir builds
-cd builds
+#cd
+#mkdir builds
+#cd builds
+cd /tmp
 git clone https://aur.archlinux.org/paru.git
 cd paru
 makepkg -si --noconfirm
