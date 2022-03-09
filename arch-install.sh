@@ -559,7 +559,7 @@ EOF
 
 if [ "$winmanager" -eq "dwm" ]
 sed -i 's/paru -S polybar --removemake/#paru -S polybar --removemake/' /home/$username/install-dotfiles.sh
-sed -i 's/\(^git clone.*paru.git.*\)/#\1/' $HOME/install-dotfiles.sh
+sed -i 's/\(^git clone.*paru.git.*\)/#\1/' /home/$username/install-dotfiles.sh
 
 cat >> /mnt/home/$username/install-dotfiles.sh <<EOF
 #DWMDIR="/home/$username/suckless/dwm-flexipatch"
