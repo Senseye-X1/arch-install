@@ -220,7 +220,7 @@ mount $ESP /mnt/boot/
 microcode_detector
 
 # Install packages.
-pacstrap /mnt base linux linux-firmware ${microcode} btrfs-progs git nano alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto ttf-iosevka-nerd udiskie accountsservice archlinux-wallpaper dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-gtk-greeter lxappearance-gtk3 picom rofi stow xautolock xorg zsh zsh-autosuggestions zsh-completions reflector nvidia nvidia-settings
+pacstrap /mnt base linux linux-firmware ${microcode} btrfs-progs git nano alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto ttf-iosevka-nerd udiskie accountsservice dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-gtk-greeter lxappearance-gtk3 picom stow xautolock xorg zsh zsh-autosuggestions zsh-completions reflector nvidia nvidia-settings
 
 # Selecting the window manager for the installation.
 PS3="Please select the window manager: "
@@ -230,11 +230,12 @@ do
         "bspwm")
 	winmanager="bspwm"
         echo "Installing $WMENTRY."
-	pacstrap /mnt bspwm sxhkd
+	pacstrap /mnt bspwm sxhkd rofi
         ;;
         "dwm")
         winmanager="dwm"
         echo "Installing $WMENTRY."
+	pacstrap /mnt dmenu
         ;;
         *)
         winmanager=""
