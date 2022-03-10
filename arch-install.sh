@@ -475,7 +475,6 @@ sed -i 's/#\(ReconnectAttempts=.*\)/\1/' /mnt/etc/bluetooth/main.conf
 sed -i 's/#\(ReconnectIntervals=.*\)/\1/' /mnt/etc/bluetooth/main.conf
 
 # User-specific configuration.
-
 cat > /mnt/home/$username/install-dotfiles.sh <<EOF
 #!/usr/bin/env -S bash -e
 
@@ -487,36 +486,23 @@ git clone https://github.com/Senseye-X1/dotfiles.git $HOME/dotfiles
 chmod +x $HOME/dotfiles/bspwm/\.config/bspwm/bspwmrc
 chmod +x $HOME/dotfiles/polybar/\.config/polybar/launch.sh
 chmod -R +x $HOME/dotfiles/scripts/\.scripts
-#chmod +x '/home/'$username'/dotfiles/bspwm/.config/bspwm/bspwmrc'
-#chmod +x '/home/'$username'/dotfiles/polybar/.config/polybar/launch.sh'
-#chmod -R +x '/home/'$username'/dotfiles/scripts/.scripts'
 cd $HOME/dotfiles
 stow */
 
-#cd
-#mkdir builds
-#cd builds
-#cd /tmp
 git clone https://aur.archlinux.org/paru.git /tmp/paru
 cd /tmp/paru;makepkg -si --noconfirm;cd
 
 paru -S polybar --removemake
 
 sudo systemctl enable lightdm.service
-
-#echo -e "All done!\nReboot and login."
 EOF
 
-if [ "$winmanager" -eq "dwm" ]
-sed -i 's/\(^paru -S polybar --removemake\)/#\1/' /home/$username/install-dotfiles.sh
-sed -i 's/\(^cd.*makepkg -si --noconfirm.*\)/#\1/' /home/$username/install-dotfiles.sh
-sed -i 's/\(^git clone.*paru.git.*\)/#\1/' /home/$username/install-dotfiles.sh
+if [ "$winmanager" -eq "dwm" ]; then
+sed -i 's/\(^git clone.*paru.git.*\)/#\1/' /mnt/home/$username/install-dotfiles.sh
+sed -i 's/\(^cd.*makepkg -si --noconfirm.*\)/#\1/' /mnt/home/$username/install-dotfiles.sh
+sed -i 's/\(^paru -S polybar --removemake\)/#\1/' /mnt/home/$username/install-dotfiles.sh
 
 cat >> /mnt/home/$username/install-dotfiles.sh <<EOF
-#DWMDIR="/home/$username/suckless/dwm-flexipatch"
-#cd
-#mkdir -p /home/$username/suckless/dwm-flexipatch
-#cd suckless
 git clone https://github.com/bakkeby/dwm-flexipatch.git $HOME/suckless/dwm-flexipatch
 git clone https://github.com/bakkeby/flexipatch-finalizer.git $HOME/suckless/flexipatch-finalizer
 
