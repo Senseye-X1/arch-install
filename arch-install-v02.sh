@@ -474,53 +474,25 @@ sed -i 's/#FastConnectable.*/FastConnectable = true/' /mnt/etc/bluetooth/main.co
 sed -i 's/#\(ReconnectAttempts=.*\)/\1/' /mnt/etc/bluetooth/main.conf
 sed -i 's/#\(ReconnectIntervals=.*\)/\1/' /mnt/etc/bluetooth/main.conf
 
-# User-specific configuration.
-cat > /mnt/home/$username/install-dotfiles.sh <<EOF
-#!/usr/bin/env -S bash -e
-
-timedatectl set-ntp true
-localectl set-x11-keymap se
-
-#cd
-git clone https://github.com/Senseye-X1/dotfiles.git $HOME/dotfiles
-chmod +x $HOME/dotfiles/bspwm/\.config/bspwm/bspwmrc
-chmod +x $HOME/dotfiles/polybar/\.config/polybar/launch.sh
-chmod -R +x $HOME/dotfiles/scripts/\.scripts
-cd $HOME/dotfiles
-stow */
-
-git clone https://aur.archlinux.org/paru.git /tmp/paru
-cd /tmp/paru;makepkg -si --noconfirm;cd
-
-paru -S polybar --removemake
-
-sudo systemctl enable lightdm.service
-EOF
-
 if [ "$winmanager" -eq "dwm" ]; then
-sed -i 's/\(^git clone.*paru.git.*\)/#\1/' /mnt/home/$username/install-dotfiles.sh
-sed -i 's/\(^cd.*makepkg -si --noconfirm.*\)/#\1/' /mnt/home/$username/install-dotfiles.sh
-sed -i 's/\(^paru -S polybar --removemake\)/#\1/' /mnt/home/$username/install-dotfiles.sh
-
-cat >> /mnt/home/$username/install-dotfiles.sh <<EOF
-git clone https://github.com/bakkeby/dwm-flexipatch.git $HOME/suckless/dwm-flexipatch
-git clone https://github.com/bakkeby/flexipatch-finalizer.git $HOME/suckless/flexipatch-finalizer
+git clone https://github.com/bakkeby/dwm-flexipatch.git /mnt/tmp/dwm-flexipatch
+git clone https://github.com/bakkeby/flexipatch-finalizer.git /mnt/tmp/flexipatch-finalizer
 
 # Win-key as modkey.
-sed -i 's/#define MODKEY Mod1Mask/#define MODKEY Mod4Mask/' /home/$username/suckless/dwm-flexipatch/config.def.h
+sed -i 's/#define MODKEY Mod1Mask/#define MODKEY Mod4Mask/' /mnt/tmp/dwm-flexipatch/config.def.h
 
 for patch in BAR_STATUSCMD_PATCH AUTOSTART_PATCH ATTACHBOTTOM_PATCH ALWAYSCENTER_PATCH CYCLELAYOUTS_PATCH FIBONACCI_DWINDLE_LAYOUT SCRATCHPADS_PATCH BAR_HEIGHT_PATCH ROTATESTACK_PATCH VANITYGAPS_PATCH PERTAG_PATCH
 do
-    sed -i 's/\(.*'"$patch"'\).*/\1 1/' /home/$username/suckless/dwm-flexipatch/patches.def.h
+    sed -i 's/\(.*'"$patch"'\).*/\1 1/' /mnt/tmp/dwm-flexipatch/patches.def.h
 done
 
-cd /home/$username/suckless/dwm-flexipatch;make;cd ..
-mkdir dwm-finalized
-cd flexipatch-finalizer
-./flexipatch-finalizer.sh -r -d $HOME/suckless/dwm-flexipatch -o $HOME/suckless/dwm-finalized
+cd /mnt/tmp/dwm-flexipatch;make;cd ..
+mkdir /mnt/tmp/dwm-finalized
+cd /mnt/tmp/flexipatch-finalizer
+./flexipatch-finalizer.sh -r -d /mnt/tmp/dwm-flexipatch -o /mnt/tmp/dwm-finalized
+cd /mnt/tmp/dwm-finalized;make install;cd
 
-
-sudo cat > /usr/share/xsessions/dwm.desktop <<EOF
+cat > /mnt/usr/share/xsessions/dwm.desktop <<EOF
 [Desktop Entry]
 Encoding=UTF-8
 Name=Dwm
@@ -529,6 +501,30 @@ Exec=dwm
 Icon=dwm
 Type=XSession
 EOF
+fi
+
+# User-specific configuration.
+cat > /mnt/home/$username/install-dotfiles.sh <<EOF
+#!/usr/bin/env -S bash -e
+
+timedatectl set-ntp true
+localectl set-x11-keymap se
+
+git clone https://github.com/Senseye-X1/dotfiles.git $HOME/dotfiles
+chmod +x $HOME/dotfiles/bspwm/\.config/bspwm/bspwmrc
+chmod +x $HOME/dotfiles/polybar/\.config/polybar/launch.sh
+chmod -R +x $HOME/dotfiles/scripts/\.scripts
+cd $HOME/dotfiles
+stow */
+
+sudo systemctl enable lightdm.service
+EOF
+
+if [ "$winmanager" -eq "bspwm" ]; then
+cat >> /mnt/home/$username/install-dotfiles.sh <<EOF
+git clone https://aur.archlinux.org/paru.git /tmp/paru
+cd /tmp/paru;makepkg -si --noconfirm;cd
+paru -S polybar --removemake
 EOF
 fi
 
