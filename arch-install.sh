@@ -475,54 +475,6 @@ sed -i 's/#\(ReconnectAttempts=.*\)/\1/' /mnt/etc/bluetooth/main.conf
 sed -i 's/#\(ReconnectIntervals=.*\)/\1/' /mnt/etc/bluetooth/main.conf
 
 # User-specific configuration.
-#arch-chroot /mnt /bin/bash -e <<EOF
-
-#timedatectl set-ntp true
-
-#git clone https://aur.archlinux.org/paru.git
-#cd paru
-#makepkg -si --noconfirm
-#cd ..
-
-#paru polybar
-#echo "Clone dotfiles for $username."
-#cd /home/$username
-#git clone https://github.com/Senseye-X1/dotfiles.git
-#chown -R "$username:$username" /home/$username/dotfiles
-#chmod +x /home/$username/dotfiles/install-second.sh
-#chmod +x /home/$username/dotfiles/bspwm/\.config/bspwm/bspwmrc
-#chmod +x /home/$username/dotfiles/polybar/\.config/polybar/launch.sh
-#chmod -R +x /home/$username/dotfiles/scripts/\.scripts
-
-#git clone https://github.com/Senseye-X1/arch_install.git
-#cd arch_install
-#cp install-second.sh /home/$username/
-#chown "$username:$username" /home/$username/install-second.sh
-#cp -R dotfiles /home/$username/
-
-#cp -RT \.config "/home/$username/dotfiles"
-#cp -R \.scripts "/home/$username/dotfiles"
-#chown -R "$username:$username" dotfiles
-#cp -RT dotfiles "/home/$username"
-#chown -R "$username:$username" /home/$username/dotfiles
-#cp \.zshrc /home/$username/
-#chown -R "$username:$username" /home/$username/\.config
-#chown -R "$username:$username" /home/$username/\.scripts
-#chown "$username:$username" /home/$username/\.zshrc
-
-#cd /
-#rm -rf /arch_install
-#EOF
-
-#cat >> /mnt/home/$username/.Xresources <<EOF
-#Xcursor.theme: Adwaita
-#Xcursor.size: 16
-#EOF
-
-#cat >> /mnt/home/$username/.xprofile <<EOF
-#setxkbmap se
-#xrdb ~/.Xresources
-#EOF
 
 cat > /mnt/home/$username/install-dotfiles.sh <<EOF
 #!/usr/bin/env -S bash -e
