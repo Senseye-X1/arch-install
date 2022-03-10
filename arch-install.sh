@@ -565,16 +565,17 @@ cat >> /mnt/home/$username/install-dotfiles.sh <<EOF
 #cd
 #mkdir -p /home/$username/suckless/dwm-flexipatch
 #cd suckless
-git clone https://github.com/bakkeby/dwm-flexipatch.git /home/$username/suckless/dwm-flexipatch
-git clone https://github.com/bakkeby/flexipatch-finalizer.git$HOME/suckless/flexipatch-finalizer
+git clone https://github.com/bakkeby/dwm-flexipatch.git $HOME/suckless/dwm-flexipatch
+git clone https://github.com/bakkeby/flexipatch-finalizer.git $HOME/suckless/flexipatch-finalizer
+
+# Win-key as modkey.
+sed -i 's/#define MODKEY Mod1Mask/#define MODKEY Mod4Mask/' /home/$username/suckless/dwm-flexipatch/config.def.h
 
 for patch in BAR_STATUSCMD_PATCH AUTOSTART_PATCH ATTACHBOTTOM_PATCH ALWAYSCENTER_PATCH CYCLELAYOUTS_PATCH FIBONACCI_DWINDLE_LAYOUT SCRATCHPADS_PATCH BAR_HEIGHT_PATCH ROTATESTACK_PATCH VANITYGAPS_PATCH PERTAG_PATCH
 do
     sed -i 's/\(.*'"$patch"'\).*/\1 1/' /home/$username/suckless/dwm-flexipatch/patches.def.h
 done
 
-# Win-key as modkey.
-sed -i 's/#define MODKEY Mod1Mask/#define MODKEY Mod4Mask/' /mnt/home/$username/suckless/dwm-flexipatch/config.def.h
 cd /home/$username/suckless/dwm-flexipatch;make;cd ..
 mkdir dwm-finalized
 cd flexipatch-finalizer
@@ -596,9 +597,6 @@ fi
 arch-chroot /mnt /bin/bash -e <<EOF
 chown "$username:$username" "/home/$username/install-dotfiles.sh"
 chmod +x "/home/$username/install-dotfiles.sh"
-#chown "$username:$username" "/home/$username/userChrome.css"
-#chown "$username:$username" "/home/$username/.xprofile"
-#chown "$username:$username" "/home/$username/.Xresources"
 EOF
 
 echo -e "All done!\numount -a\nreboot\n\nAfter reboot login as user $username and run ./install-dotfiles.sh"
