@@ -566,7 +566,7 @@ cat >> /mnt/home/$username/install-dotfiles.sh <<EOF
 #mkdir -p /home/$username/suckless/dwm-flexipatch
 #cd suckless
 git clone https://github.com/bakkeby/dwm-flexipatch.git /home/$username/suckless/dwm-flexipatch
-
+git clone https://github.com/bakkeby/flexipatch-finalizer.git$HOME/suckless/flexipatch-finalizer
 
 for patch in BAR_STATUSCMD_PATCH AUTOSTART_PATCH ATTACHBOTTOM_PATCH ALWAYSCENTER_PATCH CYCLELAYOUTS_PATCH FIBONACCI_DWINDLE_LAYOUT SCRATCHPADS_PATCH BAR_HEIGHT_PATCH ROTATESTACK_PATCH VANITYGAPS_PATCH PERTAG_PATCH
 do
@@ -575,7 +575,11 @@ done
 
 # Win-key as modkey.
 sed -i 's/#define MODKEY Mod1Mask/#define MODKEY Mod4Mask/' /mnt/home/$username/suckless/dwm-flexipatch/config.def.h
-cd /home/$username/suckless/dwm-flexipatch;make;sudo make install;cd
+cd /home/$username/suckless/dwm-flexipatch;make;cd ..
+mkdir dwm-finalized
+cd flexipatch-finalizer
+./flexipatch-finalizer.sh -r -d $HOME/suckless/dwm-flexipatch -o $HOME/suckless/dwm-finalized
+
 
 sudo cat > /usr/share/xsessions/dwm.desktop <<EOF
 [Desktop Entry]
