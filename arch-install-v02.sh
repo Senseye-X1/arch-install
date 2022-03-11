@@ -504,19 +504,6 @@ const Block blocks[] = {
 };
 EOF
 
-mkdir /mnt/home/$username/\.dwm
-cat > /mnt/home/$username/.dwm/autostart.sh <<EOF
-#!/bin/sh
-
-picom --config ~/.config/picom/picom.conf -b &
-udiskie &
-light-locker &
-dwmblocks &
-xset s off
-xset dpms 0 0 0
-xautolock -time 15 -locker "systemctl suspend" -detectsleep &
-EOF
-
 cd /mnt/tmp/dwm-flexipatch;make;cd
 mkdir /mnt/tmp/dwm-finalized
 cd /mnt/tmp/flexipatch-finalizer
