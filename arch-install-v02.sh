@@ -504,6 +504,13 @@ const Block blocks[] = {
 };
 EOF
 
+mkdir /mnt/home/$username/\.dwm
+cat > /mnt/home/$username/.dwm/autostart.sh <<EOF
+#!/bin/sh
+
+dwmblocks &
+EOF
+
 cd /mnt/tmp/dwm-flexipatch;make;cd
 mkdir /mnt/tmp/dwm-finalized
 cd /mnt/tmp/flexipatch-finalizer
