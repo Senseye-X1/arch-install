@@ -475,6 +475,7 @@ sed -i 's/#\(ReconnectIntervals=.*\)/\1/' /mnt/etc/bluetooth/main.conf
 if [ "$winmanager" -eq "dwm" ]; then
 git clone https://github.com/bakkeby/dwm-flexipatch.git /mnt/tmp/dwm-flexipatch
 git clone https://github.com/bakkeby/flexipatch-finalizer.git /mnt/tmp/flexipatch-finalizer
+git clone https://github.com/UtkarshVerma/dwmblocks-async.git /mnt/tmp/dwmblocks-async
 
 # Win-key as modkey.
 sed -i 's/#define MODKEY Mod1Mask/#define MODKEY Mod4Mask/' /mnt/tmp/dwm-flexipatch/config.def.h
@@ -484,11 +485,31 @@ do
     sed -i 's/\(.*'"$patch"'\).*/\1 1/' /mnt/tmp/dwm-flexipatch/patches.def.h
 done
 
-cd /mnt/tmp/dwm-flexipatch;make;cd ..
+cat > /mnt/tmp/dwmblocks-async/config.h <<EOF
+#define CMDLENGTH 60
+#define DELIMITER "  "
+#define CLICKABLE_BLOCKS
+
+const Block blocks[] = {
+	BLOCK("sb-mail",    1800, 17),
+	BLOCK("sb-music",   0,    18),
+	BLOCK("sb-disk",    1800, 19),
+	BLOCK("sb-memory",  10,   20),
+	BLOCK("sb-loadavg", 5,    21),
+	BLOCK("sb-mic",     0,    26),
+	BLOCK("sb-record",  0,    27),
+	BLOCK("sb-volume",  0,    22),
+	BLOCK("sb-battery", 5,    23),
+	BLOCK("sb-date",    1,    24)
+};
+EOF
+
+cd /mnt/tmp/dwm-flexipatch;make;cd
 mkdir /mnt/tmp/dwm-finalized
 cd /mnt/tmp/flexipatch-finalizer
 ./flexipatch-finalizer.sh -r -d /mnt/tmp/dwm-flexipatch -o /mnt/tmp/dwm-finalized
 cd /mnt/tmp/dwm-finalized;make install;cd
+cd /mnt/tmp/dwmblocks-async;make isntall;cd
 
 cat > /mnt/usr/share/xsessions/dwm.desktop <<EOF
 [Desktop Entry]
