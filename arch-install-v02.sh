@@ -472,7 +472,7 @@ sed -i 's/#FastConnectable.*/FastConnectable = true/' /mnt/etc/bluetooth/main.co
 sed -i 's/#\(ReconnectAttempts=.*\)/\1/' /mnt/etc/bluetooth/main.conf
 sed -i 's/#\(ReconnectIntervals=.*\)/\1/' /mnt/etc/bluetooth/main.conf
 
-if [ "$winmanager" -eq "dwm" ]; then
+if [ "$winmanager" = "dwm" ]; then
 git clone https://github.com/bakkeby/dwm-flexipatch.git /mnt/tmp/dwm-flexipatch
 git clone https://github.com/bakkeby/flexipatch-finalizer.git /mnt/tmp/flexipatch-finalizer
 git clone https://github.com/UtkarshVerma/dwmblocks-async.git /mnt/tmp/dwmblocks-async
@@ -539,7 +539,7 @@ stow */
 sudo systemctl enable lightdm.service
 EOF
 
-if [ "$winmanager" -eq "bspwm" ]; then
+if [ "$winmanager" = "bspwm" ]; then
 cat >> /mnt/home/$username/install-dotfiles.sh <<EOF
 git clone https://aur.archlinux.org/paru.git /tmp/paru
 cd /tmp/paru;makepkg -si --noconfirm;cd
