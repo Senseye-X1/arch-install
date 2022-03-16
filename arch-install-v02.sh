@@ -498,9 +498,9 @@ const Block blocks[] = {
 	BLOCK("sb-loadavg", 5,    21),
 	BLOCK("sb-mic",     0,    26),
 	BLOCK("sb-record",  0,    27),
-	BLOCK("sb-volume",  0,    22),
-	BLOCK("sb-battery", 5,    23),
-	BLOCK("sb-date",    1,    24)
+	BLOCK("sb-audio-icons",  0,    22),
+	BLOCK("sb-audio-volume", 0,    23),
+	BLOCK("sb-date",    60,    24)
 };
 EOF
 
