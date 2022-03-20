@@ -509,7 +509,7 @@ mkdir /mnt/tmp/dwm-finalized
 cd /mnt/tmp/flexipatch-finalizer
 ./flexipatch-finalizer.sh -r -d /mnt/tmp/dwm-flexipatch -o /mnt/tmp/dwm-finalized
 cd /mnt/tmp/dwm-finalized;make install;cd
-cd /mnt/tmp/dwmblocks-async;make isntall;cd
+cd /mnt/tmp/dwmblocks-async;make install;cd
 
 cat > /mnt/usr/share/xsessions/dwm.desktop <<EOF
 [Desktop Entry]
