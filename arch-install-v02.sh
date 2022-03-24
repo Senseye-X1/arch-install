@@ -223,23 +223,18 @@ pacstrap /mnt base linux linux-firmware ${microcode} btrfs-progs git nano alsa-u
 PS3="Please select the window manager: "
 select WMENTRY in bspwm dwm;
 do
-    case $WMENTRY in 
-        "bspwm")
-	winmanager="bspwm"
-        echo "Installing $WMENTRY."
-	pacstrap /mnt bspwm sxhkd rofi
-        ;;
-        "dwm")
-        winmanager="dwm"
-        echo "Installing $WMENTRY."
-	pacstrap /mnt dmenu
-        ;;
-        *)
-        winmanager=""
-        echo "No window manager selected."
-        ;;
-    esac
+    winmanager=$WMENTRY
+    echo "Installing window manager $winmanager."
+    break
 done
+
+if [[ $winmanager == "bspwm" ]]; then
+    pacstrap /mnt bspwm sxhkd rofi
+fi
+
+if [[ $winmanager == "dwm" ]]; then
+    pacstrap /mnt dmenu
+fi
 
 # Generating /etc/fstab.
 echo "Generating a new fstab."
