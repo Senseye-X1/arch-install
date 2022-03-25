@@ -381,7 +381,7 @@ EOF
 # Pre-snapshot boot backup hook.
 echo "Configuring boot backup when pacman transactions are made."
 #echo '[Trigger]\nOperation = Upgrade\nOperation = Install\nOperation = Remove\nType = Path\nTarget = usr/lib/modules/*/vmlinuz\n\n[Action]\nDepends = rsync\nDescription = Backing up /boot...\nWhen = PreTransaction\nExec = /usr/bin/rsync -a --delete /boot /.bootbackup' | tee -a /etc/pacman.d/hooks/04-bootbackup.hook > /dev/null
-cat > /mnt/etc/pacman.d/hooks/04-prebootbackup.hook <<EOF
+cat > /mnt/etc/pacman.d/hooks/04-bootbackuppre.hook <<EOF
 [Trigger]
 Operation = Upgrade
 Operation = Install
@@ -397,7 +397,7 @@ Exec = /usr/bin/rsync -a --delete /boot /.bootbackup
 EOF
 
 # Post-snapshot boot backup hook.
-cat > /mnt/etc/pacman.d/hooks/06-postbootbackup.hook <<EOF
+cat > /mnt/etc/pacman.d/hooks/06-bootbackuppost.hook <<EOF
 [Trigger]
 Operation = Upgrade
 Operation = Install
