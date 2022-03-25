@@ -518,7 +518,7 @@ EOF
 fi
 
 # User-specific configuration.
-cat > /mnt/home/$username/install-dotfiles.sh <<EOF
+cat << 'EOF' > /mnt/home/$username/install-dotfiles.sh
 #!/usr/bin/env -S bash -e
 
 timedatectl set-ntp true
