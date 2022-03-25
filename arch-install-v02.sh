@@ -361,7 +361,7 @@ sed -i 's/TIMELINE_LIMIT_YEARLY=.*/TIMELINE_LIMIT_YEARLY="0"/' /mnt/etc/snapper/
 mkdir -p /mnt/etc/pacman.d/hooks
 
 # Update initramfs after an NVIDIA driver upgrade.
-cat > /mnt/etc/pacman.d/hooks/nvidia.hook <<'EOF'
+cat << 'EOF' > /mnt/etc/pacman.d/hooks/nvidia.hook
 [Trigger]
 Operation=Install
 Operation=Upgrade
