@@ -66,6 +66,19 @@ keyboard_selector () {
 
 keyboard_selector
 
+# Selecting the swaptype.
+PS3="Please select the swap type: "
+select SWENTRY in file ram;
+do
+    echo "Configuring swap in $SWENTRY."
+    if [[ $SWENTRY == "ram" ]]; then
+        swaptype="zram-generator"
+    else
+        swaptype=""
+    fi
+    break
+done
+
 # Selecting the target for the installation.
 PS3="Please select the disk where Arch Linux is going to be installed: "
 select ENTRY in $(lsblk -dpnoNAME|grep -P "/dev/sd|nvme|vd");
@@ -192,25 +205,32 @@ mount $BTRFS /mnt
 
 ### Creating BTRFS subvolumes for Snapper manual flat layout.
 echo "Creating BTRFS subvolumes."
-for volume in @ @home @root @srv @snapshots @log @pkg @swap
+for volume in @ @home @root @srv @snapshots @log @pkg
 do
     btrfs su cr /mnt/$volume
 done
+
+if [ $swaptype = "" ]; then
+btrfs su cr /mnt/@swap
+fi
 
 # Mounting the newly created subvolumes.
 umount /mnt
 echo "Mounting the newly created subvolumes."
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@ $BTRFS /mnt
-mkdir -p /mnt/{home,root,srv,.snapshots,/var/log,/var/cache/pacman/pkg,boot,swap}
+mkdir -p /mnt/{home,root,srv,.snapshots,/var/log,/var/cache/pacman/pkg,boot}
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@home $BTRFS /mnt/home
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@root $BTRFS /mnt/root
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@srv $BTRFS /mnt/srv
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@snapshots $BTRFS /mnt/.snapshots
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@log $BTRFS /mnt/var/log
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@pkg $BTRFS /mnt/var/cache/pacman/pkg
-mount -o subvol=@swap $BTRFS /mnt/swap
 chattr +C /mnt/var/log
 mount $ESP /mnt/boot/
+if [ $swaptype = "" ]; then
+mkdir -p /mnt/swap
+mount -o subvol=@swap $BTRFS /mnt/swap
+fi
 
 # Setting username and password.
 echo
@@ -254,21 +274,8 @@ do
     break
 done
 
-# Selecting the swaptype.
-PS3="Please select the swap type: "
-select SWENTRY in file ram;
-do
-    echo "Configuring swap in $SWENTRY."
-    if [[ $SWENTRY == "ram" ]]; then
-        swaptype="zram-generator"
-    else
-        swaptype=""
-    fi
-    break
-done
-
 # Install packages.
-pacstrap /mnt base linux linux-firmware ${microcode} btrfs-progs git nano alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ${fonts} udiskie accountsservice dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-gtk-greeter lxappearance-gtk3 picom stow xautolock ${xorg} ${winmanager} ${usershell} reflector nvidia nvidia-settings
+pacstrap /mnt base linux linux-firmware ${microcode} ${swaptype} btrfs-progs git nano alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ${fonts} udiskie accountsservice dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-gtk-greeter lxappearance-gtk3 picom stow xautolock ${xorg} ${winmanager} ${usershell} reflector nvidia nvidia-settings
 
 # Generating /etc/fstab.
 echo "Generating a new fstab."
@@ -280,7 +287,7 @@ sed -i 's/^GRUB_DEFAULT=.*/GRUB_DEFAULT=saved/' /mnt/etc/default/grub
 sed -i 's/\(^GRUB_CMDLINE_LINUX_DEFAULT=".*\)\(.\)$/\1 nvidia-drm.modeset=1\2/' /mnt/etc/default/grub
 sed -i 's/^#GRUB_SAVEDEFAULT=.*/GRUB_SAVEDEFAULT=true/' /mnt/etc/default/grub
 echo 'GRUB_DISABLE_OS_PROBER=false' >> /mnt/etc/default/grub
-if [ $swaptype = "zram" ]; then
+if [ $swaptype = "zram-generator" ]; then
 sed -i 's/\(^GRUB_CMDLINE_LINUX_DEFAULT=".*\)\(.\)$/\1 zswap.enabled=0\2/' /mnt/etc/default/grub
 fi
 ### End creating BTRFS subvolumes for Snapper manual flat layout.
@@ -319,6 +326,7 @@ sed -i 's/^MODULES=.*/MODULES=\(btrfs nvidia nvidia_modeset nvidia_uvm nvidia_dr
 arch-chroot /mnt /bin/bash -e <<EOF
     
     # Create swapfile, set No_COW, add to fstab
+    if [ $swaptype = "" ]; then
     echo "Creating swapfile."
     truncate -s 0 /swap/swapfile
     chattr +C /swap/swapfile
@@ -328,6 +336,7 @@ arch-chroot /mnt /bin/bash -e <<EOF
     mkswap /swap/swapfile
     swapon /swap/swapfile
     echo "/swap/swapfile none swap defaults 0 0" >> /etc/fstab
+    fi
 
     # Setting up timezone.
     echo "Setting up timezone."
@@ -492,7 +501,7 @@ do
 done
 
 # ZRAM configuration.
-if [ $swaptype = "zram" ]; then
+if [ $swaptype = "zram-generator" ]; then
 print "Configuring ZRAM."
 cat > /mnt/etc/systemd/zram-generator.conf <<EOF
 [zram0]
@@ -509,7 +518,7 @@ sed -i 's/#FastConnectable.*/FastConnectable = true/' /mnt/etc/bluetooth/main.co
 sed -i 's/#\(ReconnectAttempts=.*\)/\1/' /mnt/etc/bluetooth/main.conf
 sed -i 's/#\(ReconnectIntervals=.*\)/\1/' /mnt/etc/bluetooth/main.conf
 
-if [ "$winmanager" = "dwm" ]; then
+if [ "$WMENTRY" = "dwm" ]; then
 git clone https://github.com/bakkeby/dwm-flexipatch.git /mnt/tmp/dwm-flexipatch
 git clone https://github.com/bakkeby/flexipatch-finalizer.git /mnt/tmp/flexipatch-finalizer
 git clone https://github.com/UtkarshVerma/dwmblocks-async.git /mnt/tmp/dwmblocks-async
@@ -522,7 +531,7 @@ do
     sed -i 's/\(.*'"$patch"'\).*/\1 1/' /mnt/tmp/dwm-flexipatch/patches.def.h
 done
 
-cat > /mnt/tmp/dwmblocks-async/config.h <<EOF
+cat << 'EOF' > /mnt/tmp/dwmblocks-async/config.h
 #define CMDLENGTH 60
 #define DELIMITER "  "
 #define CLICKABLE_BLOCKS
@@ -576,7 +585,7 @@ stow */
 sudo systemctl enable lightdm.service
 EOF
 
-if [ "$winmanager" = "bspwm" ]; then
+if [ "$WMENTRY" = "bspwm" ]; then
 cat >> /mnt/home/$username/install-dotfiles.sh <<EOF
 git clone https://aur.archlinux.org/paru.git /tmp/paru
 cd /tmp/paru;makepkg -si --noconfirm;cd
