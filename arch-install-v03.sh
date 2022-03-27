@@ -46,7 +46,7 @@ hostname_selector () {
 
 # Setting up the locale (function).
 locale_selector () {
-    read -r -p "Please insert the locale you use (format: xx_XX or enter empty to use en_US): " locale
+    read -r -p "Please insert the locale you use (format: xx_XX or leave empty to use en_US): " locale
     if [ -z "$locale" ]; then
         echo
         echo "en_US will be used as default locale."
@@ -65,8 +65,9 @@ keyboard_selector () {
         kblayout="sv-latin1"
     fi
     loadkeys $kblayout
-    echo "KEYMAP=$kblayout" > /mnt/etc/vconsole.conf
 }
+
+keyboard_selector
 
 # Selecting the target for the installation.
 PS3="Please select the disk where Arch Linux is going to be installed: "
@@ -270,7 +271,7 @@ echo 'GRUB_DISABLE_OS_PROBER=false' >> /mnt/etc/default/grub
 ### End creating BTRFS subvolumes for Snapper manual flat layout.
 
 # Setting up keyboard layout.
-keyboard_selector
+echo "KEYMAP=$kblayout" > /mnt/etc/vconsole.conf
 
 # Setting up the hostname.
 echo "$hostname" > /mnt/etc/hostname
