@@ -214,7 +214,7 @@ mount $ESP /mnt/boot/
 
 # Setting username and password.
 echo
-read -r -p "Please enter name for a user account (enter empty to not create one): " username
+read -r -p "Please enter name for a user account (leave empty to not create one): " username
 userpass_selector
 
 # Checking the microcode to install.
