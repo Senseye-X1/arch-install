@@ -254,6 +254,19 @@ do
     break
 done
 
+# Selecting the swaptype.
+PS3="Please select the swap type: "
+select SWENTRY in file ram;
+do
+    echo "Configuring swap in $SWENTRY."
+    if [[ $SWENTRY == "ram" ]]; then
+        swaptype="zram-generator"
+    else
+        swaptype=""
+    fi
+    break
+done
+
 # Install packages.
 pacstrap /mnt base linux linux-firmware ${microcode} btrfs-progs git nano alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ${fonts} udiskie accountsservice dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-gtk-greeter lxappearance-gtk3 picom stow xautolock ${xorg} ${winmanager} ${usershell} reflector nvidia nvidia-settings
 
@@ -267,6 +280,9 @@ sed -i 's/^GRUB_DEFAULT=.*/GRUB_DEFAULT=saved/' /mnt/etc/default/grub
 sed -i 's/\(^GRUB_CMDLINE_LINUX_DEFAULT=".*\)\(.\)$/\1 nvidia-drm.modeset=1\2/' /mnt/etc/default/grub
 sed -i 's/^#GRUB_SAVEDEFAULT=.*/GRUB_SAVEDEFAULT=true/' /mnt/etc/default/grub
 echo 'GRUB_DISABLE_OS_PROBER=false' >> /mnt/etc/default/grub
+if [ $swaptype = "zram" ]; then
+sed -i 's/\(^GRUB_CMDLINE_LINUX_DEFAULT=".*\)\(.\)$/\1 zswap.enabled=0\2/' /mnt/etc/default/grub
+fi
 ### End creating BTRFS subvolumes for Snapper manual flat layout.
 
 # Setting up keyboard layout.
@@ -433,14 +449,6 @@ When = PostTransaction
 Exec = /usr/bin/rsync -a --delete /boot /.bootbackup
 EOF
 
-# ZRAM configuration.
-#print "Configuring ZRAM."
-#cat > /mnt/etc/systemd/zram-generator.conf <<EOF
-#[zram0]
-#zram-fraction = 1
-#max-zram-size = 8192
-#EOF
-
 # Monitor and LightDM setup.
 cat > /mnt/etc/lightdm/monitor_setup.sh <<EOF
 #!/bin/bash
@@ -482,6 +490,18 @@ for service in NetworkManager fstrim.timer bluetooth systemd-timesyncd reflector
 do
     systemctl enable "$service" --root=/mnt &>/dev/null
 done
+
+# ZRAM configuration.
+if [ $swaptype = "zram" ]; then
+print "Configuring ZRAM."
+cat > /mnt/etc/systemd/zram-generator.conf <<EOF
+[zram0]
+zram-size = ram / 2
+#zram-fraction = 1
+#max-zram-size = 8192
+EOF
+systemctl enable systemd-oomd --root=/mnt &>/dev/null
+fi
 
 # Fix Keychron Bluetooth Keyboard Connection
 sed -i 's/#AutoEnable=false/AutoEnable=true/' /mnt/etc/bluetooth/main.conf
