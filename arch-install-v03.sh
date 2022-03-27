@@ -1,7 +1,7 @@
 #!/usr/bin/env -S bash -e
 
 xorg="xorg-server xorg-xinit xorg-setxkbmap xorg-xsetroot xorg-xset xdg-utils"
-fonts="ttf-font-awesome ttf-roboto ttf-iosevka-nerd"
+fonts="ttf-font-awesome ttf-monofur ttf-roboto ttf-iosevka-nerd ttf-ubuntu-font-family"
 
 # Microcode detector (function).
 microcode_detector () {
