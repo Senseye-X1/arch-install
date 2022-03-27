@@ -217,7 +217,7 @@ mount $ESP /mnt/boot/
 microcode_detector
 
 # Install packages.
-pacstrap /mnt base linux linux-firmware ${microcode} btrfs-progs git nano alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto ttf-iosevka-nerd udiskie accountsservice dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-gtk-greeter lxappearance-gtk3 picom stow xautolock xorg zsh zsh-autosuggestions zsh-completions reflector nvidia nvidia-settings
+pacstrap /mnt base linux linux-firmware ${microcode} btrfs-progs git nano alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto ttf-iosevka-nerd udiskie accountsservice dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-gtk-greeter lxappearance-gtk3 picom stow xautolock xorg reflector nvidia nvidia-settings
 
 # Selecting the window manager for the installation.
 PS3="Please select the window manager: "
@@ -234,6 +234,23 @@ fi
 
 if [[ $winmanager == "dwm" ]]; then
     pacstrap /mnt dmenu
+fi
+
+# Selecting the command shell for the user.
+PS3="Please select the command shell: "
+select SHENTRY in bash zsh;
+do
+    usershell=$SHENTRY
+    echo "Installing user command shell $usershell."
+    break
+done
+
+if [[ $usershell == "zsh" ]]; then
+    pacstrap /mnt zsh zsh-autosuggestions zsh-completions zsh-syntax-highlighting
+fi
+
+if [[ $usershell == "bash" ]]; then
+    pacstrap /mnt 
 fi
 
 # Generating /etc/fstab.
@@ -343,7 +360,11 @@ echo "root:$password" | arch-chroot /mnt chpasswd
 # Adding user/password, change shell if not zsh.
 if [ -n "$username" ]; then
     echo "Adding the user $username to the system with root privilege."
-    arch-chroot /mnt useradd -m -G wheel -s /usr/bin/zsh "$username"
+    if [[ $usershell == "zsh" ]]; then
+        arch-chroot /mnt useradd -m -G wheel -s /usr/bin/zsh "$username"
+    else
+	arch-chroot /mnt useradd -m -G wheel "$username"
+    fi
     sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/' /mnt/etc/sudoers
     echo "Setting user password for $username." 
     echo "$username:$password" | arch-chroot /mnt chpasswd
