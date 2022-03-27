@@ -41,7 +41,6 @@ hostname_selector () {
         echo "You need to enter a hostname in order to continue."
         read -r -p "Please enter the hostname: " hostname
     fi
-    
 }
 
 # Setting up the locale (function).
