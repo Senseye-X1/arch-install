@@ -51,8 +51,6 @@ locale_selector () {
         echo "en_US will be used as default locale."
         locale="en_US"
     fi
-    echo "$locale.UTF-8 UTF-8"  > /mnt/etc/locale.gen
-    echo "LANG=$locale.UTF-8" > /mnt/etc/locale.conf
 }
 
 # Setting up the keyboard layout (function).
@@ -224,6 +222,8 @@ microcode_detector
 
 hostname_selector
 
+locale_selector
+
 # Selecting the window manager for the installation.
 PS3="Please select the window manager: "
 select WMENTRY in bspwm dwm;
@@ -284,7 +284,8 @@ cat > /mnt/etc/hosts <<EOF
 EOF
 
 # Setting up locale.
-locale_selector
+echo "$locale.UTF-8 UTF-8"  > /mnt/etc/locale.gen
+echo "LANG=$locale.UTF-8" > /mnt/etc/locale.conf
 
 # Fix function keys on Keychron keyboards using Apple driver.
 cat >> /mnt/etc/modprobe.d/hid_apple.conf <<EOF
