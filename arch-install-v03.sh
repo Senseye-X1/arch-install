@@ -1,6 +1,7 @@
 #!/usr/bin/env -S bash -e
 
-#timezone="Europe/Stockholm"
+xorg="xorg-server xorg-xinit xorg-setxkbmap xorg-xsetroot xorg-xset xdg-utils"
+fonts="ttf-font-awesome ttf-roboto ttf-iosevka-nerd"
 
 # Microcode detector (function).
 microcode_detector () {
@@ -238,25 +239,23 @@ do
     break
 done
 
-# Install packages.
-pacstrap /mnt base linux linux-firmware ${microcode} btrfs-progs git nano alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto ttf-iosevka-nerd udiskie accountsservice dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-gtk-greeter lxappearance-gtk3 picom stow xautolock xorg-server xorg-xinit xorg-setxkbmap xorg-xsetroot xorg-xset xdg-utils ${winmanager} reflector nvidia nvidia-settings
-
 # Selecting the command-line shell for the user.
 PS3="Please select the command-line shell: "
 select SHENTRY in bash zsh;
 do
-    usershell=$SHENTRY
     echo "Installing user command-line shell $usershell."
+    if [[ $SHENTRY == "zsh" ]]; then
+        usershell="zsh zsh-autosuggestions zsh-completions zsh-syntax-highlighting"
+    else if [[ $SHENTRY == "bash" ]]; then
+        usershell=""
+    else
+        usershell=""
+    fi
     break
 done
 
-if [[ $usershell == "zsh" ]]; then
-    pacstrap /mnt zsh zsh-autosuggestions zsh-completions zsh-syntax-highlighting
-fi
-
-if [[ $usershell == "bash" ]]; then
-    pacstrap /mnt 
-fi
+# Install packages.
+pacstrap /mnt base linux linux-firmware ${microcode} btrfs-progs git nano alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ${fonts} udiskie accountsservice dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-gtk-greeter lxappearance-gtk3 picom stow xautolock ${xorg} ${winmanager} ${usershell} reflector nvidia nvidia-settings
 
 # Generating /etc/fstab.
 echo "Generating a new fstab."
