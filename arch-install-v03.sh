@@ -40,7 +40,7 @@ hostname_selector () {
         echo "You need to enter a hostname in order to continue."
         read -r -p "Please enter the hostname: " hostname
     fi
-    echo "$hostname" > /mnt/etc/hostname
+    
 }
 
 # Setting up the locale (function).
@@ -216,6 +216,8 @@ mount $ESP /mnt/boot/
 # Checking the microcode to install.
 microcode_detector
 
+hostname_selector
+
 # Install packages.
 pacstrap /mnt base linux linux-firmware ${microcode} btrfs-progs git nano alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto ttf-iosevka-nerd udiskie accountsservice dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-gtk-greeter lxappearance-gtk3 picom stow xautolock xorg reflector nvidia nvidia-settings
 
@@ -236,12 +238,12 @@ if [[ $winmanager == "dwm" ]]; then
     pacstrap /mnt dmenu
 fi
 
-# Selecting the command shell for the user.
-PS3="Please select the command shell: "
+# Selecting the command-line shell for the user.
+PS3="Please select the command-line shell: "
 select SHENTRY in bash zsh;
 do
     usershell=$SHENTRY
-    echo "Installing user command shell $usershell."
+    echo "Installing user command-line shell $usershell."
     break
 done
 
@@ -274,7 +276,7 @@ read -r -p "Please enter name for a user account (enter empty to not create one)
 userpass_selector
 
 # Setting up the hostname.
-hostname_selector
+echo "$hostname" > /mnt/etc/hostname
 
 # Setting hosts file.
 echo "Setting hosts file."
