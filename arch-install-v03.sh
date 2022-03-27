@@ -57,7 +57,7 @@ locale_selector () {
 
 # Setting up the keyboard layout (function).
 keyboard_selector () {
-    read -r -p "Please insert the keyboard layout you use (enter empty to use sv-latin1 keyboard layout): " kblayout
+    read -r -p "Please insert the keyboard layout you use (leave empty to use sv-latin1 keyboard layout): " kblayout
     if [ -z "$kblayout" ]; then
         echo
         echo "sv-latin1 keyboard layout will be used by default."
@@ -213,30 +213,33 @@ mount -o subvol=@swap $BTRFS /mnt/swap
 chattr +C /mnt/var/log
 mount $ESP /mnt/boot/
 
+# Setting username and password.
+echo
+read -r -p "Please enter name for a user account (enter empty to not create one): " username
+userpass_selector
+
 # Checking the microcode to install.
 microcode_detector
 
 hostname_selector
 
-# Install packages.
-pacstrap /mnt base linux linux-firmware ${microcode} btrfs-progs git nano alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto ttf-iosevka-nerd udiskie accountsservice dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-gtk-greeter lxappearance-gtk3 picom stow xautolock xorg-server xorg-xinit xorg-setxkbmap xorg-xsetroot xorg-xset xdg-utils reflector nvidia nvidia-settings
-
 # Selecting the window manager for the installation.
 PS3="Please select the window manager: "
 select WMENTRY in bspwm dwm;
 do
-    winmanager=$WMENTRY
+    if [[ $WMENTRY == "bspwm" ]]; then
+        winmanager="bspwm sxhkd rofi"
+    else if [[ $WMENTRY == "dwm" ]]; then
+        winmanager="dmenu"
+    else
+	winmanager=""
+    fi
     echo "Installing window manager $winmanager."
     break
 done
 
-if [[ $winmanager == "bspwm" ]]; then
-    pacstrap /mnt bspwm sxhkd rofi
-fi
-
-if [[ $winmanager == "dwm" ]]; then
-    pacstrap /mnt dmenu
-fi
+# Install packages.
+pacstrap /mnt base linux linux-firmware ${microcode} btrfs-progs git nano alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ttf-font-awesome ttf-roboto ttf-iosevka-nerd udiskie accountsservice dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-gtk-greeter lxappearance-gtk3 picom stow xautolock xorg-server xorg-xinit xorg-setxkbmap xorg-xsetroot xorg-xset xdg-utils ${winmanager} reflector nvidia nvidia-settings
 
 # Selecting the command-line shell for the user.
 PS3="Please select the command-line shell: "
@@ -269,11 +272,6 @@ echo 'GRUB_DISABLE_OS_PROBER=false' >> /mnt/etc/default/grub
 
 # Setting up keyboard layout.
 keyboard_selector
-
-# Setting username and password.
-echo
-read -r -p "Please enter name for a user account (enter empty to not create one): " username
-userpass_selector
 
 # Setting up the hostname.
 echo "$hostname" > /mnt/etc/hostname
