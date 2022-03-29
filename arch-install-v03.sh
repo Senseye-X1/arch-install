@@ -472,7 +472,7 @@ sed -i 's/#greeter-setup-script=.*/greeter-setup-script=\/etc\/lightdm\/monitor_
 cat > /mnt/etc/lightdm/lightdm-gtk-greeter.conf <<EOF
 [greeter]
 cursor-theme-name = Adwaita
-cursor-theme-size = 16
+cursor-theme-size = 24
 theme-name = Arc-Dark
 icon-theme-name = Adwaita
 font-name = Roboto 10
