@@ -589,7 +589,8 @@ if [ "$WMENTRY" = "bspwm" ]; then
 cat >> /mnt/home/$username/install-dotfiles.sh <<EOF
 git clone https://aur.archlinux.org/paru.git /tmp/paru
 cd /tmp/paru;makepkg -si --noconfirm;cd
-paru -S polybar --removemake
+sudo sed -i 's/#\(RemoveMake.*\)/\1/' /etc/paru.conf
+paru -S polybar
 EOF
 fi
 
