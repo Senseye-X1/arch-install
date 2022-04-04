@@ -580,7 +580,20 @@ chmod +x $HOME/dotfiles/bspwm/\.config/bspwm/bspwmrc
 chmod +x $HOME/dotfiles/polybar/\.config/polybar/launch.sh
 chmod -R +x $HOME/dotfiles/scripts/\.scripts
 cd $HOME/dotfiles
-stow */
+#stow */
+stow bspwm
+stow dunst
+stow dwm
+stow geany
+stow gtk
+stow kitty
+stow picom
+stow polybar
+stow rofi
+stow scripts
+stow sxhkd
+stow x
+stow zsh
 
 sudo systemctl enable lightdm.service
 EOF
