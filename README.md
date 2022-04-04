@@ -14,3 +14,6 @@ removed gnome-themes-extra, lxappearance-gtk3, zsh
 
 could rofi cause it? 
 No errors so far with dmenu. 
+
+todo: statusbar scripts for dwmblocks
+move scripts to .local/bin and change config paths so they match
