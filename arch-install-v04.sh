@@ -2,6 +2,11 @@
 
 xorg="xorg-server xorg-xinit xorg-setxkbmap xorg-xsetroot xorg-xset xdg-utils"
 fonts="ttf-font-awesome ttf-monofur ttf-roboto ttf-iosevka-nerd ttf-ubuntu-font-family"
+winmgrutils="accountsservice udiskie dunst feh firewalld gvfs kitty light-locker lightdm-gtk-greeter lxappearance-gtk3 picom xautolock geany gnome-themes-extra"
+network="networkmanager bluez bluez-utils"
+audio="alsa-utils pulseaudio"
+browser="firefox"
+basesetup="base linux linux-firmware btrfs-progs git nano base-devel efibootmgr grub grub-btrfs os-prober pacman-contrib rsync snap-pac snapper stow reflector nvidia nvidia-settings"
 
 # Microcode detector (function).
 microcode_detector () {
@@ -246,12 +251,24 @@ locale_selector
 
 # Selecting the window manager for the installation.
 PS3="Please select the window manager: "
-select WMENTRY in bspwm dwm;
+select WMENTRY in bspwm dwm kde gnome;
 do
     if [[ $WMENTRY == "bspwm" ]]; then
         winmanager="bspwm sxhkd rofi"
     else if [[ $WMENTRY == "dwm" ]]; then
         winmanager="dmenu"
+    else if [[ $WMENTRY == "kde" ]]; then
+        winmanager="plasma-meta"
+	winmgrutils=""
+	audio=""
+	network=""
+	fonts=""
+    else if [[ $WMENTRY == "kde" ]]; then
+        winmanager="gnome-meta"
+	winmgrutils=""
+	audio=""
+	network=""
+	fonts=""
     else
 	winmanager=""
     fi
@@ -274,8 +291,9 @@ do
     break
 done
 
+
 # Install packages.
-pacstrap /mnt base linux linux-firmware ${microcode} ${swaptype} btrfs-progs git nano alsa-utils base-devel efibootmgr firewalld grub grub-btrfs gvfs networkmanager bluez bluez-utils os-prober pacman-contrib pulseaudio rsync snap-pac snapper ${fonts} udiskie accountsservice dunst feh firefox geany gnome-themes-extra kitty light-locker lightdm-gtk-greeter lxappearance-gtk3 picom stow xautolock ${xorg} ${winmanager} ${usershell} reflector nvidia nvidia-settings
+pacstrap /mnt ${basesetup} ${microcode} ${swaptype} ${xorg} ${winmanager} ${usershell} ${fonts} ${winmgrutils} ${network} ${audio} ${browser}
 
 # Generating /etc/fstab.
 echo "Generating a new fstab."
