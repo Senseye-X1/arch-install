@@ -263,8 +263,8 @@ do
 	audio=""
 	network=""
 	fonts=""
-    else if [[ $WMENTRY == "kde" ]]; then
-        winmanager="gnome-meta"
+    else if [[ $WMENTRY == "gnome" ]]; then
+        winmanager="gnome"
 	winmgrutils=""
 	audio=""
 	network=""
