@@ -260,9 +260,11 @@ do
     if [[ $WMENTRY == "bspwm" ]]; then
         pacstrap /mnt bspwm sxhkd rofi polybar ${xorg} ${fonts} ${winmgrutils} ${pulseaudio} >/dev/null
 	winmanager="bspwm"
+	systemctl enable lightdm.service --root=/mnt &>/dev/null
     else if [[ $WMENTRY == "dwm" ]]; then
         pacstrap /mnt git dmenu ${xorg} ${fonts} ${winmgrutils} ${pulseaudio} >/dev/null
 	winmanager="dwm"
+	systemctl enable lightdm.service --root=/mnt &>/dev/null
     else if [[ $WMENTRY == "kde" ]]; then
         pacstrap /mnt xorg plasma kde-graphics-meta kde-multimedia-meta kde-network-meta kde-pim-meta kde-system-meta kde-utilities-meta >/dev/null
 	systemctl enable sddm --root=/mnt &>/dev/null
@@ -610,7 +612,7 @@ stow sxhkd
 stow x
 stow zsh
 
-sudo systemctl enable lightdm.service
+#sudo systemctl enable lightdm.service
 EOF
 
 #if [ "$WMENTRY" = "bspwm" ]; then
