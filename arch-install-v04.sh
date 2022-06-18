@@ -5,7 +5,7 @@ fonts="ttf-font-awesome ttf-monofur ttf-roboto ttf-iosevka-nerd ttf-ubuntu-font-
 winmgrutils="accountsservice udiskie dunst feh firewalld gvfs kitty light-locker lightdm-gtk-greeter lxappearance-gtk3 picom xautolock geany gnome-themes-extra xdg-user-dirs xdg-utils"
 network="networkmanager bluez bluez-utils"
 audio="alsa-utils pulseaudio"
-pipewire="alsa-utils pipewire"
+pipewire="alsa-utils pipewire pipewire-alsa pipewire-pulse"
 browser="firefox"
 basesetup="base linux linux-firmware btrfs-progs git nano base-devel efibootmgr grub grub-btrfs os-prober pacman-contrib rsync snap-pac snapper stow reflector nvidia nvidia-settings"
 
