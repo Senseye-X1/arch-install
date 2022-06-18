@@ -7,7 +7,7 @@ network="networkmanager"
 pulseaudio="alsa-utils pulseaudio"
 pipewire="alsa-utils pipewire pipewire-alsa pipewire-pulse"
 browser="firefox"
-basesetup="base linux linux-firmware btrfs-progs git nano sudo efibootmgr grub grub-btrfs os-prober pacman-contrib rsync snap-pac snapper stow reflector nvidia nvidia-settings"
+basesetup="base linux linux-firmware btrfs-progs nano sudo efibootmgr grub grub-btrfs os-prober pacman-contrib rsync snap-pac snapper stow reflector nvidia nvidia-settings"
 
 # Microcode detector (function).
 microcode_detector () {
@@ -261,7 +261,7 @@ do
         pacstrap /mnt bspwm sxhkd rofi polybar ${xorg} ${fonts} ${winmgrutils} ${pulseaudio} >/dev/null
 	winmanager="bspwm"
     else if [[ $WMENTRY == "dwm" ]]; then
-        pacstrap /mnt dmenu ${xorg} ${fonts} ${winmgrutils} ${pulseaudio} >/dev/null
+        pacstrap /mnt git dmenu ${xorg} ${fonts} ${winmgrutils} ${pulseaudio} >/dev/null
 	winmanager="dwm"
     else if [[ $WMENTRY == "kde" ]]; then
         pacstrap /mnt xorg plasma kde-graphics-meta kde-multimedia-meta kde-network-meta kde-pim-meta kde-system-meta kde-utilities-meta >/dev/null
@@ -613,14 +613,14 @@ stow zsh
 sudo systemctl enable lightdm.service
 EOF
 
-if [ "$WMENTRY" = "bspwm" ]; then
-cat >> /mnt/home/$username/install-dotfiles.sh <<EOF
-git clone https://aur.archlinux.org/paru.git /tmp/paru
-cd /tmp/paru;makepkg -si --noconfirm;cd
-sudo sed -i 's/#\(RemoveMake.*\)/\1/' /etc/paru.conf
-paru -S polybar
-EOF
-fi
+#if [ "$WMENTRY" = "bspwm" ]; then
+#cat >> /mnt/home/$username/install-dotfiles.sh <<EOF
+#git clone https://aur.archlinux.org/paru.git /tmp/paru
+#cd /tmp/paru;makepkg -si --noconfirm;cd
+#sudo sed -i 's/#\(RemoveMake.*\)/\1/' /etc/paru.conf
+#paru -S polybar
+#EOF
+#fi
 
 arch-chroot /mnt /bin/bash -e <<EOF
 chown "$username:$username" "/home/$username/install-dotfiles.sh"
