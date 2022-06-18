@@ -259,7 +259,7 @@ do
     else if [[ $WMENTRY == "dwm" ]]; then
         winmanager="dmenu"
     else if [[ $WMENTRY == "kde" ]]; then
-        winmanager="plasma"
+        winmanager="xorg plasma kde-graphics-meta kde-multimedia-meta kde-network-meta kde-pim-meta kde-system-meta kde-utilities-meta"
 	winmgrutils=""
 	audio=""
 	network=""
