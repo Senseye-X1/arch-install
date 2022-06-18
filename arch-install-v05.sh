@@ -7,7 +7,7 @@ network="networkmanager"
 pulseaudio="alsa-utils pulseaudio"
 pipewire="alsa-utils pipewire pipewire-alsa pipewire-pulse"
 browser="firefox"
-basesetup="base linux linux-firmware btrfs-progs git nano base-devel efibootmgr grub grub-btrfs os-prober pacman-contrib rsync snap-pac snapper stow reflector nvidia nvidia-settings"
+basesetup="base linux linux-firmware btrfs-progs git nano sudo efibootmgr grub grub-btrfs os-prober pacman-contrib rsync snap-pac snapper stow reflector nvidia nvidia-settings"
 
 # Microcode detector (function).
 microcode_detector () {
@@ -258,9 +258,11 @@ PS3="Please select the DE/WM: "
 select WMENTRY in bspwm dwm kde gnome;
 do
     if [[ $WMENTRY == "bspwm" ]]; then
-        pacstrap /mnt bspwm sxhkd rofi ${xorg} ${fonts} ${winmgrutils} ${pulseaudio} >/dev/null
+        pacstrap /mnt bspwm sxhkd rofi polybar ${xorg} ${fonts} ${winmgrutils} ${pulseaudio} >/dev/null
+	winmanager="bspwm"
     else if [[ $WMENTRY == "dwm" ]]; then
         pacstrap /mnt dmenu ${xorg} ${fonts} ${winmgrutils} ${pulseaudio} >/dev/null
+	winmanager="dwm"
     else if [[ $WMENTRY == "kde" ]]; then
         pacstrap /mnt xorg plasma kde-graphics-meta kde-multimedia-meta kde-network-meta kde-pim-meta kde-system-meta kde-utilities-meta >/dev/null
 	systemctl enable sddm --root=/mnt &>/dev/null
