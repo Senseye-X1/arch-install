@@ -611,8 +611,6 @@ stow scripts
 stow sxhkd
 stow x
 stow zsh
-
-#sudo systemctl enable lightdm.service
 EOF
 
 #if [ "$WMENTRY" = "bspwm" ]; then
