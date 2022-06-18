@@ -3,8 +3,8 @@
 xorg="xorg-server xorg-xinit xorg-setxkbmap xorg-xsetroot xorg-xset xdg-utils"
 fonts="ttf-font-awesome ttf-monofur ttf-roboto ttf-iosevka-nerd ttf-ubuntu-font-family"
 winmgrutils="accountsservice udiskie dunst feh firewalld gvfs kitty light-locker lightdm-gtk-greeter lxappearance-gtk3 picom xautolock geany gnome-themes-extra xdg-user-dirs xdg-utils"
-network="networkmanager bluez bluez-utils"
-audio="alsa-utils pulseaudio"
+network="networkmanager"
+pulseaudio="alsa-utils pulseaudio"
 pipewire="alsa-utils pipewire pipewire-alsa pipewire-pulse"
 browser="firefox"
 basesetup="base linux linux-firmware btrfs-progs git nano base-devel efibootmgr grub grub-btrfs os-prober pacman-contrib rsync snap-pac snapper stow reflector nvidia nvidia-settings"
@@ -250,26 +250,23 @@ hostname_selector
 
 locale_selector
 
+# Install base setup.
+pacstrap /mnt ${basesetup} ${microcode} ${swaptype} ${network} ${browser}
+
 # Selecting the window manager for the installation.
-PS3="Please select the window manager: "
+PS3="Please select the DE/WM: "
 select WMENTRY in bspwm dwm kde gnome;
 do
     if [[ $WMENTRY == "bspwm" ]]; then
-        winmanager="bspwm sxhkd rofi"
+        pacstrap /mnt bspwm sxhkd rofi ${xorg} ${fonts} ${winmgrutils} ${pulseaudio} >/dev/null
     else if [[ $WMENTRY == "dwm" ]]; then
-        winmanager="dmenu"
+        pacstrap /mnt dmenu ${xorg} ${fonts} ${winmgrutils} ${pulseaudio} >/dev/null
     else if [[ $WMENTRY == "kde" ]]; then
-        winmanager="xorg plasma kde-graphics-meta kde-multimedia-meta kde-network-meta kde-pim-meta kde-system-meta kde-utilities-meta"
-	winmgrutils=""
-	audio=""
-	network=""
-	fonts=""
+        pacstrap /mnt xorg plasma kde-graphics-meta kde-multimedia-meta kde-network-meta kde-pim-meta kde-system-meta kde-utilities-meta >/dev/null
+	systemctl enable sddm --root=/mnt &>/dev/null
     else if [[ $WMENTRY == "gnome" ]]; then
-        winmanager="gnome"
-	winmgrutils=""
-	audio=""
-	network=""
-	fonts=""
+        pacstrap /mnt xorg gnome >/dev/null
+	systemctl enable gdm --root=/mnt &>/dev/null
     else
 	winmanager=""
     fi
@@ -283,7 +280,7 @@ select SHENTRY in bash zsh;
 do
     echo "Installing user command-line shell $usershell."
     if [[ $SHENTRY == "zsh" ]]; then
-        usershell="zsh zsh-autosuggestions zsh-completions zsh-syntax-highlighting"
+        pacstrap /mnt zsh zsh-autosuggestions zsh-completions zsh-syntax-highlighting >/dev/null
     else if [[ $SHENTRY == "bash" ]]; then
         usershell=""
     else
@@ -291,10 +288,6 @@ do
     fi
     break
 done
-
-
-# Install packages.
-pacstrap /mnt ${basesetup} ${microcode} ${swaptype} ${xorg} ${winmanager} ${usershell} ${fonts} ${winmgrutils} ${network} ${audio} ${browser}
 
 # Generating /etc/fstab.
 echo "Generating a new fstab."
