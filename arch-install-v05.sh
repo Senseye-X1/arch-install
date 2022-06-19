@@ -3,7 +3,7 @@
 xorg="xorg-server xorg-xinit xorg-setxkbmap xorg-xsetroot xorg-xset"
 xdg="xdg-user-dirs xdg-utils"
 fonts="ttf-font-awesome ttf-monofur ttf-roboto ttf-iosevka-nerd ttf-ubuntu-font-family"
-winmgrutils="accountsservice udiskie dunst feh firewalld gvfs kitty light-locker lightdm-gtk-greeter lxappearance-gtk3 picom xautolock geany gnome-themes-extra xdg-user-dirs xdg-utils"
+winmgrutils="accountsservice udiskie dunst feh firewalld gvfs kitty light-locker lightdm-gtk-greeter lxappearance-gtk3 picom xautolock geany gnome-themes-extra"
 network="networkmanager"
 pulseaudio="alsa-utils pulseaudio"
 pipewire="alsa-utils pipewire pipewire-alsa pipewire-pulse"
@@ -182,11 +182,11 @@ PS3="Please select the DE/WM: "
 select WMENTRY in bspwm dwm kde gnome;
 do
     if [[ $WMENTRY == "bspwm" ]]; then
-        pacstrap /mnt bspwm sxhkd rofi polybar ${xorg} ${fonts} ${winmgrutils} ${pulseaudio} >/dev/null
+        pacstrap /mnt bspwm sxhkd rofi polybar ${xorg} ${fonts} ${winmgrutils} ${pulseaudio} ${xdg} >/dev/null
 	winmanager="bspwm"
 	systemctl enable lightdm.service --root=/mnt &>/dev/null
     else if [[ $WMENTRY == "dwm" ]]; then
-        pacstrap /mnt git dmenu ${xorg} ${fonts} ${winmgrutils} ${pulseaudio} >/dev/null
+        pacstrap /mnt git dmenu ${xorg} ${fonts} ${winmgrutils} ${pulseaudio} ${xdg} >/dev/null
 	winmanager="dwm"
 	systemctl enable lightdm.service --root=/mnt &>/dev/null
     else if [[ $WMENTRY == "kde" ]]; then
