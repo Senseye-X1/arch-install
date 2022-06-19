@@ -206,7 +206,6 @@ done
 PS3="Please select the command-line shell: "
 select SHENTRY in bash zsh;
 do
-    echo "Installing user command-line shell $usershell."
     if [[ $SHENTRY == "zsh" ]]; then
         pacstrap /mnt zsh zsh-autosuggestions zsh-completions zsh-syntax-highlighting >/dev/null
 	usershell="zsh"
@@ -216,6 +215,7 @@ do
     else
         usershell=""
     fi
+    echo "Installed user command-line shell."
     break
 done
 
