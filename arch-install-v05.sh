@@ -40,36 +40,85 @@ while true; do
 done
 }
 
-# Setting up the hostname (function).
+# User enters a hostname (function).
 hostname_selector () {
     read -r -p "Please enter the hostname: " hostname
-    if [ -z "$hostname" ]; then
+    if [[ -z "$hostname" ]]; then
         echo
-        echo "You need to enter a hostname in order to continue."
-        read -r -p "Please enter the hostname: " hostname
+	echo "You need to enter a hostname in order to continue."
+        return 1
     fi
+    return 0
 }
 
-# Setting up the locale (function).
+## Setting up the hostname (function).
+#hostname_selector () {
+#    read -r -p "Please enter the hostname (defaults to arch if blank) : " hostname
+#    if [ -z "$hostname" ]; then
+#        echo
+#        echo "Default hostname used."
+#        hostname="arch"
+#    fi
+#}
+
+# User chooses the locale (function).
 locale_selector () {
-    read -r -p "Please insert the locale you use (format: xx_XX or leave empty to use en_US): " locale
-    if [ -z "$locale" ]; then
-        echo
-        echo "en_US will be used as default locale."
-        locale="en_US"
-    fi
+    read -r -p "Please insert the locale you use (format: xx_XX. Enter empty to use en_US, or \"/\" to search locales): " locale
+    case "$locale" in
+        '') locale="en_US.UTF-8"
+            echo "$locale will be the default locale."
+            return 0;;
+        '/')    sed -E '/^#( +|$)/d;s/^#| *$//g;s/ .*/      (Charset:&)/' /etc/locale.gen | less -M
+                clear
+                return 1;;
+        *)  if ! grep -q "^#\?$(sed 's/[].*[]/\\&/g' <<< $locale) " /etc/locale.gen; then
+                echo "The specified locale doesn't exist or isn't supported."
+                return 1
+            fi
+            return 0
+    esac
 }
 
-# Setting up the keyboard layout (function).
+## Setting up the locale (function).
+#locale_selector () {
+#    read -r -p "Please insert the locale you use (format: xx_XX or leave empty to use en_US): " locale
+#    if [ -z "$locale" ]; then
+#        echo
+#        echo "Default locale used."
+#        locale="en_US"
+#    fi
+#}
+
+# User chooses the console keyboard layout (function).
 keyboard_selector () {
-    read -r -p "Please insert the keyboard layout you use (leave empty to use sv-latin1 keyboard layout): " kblayout
-    if [ -z "$kblayout" ]; then
-        echo
-        echo "sv-latin1 keyboard layout will be used by default."
-        kblayout="sv-latin1"
-    fi
-    loadkeys $kblayout
+    read -r -p "Please insert the keyboard layout to use in console (leave blank for sv-latin1, or \"/\" to look up keyboard layouts): " kblayout
+    case "$kblayout" in
+        '') kblayout="sv-latin1"
+            echo "The default keyboard layout will be used."
+            return 0;;
+        '/') localectl list-keymaps
+             clear
+             return 1;;
+        *) if ! localectl list-keymaps | grep -Fxq "$kblayout"; then
+               echo "The specified keymap doesn't exist."
+               return 1
+           fi
+        echo "Changing console layout to $kblayout."
+        loadkeys "$kblayout"
+        return 0
+    esac
 }
+
+## Setting up the keyboard layout (function).
+#keyboard_selector () {
+#    read -r -p "Please insert the keyboard layout you use (leave empty to use sv-latin1 keyboard layout): " kblayout
+#    if [ -z "$kblayout" ]; then
+#        echo
+#        echo "Default keyboard layout used."
+#        kblayout="sv-latin1"
+#    fi
+#    loadkeys $kblayout
+#}
 
 keyboard_selector
 
@@ -221,6 +270,17 @@ do
     break
 done
 
+read -r -p "Install Bluetooth [y/N]? " bt
+bt=${bt,,}
+if [[ "$bt" =~ ^(yes|y)$ ]]; then
+    echo
+    echo "Installing Bluetooth."
+    pacstrap /mnt bluez bluez-utils >/dev/null
+    bluetooth="yes"
+else
+    bluetooth="no"
+fi
+
 # Generating /etc/fstab.
 echo "Generating a new fstab."
 genfstab -U /mnt >> /mnt/etc/fstab
@@ -251,8 +311,8 @@ cat > /mnt/etc/hosts <<EOF
 EOF
 
 # Setting up locale.
-echo "$locale.UTF-8 UTF-8"  > /mnt/etc/locale.gen
-echo "LANG=$locale.UTF-8" > /mnt/etc/locale.conf
+echo "$locale UTF-8"  > /mnt/etc/locale.gen
+echo "LANG=$locale" > /mnt/etc/locale.conf
 
 # Fix function keys on Keychron keyboards using Apple driver.
 cat >> /mnt/etc/modprobe.d/hid_apple.conf <<EOF
@@ -436,7 +496,7 @@ fi
 #firewall-cmd --add-port=1025-65535/udp --permanent
 #firewall-cmd --reload
 
-# Enabling various services excluding lightdm. Lightdm will be enabled after reboot as user from install-second.sh.
+# Enabling various services excluding lightdm. Lightdm will be enabled after reboot as user from install-dotfiles.sh.
 echo "Enabling services."
 # Use this instead if nested BTRFS layout:
 #for service in NetworkManager fstrim.timer bluetooth systemd-timesyncd lightdm reflector.timer snapper-timeline.timer snapper-cleanup.timer btrfs-scrub@-.timer btrfs-scrub@home.timer btrfs-scrub@var.timer btrfs-scrub@\\x2esnapshots.timer grub-btrfs.path
@@ -459,10 +519,12 @@ systemctl enable systemd-oomd --root=/mnt &>/dev/null
 fi
 
 # Fix Keychron Bluetooth Keyboard Connection
+if [ "$bluetooth" = "yes" ]; then
 sed -i 's/#AutoEnable=false/AutoEnable=true/' /mnt/etc/bluetooth/main.conf
 sed -i 's/#FastConnectable.*/FastConnectable = true/' /mnt/etc/bluetooth/main.conf
 sed -i 's/#\(ReconnectAttempts=.*\)/\1/' /mnt/etc/bluetooth/main.conf
 sed -i 's/#\(ReconnectIntervals=.*\)/\1/' /mnt/etc/bluetooth/main.conf
+fi
 
 if [ "$WMENTRY" = "dwm" ]; then
 git clone https://github.com/bakkeby/dwm-flexipatch.git /mnt/tmp/dwm-flexipatch
