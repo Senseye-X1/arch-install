@@ -326,7 +326,7 @@ EOF
 echo "Setting root password."
 echo "root:$password" | arch-chroot /mnt chpasswd
 
-# Adding user/password, change shell if not zsh.
+# Adding user/password, change shell if zsh.
 if [ -n "$username" ]; then
     echo "Adding the user $username to the system with root privilege."
     if [[ $usershell == "zsh" ]]; then
@@ -370,7 +370,6 @@ EOF
 
 # Pre-snapshot boot backup hook.
 echo "Configuring boot backup when pacman transactions are made."
-#echo '[Trigger]\nOperation = Upgrade\nOperation = Install\nOperation = Remove\nType = Path\nTarget = usr/lib/modules/*/vmlinuz\n\n[Action]\nDepends = rsync\nDescription = Backing up /boot...\nWhen = PreTransaction\nExec = /usr/bin/rsync -a --delete /boot /.bootbackup' | tee -a /etc/pacman.d/hooks/04-bootbackup.hook > /dev/null
 cat > /mnt/etc/pacman.d/hooks/04-bootbackuppre.hook <<EOF
 [Trigger]
 Operation = Upgrade
@@ -403,6 +402,7 @@ Exec = /usr/bin/rsync -a --delete /boot /.bootbackup
 EOF
 
 # Monitor and LightDM setup.
+if [[ "$WMENTRY" == "dwm" || "$WMENTRY" == "bspwm" ]]; then
 cat > /mnt/etc/lightdm/monitor_setup.sh <<EOF
 #!/bin/bash
 xrandr --output DP-0 --mode 3440x1440 --rate 100 --pos 0x1440 --primary --output HDMI-0 --mode 2560x1440 --rate 144 --pos 440x0
@@ -412,7 +412,6 @@ EOF
 
 chmod +x /mnt/etc/lightdm/monitor_setup.sh
 sed -i 's/#greeter-setup-script=.*/greeter-setup-script=\/etc\/lightdm\/monitor_setup.sh/' /mnt/etc/lightdm/lightdm.conf
-#sed -i 's/#greeter-session=.*/greeter-session=lightdm-slick-greeter/' /mnt/etc/lightdm/lightdm.conf
 
 cat > /mnt/etc/lightdm/lightdm-gtk-greeter.conf <<EOF
 [greeter]
@@ -430,6 +429,7 @@ Section "ServerFlags"
     Option "DontVTSwitch" "True"
 EndSection
 EOF
+fi
 
 # Firewall config
 #firewall-cmd --add-port=1025-65535/tcp --permanent
@@ -440,7 +440,8 @@ EOF
 echo "Enabling services."
 # Use this instead if nested BTRFS layout:
 #for service in NetworkManager fstrim.timer bluetooth systemd-timesyncd lightdm reflector.timer snapper-timeline.timer snapper-cleanup.timer btrfs-scrub@-.timer btrfs-scrub@home.timer btrfs-scrub@var.timer btrfs-scrub@\\x2esnapshots.timer grub-btrfs.path
-for service in NetworkManager fstrim.timer bluetooth systemd-timesyncd reflector.timer snapper-timeline.timer snapper-cleanup.timer btrfs-scrub@-.timer btrfs-scrub@home.timer btrfs-scrub@log.timer btrfs-scrub@\\x2esnapshots.timer grub-btrfs.path
+# Add bluetooth to the line below if needed.
+for service in NetworkManager fstrim.timer systemd-timesyncd reflector.timer snapper-timeline.timer snapper-cleanup.timer btrfs-scrub@-.timer btrfs-scrub@home.timer btrfs-scrub@log.timer btrfs-scrub@\\x2esnapshots.timer grub-btrfs.path
 do
     systemctl enable "$service" --root=/mnt &>/dev/null
 done
@@ -540,15 +541,6 @@ stow sxhkd
 stow x
 stow zsh
 EOF
-
-#if [ "$WMENTRY" = "bspwm" ]; then
-#cat >> /mnt/home/$username/install-dotfiles.sh <<EOF
-#git clone https://aur.archlinux.org/paru.git /tmp/paru
-#cd /tmp/paru;makepkg -si --noconfirm;cd
-#sudo sed -i 's/#\(RemoveMake.*\)/\1/' /etc/paru.conf
-#paru -S polybar
-#EOF
-#fi
 
 arch-chroot /mnt /bin/bash -e <<EOF
 chown "$username:$username" "/home/$username/install-dotfiles.sh"
