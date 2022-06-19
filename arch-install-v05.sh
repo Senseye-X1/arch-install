@@ -267,7 +267,7 @@ do
 	winmanager="dwm"
 	systemctl enable lightdm.service --root=/mnt &>/dev/null
     else if [[ $WMENTRY == "kde" ]]; then
-        pacstrap /mnt xorg plasma kde-graphics-meta kde-multimedia-meta kde-network-meta kde-pim-meta kde-system-meta kde-utilities-meta >/dev/null
+        pacstrap /mnt xorg plasma kde-graphics-meta kde-multimedia-meta kde-network-meta akregator kalarm kalendar knotes korganizer kde-system-meta kde-utilities-meta >/dev/null
 	systemctl enable sddm --root=/mnt &>/dev/null
     else if [[ $WMENTRY == "gnome" ]]; then
         pacstrap /mnt xorg gnome >/dev/null
