@@ -209,7 +209,9 @@ do
     echo "Installing user command-line shell $usershell."
     if [[ $SHENTRY == "zsh" ]]; then
         pacstrap /mnt zsh zsh-autosuggestions zsh-completions zsh-syntax-highlighting >/dev/null
+	usershell="zsh"
     else if [[ $SHENTRY == "bash" ]]; then
+        pacstrap /mnt bash-completion >/dev/null
         usershell=""
     else
         usershell=""
