@@ -1,14 +1,16 @@
 #!/usr/bin/env -S bash -e
 
-xorg="xorg-server xorg-xinit xorg-setxkbmap xorg-xsetroot xorg-xset"
+xorgminimal="xorg-server xorg-xinit xorg-setxkbmap xorg-xsetroot xorg-xset"
 xdg="xdg-user-dirs xdg-utils"
 fonts="ttf-font-awesome ttf-monofur ttf-roboto ttf-iosevka-nerd ttf-ubuntu-font-family"
-winmgrutils="accountsservice udiskie dunst feh firewalld gvfs kitty light-locker lightdm-gtk-greeter lxappearance-gtk3 picom xautolock geany gnome-themes-extra"
+winmgrutils="accountsservice udiskie dunst feh firewalld gvfs kitty lxappearance-gtk3 picom xautolock geany gnome-themes-extra"
 network="networkmanager"
 pulseaudio="alsa-utils pulseaudio"
 pipewire="alsa-utils pipewire pipewire-alsa pipewire-pulse"
 browser="firefox"
-basesetup="base linux linux-firmware btrfs-progs nano sudo efibootmgr grub grub-btrfs os-prober pacman-contrib rsync snap-pac snapper stow reflector nvidia nvidia-settings"
+basesetup="base linux linux-firmware nano sudo efibootmgr grub os-prober pacman-contrib rsync stow reflector"
+btrfsutils="grub-btrfs btrfs-progs snap-pac snapper"
+nvidia="nvidia nvidia-settings"
 
 # Microcode detector (function).
 microcode_detector () {
@@ -51,15 +53,68 @@ hostname_selector () {
     return 0
 }
 
-## Setting up the hostname (function).
-#hostname_selector () {
-#    read -r -p "Please enter the hostname (defaults to arch if blank) : " hostname
-#    if [ -z "$hostname" ]; then
-#        echo
-#        echo "Default hostname used."
-#        hostname="arch"
-#    fi
-#}
+# Selecting the DE/WM for the installation (function).
+winmgr_selector () {
+    PS3="Please select the DE/WM: "
+    select WMENTRY in bspwm dwm kde gnome;
+    do
+        if [[ $WMENTRY == "bspwm" ]]; then
+            pacstrap /mnt bspwm sxhkd rofi polybar light-locker lightdm-gtk-greeter ${xorgminimal} ${fonts} ${winmgrutils} ${pulseaudio} ${xdg} >/dev/null
+	        winmanager="bspwm"
+	        systemctl enable lightdm.service --root=/mnt &>/dev/null
+        else if [[ $WMENTRY == "dwm" ]]; then
+            pacstrap /mnt git dmenu light-locker lightdm-gtk-greeter ${xorgminimal} ${fonts} ${winmgrutils} ${pulseaudio} ${xdg} >/dev/null
+    	    winmanager="dwm"
+    	    systemctl enable lightdm.service --root=/mnt &>/dev/null
+        else if [[ $WMENTRY == "kde" ]]; then
+            pacstrap /mnt xorg plasma kde-graphics-meta kde-multimedia-meta kde-network-meta akregator kalarm kalendar knotes korganizer kde-system-meta kde-utilities-meta >/dev/null
+	        winmanager="kde"
+        	systemctl enable sddm --root=/mnt &>/dev/null
+        else if [[ $WMENTRY == "gnome" ]]; then
+            pacstrap /mnt xorg gnome >/dev/null
+	        winmanager="gnome"
+	        systemctl enable gdm --root=/mnt &>/dev/null
+        else
+	        winmanager=""
+        fi
+        echo "Installed window manager $winmanager."
+        break
+    done
+}
+
+
+# Select if Bluetooth support is needed (function).
+bluetooth_selector () {
+    read -r -p "Install Bluetooth [y/N]? " bt
+    bt=${bt,,}
+    if [[ "$bt" =~ ^(yes|y)$ ]]; then
+        echo
+        echo "Installing Bluetooth."
+        pacstrap /mnt bluez bluez-utils >/dev/null
+        bluetooth="yes"
+    else
+        bluetooth="no"
+    fi
+}
+
+# Selecting the command-line shell for the user (function).
+cmdshell_selector () {
+    PS3="Please select the command-line shell: "
+    select SHENTRY in bash zsh;
+    do
+        if [[ $SHENTRY == "zsh" ]]; then
+            pacstrap /mnt zsh zsh-autosuggestions zsh-completions zsh-syntax-highlighting >/dev/null
+	    usershell="zsh"
+        else if [[ $SHENTRY == "bash" ]]; then
+            pacstrap /mnt bash-completion >/dev/null
+            usershell="bash"
+        else
+            usershell=""
+        fi
+        echo "Installed user command-line shell."
+        break
+    done
+}
 
 # User chooses the locale (function).
 locale_selector () {
@@ -78,16 +133,6 @@ locale_selector () {
             return 0
     esac
 }
-
-## Setting up the locale (function).
-#locale_selector () {
-#    read -r -p "Please insert the locale you use (format: xx_XX or leave empty to use en_US): " locale
-#    if [ -z "$locale" ]; then
-#        echo
-#        echo "Default locale used."
-#        locale="en_US"
-#    fi
-#}
 
 # User chooses the console keyboard layout (function).
 keyboard_selector () {
@@ -108,17 +153,6 @@ keyboard_selector () {
         return 0
     esac
 }
-
-## Setting up the keyboard layout (function).
-#keyboard_selector () {
-#    read -r -p "Please insert the keyboard layout you use (leave empty to use sv-latin1 keyboard layout): " kblayout
-#    if [ -z "$kblayout" ]; then
-#        echo
-#        echo "Default keyboard layout used."
-#        kblayout="sv-latin1"
-#    fi
-#    loadkeys $kblayout
-#}
 
 keyboard_selector
 
@@ -207,8 +241,8 @@ mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@pkg $B
 chattr +C /mnt/var/log
 mount $ESP /mnt/boot/
 if [ $swaptype = "" ]; then
-mkdir -p /mnt/swap
-mount -o subvol=@swap $BTRFS /mnt/swap
+    mkdir -p /mnt/swap
+    mount -o subvol=@swap $BTRFS /mnt/swap
 fi
 
 # Setting username and password.
@@ -224,62 +258,13 @@ hostname_selector
 locale_selector
 
 # Install base setup.
-pacstrap /mnt ${basesetup} ${microcode} ${swaptype} ${network} ${browser} ${xdg}
+pacstrap /mnt ${basesetup} ${btrfsutils} ${microcode} ${nvidia} ${swaptype} ${network} ${browser} ${xdg}
 
-# Selecting the window manager for the installation.
-PS3="Please select the DE/WM: "
-select WMENTRY in bspwm dwm kde gnome;
-do
-    if [[ $WMENTRY == "bspwm" ]]; then
-        pacstrap /mnt bspwm sxhkd rofi polybar ${xorg} ${fonts} ${winmgrutils} ${pulseaudio} ${xdg} >/dev/null
-	winmanager="bspwm"
-	systemctl enable lightdm.service --root=/mnt &>/dev/null
-    else if [[ $WMENTRY == "dwm" ]]; then
-        pacstrap /mnt git dmenu ${xorg} ${fonts} ${winmgrutils} ${pulseaudio} ${xdg} >/dev/null
-	winmanager="dwm"
-	systemctl enable lightdm.service --root=/mnt &>/dev/null
-    else if [[ $WMENTRY == "kde" ]]; then
-        pacstrap /mnt xorg plasma kde-graphics-meta kde-multimedia-meta kde-network-meta akregator kalarm kalendar knotes korganizer kde-system-meta kde-utilities-meta >/dev/null
-	winmanager="kde"
-	systemctl enable sddm --root=/mnt &>/dev/null
-    else if [[ $WMENTRY == "gnome" ]]; then
-        pacstrap /mnt xorg gnome >/dev/null
-	winmanager="gnome"
-	systemctl enable gdm --root=/mnt &>/dev/null
-    else
-	winmanager=""
-    fi
-    echo "Installing window manager $winmanager."
-    break
-done
+winmgr_selector
 
-# Selecting the command-line shell for the user.
-PS3="Please select the command-line shell: "
-select SHENTRY in bash zsh;
-do
-    if [[ $SHENTRY == "zsh" ]]; then
-        pacstrap /mnt zsh zsh-autosuggestions zsh-completions zsh-syntax-highlighting >/dev/null
-	usershell="zsh"
-    else if [[ $SHENTRY == "bash" ]]; then
-        pacstrap /mnt bash-completion >/dev/null
-        usershell="bash"
-    else
-        usershell=""
-    fi
-    echo "Installed user command-line shell."
-    break
-done
+cmdshell_selector
 
-read -r -p "Install Bluetooth [y/N]? " bt
-bt=${bt,,}
-if [[ "$bt" =~ ^(yes|y)$ ]]; then
-    echo
-    echo "Installing Bluetooth."
-    pacstrap /mnt bluez bluez-utils >/dev/null
-    bluetooth="yes"
-else
-    bluetooth="no"
-fi
+bluetooth_selector
 
 # Generating /etc/fstab.
 echo "Generating a new fstab."
@@ -520,10 +505,10 @@ fi
 
 # Fix Keychron Bluetooth Keyboard Connection
 if [ "$bluetooth" = "yes" ]; then
-sed -i 's/#AutoEnable=false/AutoEnable=true/' /mnt/etc/bluetooth/main.conf
-sed -i 's/#FastConnectable.*/FastConnectable = true/' /mnt/etc/bluetooth/main.conf
-sed -i 's/#\(ReconnectAttempts=.*\)/\1/' /mnt/etc/bluetooth/main.conf
-sed -i 's/#\(ReconnectIntervals=.*\)/\1/' /mnt/etc/bluetooth/main.conf
+    sed -i 's/#AutoEnable=false/AutoEnable=true/' /mnt/etc/bluetooth/main.conf
+    sed -i 's/#FastConnectable.*/FastConnectable = true/' /mnt/etc/bluetooth/main.conf
+    sed -i 's/#\(ReconnectAttempts=.*\)/\1/' /mnt/etc/bluetooth/main.conf
+    sed -i 's/#\(ReconnectIntervals=.*\)/\1/' /mnt/etc/bluetooth/main.conf
 fi
 
 if [ "$WMENTRY" = "dwm" ]; then
