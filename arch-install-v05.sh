@@ -262,6 +262,7 @@ chattr +C /mnt/var/log
 mount $ESP /mnt/boot/
 if [ "$SWENTRY" == "file" ]; then
     mkdir -p /mnt/swap
+    chattr +C /mnt/swap
     mount -o subvol=@swap $BTRFS /mnt/swap
 fi
 
