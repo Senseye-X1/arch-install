@@ -54,6 +54,22 @@ hostname_selector () {
     return 0
 }
 
+audio_selector () {
+    PS3="Please select the audio server: "
+    select AUDIOENTRY in pulseaudio pipewire;
+    do
+        if [[ $AUDIOENTRY == "pulseaudio" ]]; then
+            audio=""
+        elif [[ $AUDIOENTRY == "pipewire" ]]; then
+            audio=""
+        else
+            audio="alsa-utils"
+        fi
+        echo "Installed $AUDIOENTRY."
+        break
+    done
+}
+
 # Selecting the DE/WM for the installation (function).
 winmgr_selector () {
     PS3="Please select the DE/WM: "
@@ -79,7 +95,7 @@ winmgr_selector () {
 	    wmsetup=""
 	    winmanager=""
         fi
-        echo "Installed window manager $winmanager."
+        echo "Installed $winmanager."
         break
     done
 }
@@ -259,10 +275,12 @@ hostname_selector
 
 locale_selector
 
+audio_selector
+
 winmgr_selector
 
 # Install base setup.
-pacstrap /mnt ${base-uefi} ${btrfsutils} ${microcode} ${swaptype} ${network} ${pulseaudio} ${wmsetup} ${browser} ${gfx}
+pacstrap /mnt ${base-uefi} ${btrfsutils} ${microcode} ${swaptype} ${network} ${audio} ${wmsetup} ${browser} ${gfx}
 
 cmdshell_selector
 
