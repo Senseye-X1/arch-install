@@ -59,9 +59,9 @@ audio_selector () {
     select AUDIOENTRY in pulseaudio pipewire;
     do
         if [[ $AUDIOENTRY == "pulseaudio" ]]; then
-            audio=""
+            audio=pulseaudio
         elif [[ $AUDIOENTRY == "pipewire" ]]; then
-            audio=""
+            audio=pipewire
         else
             audio="alsa-utils"
         fi
