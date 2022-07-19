@@ -65,7 +65,7 @@ audio_selector () {
         else
             audio="alsa-utils"
         fi
-        echo "Installed $AUDIOENTRY."
+        echo "Selected $AUDIOENTRY."
         break
     done
 }
@@ -95,7 +95,7 @@ winmgr_selector () {
 	    wmsetup=""
 	    winmanager=""
         fi
-        echo "Installed $winmanager."
+        echo "Selected $winmanager."
         break
     done
 }
