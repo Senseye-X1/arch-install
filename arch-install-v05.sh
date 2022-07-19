@@ -11,7 +11,7 @@ browser="firefox"
 uefibase="base linux linux-firmware nano sudo efibootmgr grub os-prober pacman-contrib rsync stow reflector"
 btrfsutils="grub-btrfs btrfs-progs snap-pac snapper"
 gfx="nvidia nvidia-settings"
-basesetup="${base-uefi} ${btrfsutils} ${microcode} ${swaptype} ${network} ${pulseaudio} ${browser} ${xdg} ${nvidia}"
+basesetup="${uefibase} ${btrfsutils} ${microcode} ${swaptype} ${network} ${pulseaudio} ${browser} ${xdg} ${nvidia}"
 
 # Microcode detector (function).
 microcode_detector () {
