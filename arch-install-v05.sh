@@ -241,7 +241,7 @@ do
     btrfs su cr /mnt/$volume
 done
 
-if [ $swaptype = "" ]; then
+if [ "$swaptype" = "" ]; then
 btrfs su cr /mnt/@swap
 fi
 
@@ -258,7 +258,7 @@ mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@log $B
 mount -o ssd,noatime,space_cache=v2,compress=zstd:1,discard=async,subvol=@pkg $BTRFS /mnt/var/cache/pacman/pkg
 chattr +C /mnt/var/log
 mount $ESP /mnt/boot/
-if [ $swaptype = "" ]; then
+if [ "$swaptype" = "" ]; then
     mkdir -p /mnt/swap
     mount -o subvol=@swap $BTRFS /mnt/swap
 fi
@@ -296,7 +296,7 @@ sed -i 's/^GRUB_DEFAULT=.*/GRUB_DEFAULT=saved/' /mnt/etc/default/grub
 sed -i 's/\(^GRUB_CMDLINE_LINUX_DEFAULT=".*\)\(.\)$/\1 nvidia-drm.modeset=1\2/' /mnt/etc/default/grub
 sed -i 's/^#GRUB_SAVEDEFAULT=.*/GRUB_SAVEDEFAULT=true/' /mnt/etc/default/grub
 echo 'GRUB_DISABLE_OS_PROBER=false' >> /mnt/etc/default/grub
-if [ $swaptype = "zram-generator" ]; then
+if [ "$swaptype" = "zram-generator" ]; then
 sed -i 's/\(^GRUB_CMDLINE_LINUX_DEFAULT=".*\)\(.\)$/\1 zswap.enabled=0\2/' /mnt/etc/default/grub
 fi
 ### End creating BTRFS subvolumes for Snapper manual flat layout.
@@ -335,7 +335,7 @@ sed -i 's/^MODULES=.*/MODULES=\(btrfs nvidia nvidia_modeset nvidia_uvm nvidia_dr
 arch-chroot /mnt /bin/bash -e <<EOF
     
     # Create swapfile, set No_COW, add to fstab
-    if [ $swaptype = "" ]; then
+    if [ "$swaptype" = "" ]; then
     echo "Creating swapfile."
     truncate -s 0 /swap/swapfile
     chattr +C /swap/swapfile
@@ -394,7 +394,7 @@ echo "root:$password" | arch-chroot /mnt chpasswd
 # Adding user/password, change shell if zsh.
 if [ -n "$username" ]; then
     echo "Adding the user $username to the system with root privilege."
-    if [[ $usershell == "zsh" ]]; then
+    if [ "$usershell" == "zsh" ]; then
         arch-chroot /mnt useradd -m -G wheel -s /usr/bin/zsh "$username"
     else
 	arch-chroot /mnt useradd -m -G wheel "$username"
@@ -512,7 +512,7 @@ do
 done
 
 # ZRAM configuration.
-if [ $swaptype = "zram-generator" ]; then
+if [ "$swaptype" = "zram-generator" ]; then
 print "Configuring ZRAM."
 cat > /mnt/etc/systemd/zram-generator.conf <<EOF
 [zram0]
