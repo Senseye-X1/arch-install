@@ -8,7 +8,7 @@ network="networkmanager"
 pulseaudio="alsa-utils pulseaudio"
 pipewire="alsa-utils pipewire pipewire-alsa pipewire-pulse"
 browser="firefox"
-base-uefi="base linux linux-firmware nano sudo efibootmgr grub os-prober pacman-contrib rsync stow reflector"
+uefibase="base linux linux-firmware nano sudo efibootmgr grub os-prober pacman-contrib rsync stow reflector"
 btrfsutils="grub-btrfs btrfs-progs snap-pac snapper"
 gfx="nvidia nvidia-settings"
 basesetup="${base-uefi} ${btrfsutils} ${microcode} ${swaptype} ${network} ${pulseaudio} ${browser} ${xdg} ${nvidia}"
@@ -280,7 +280,7 @@ audio_selector
 winmgr_selector
 
 # Install base setup.
-pacstrap /mnt ${base-uefi} ${btrfsutils} ${microcode} ${swaptype} ${network} ${audio} ${wmsetup} ${browser} ${gfx}
+pacstrap /mnt ${uefibase} ${btrfsutils} ${microcode} ${swaptype} ${network} ${audio} ${wmsetup} ${browser} ${gfx}
 
 cmdshell_selector
 
