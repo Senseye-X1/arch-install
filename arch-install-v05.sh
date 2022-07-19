@@ -62,15 +62,15 @@ winmgr_selector () {
             pacstrap /mnt bspwm sxhkd rofi polybar light-locker lightdm-gtk-greeter ${xorgminimal} ${fonts} ${winmgrutils} ${pulseaudio} ${xdg} >/dev/null
 	        winmanager="bspwm"
 	        systemctl enable lightdm.service --root=/mnt &>/dev/null
-        else if [[ $WMENTRY == "dwm" ]]; then
+        elif [[ $WMENTRY == "dwm" ]]; then
             pacstrap /mnt git dmenu light-locker lightdm-gtk-greeter ${xorgminimal} ${fonts} ${winmgrutils} ${pulseaudio} ${xdg} >/dev/null
     	    winmanager="dwm"
     	    systemctl enable lightdm.service --root=/mnt &>/dev/null
-        else if [[ $WMENTRY == "kde" ]]; then
+        elif [[ $WMENTRY == "kde" ]]; then
             pacstrap /mnt xorg plasma kde-graphics-meta kde-multimedia-meta kde-network-meta akregator kalarm kalendar knotes korganizer kde-system-meta kde-utilities-meta >/dev/null
 	        winmanager="kde"
         	systemctl enable sddm --root=/mnt &>/dev/null
-        else if [[ $WMENTRY == "gnome" ]]; then
+        elif [[ $WMENTRY == "gnome" ]]; then
             pacstrap /mnt xorg gnome >/dev/null
 	        winmanager="gnome"
 	        systemctl enable gdm --root=/mnt &>/dev/null
@@ -105,7 +105,7 @@ cmdshell_selector () {
         if [[ $SHENTRY == "zsh" ]]; then
             pacstrap /mnt zsh zsh-autosuggestions zsh-completions zsh-syntax-highlighting >/dev/null
 	    usershell="zsh"
-        else if [[ $SHENTRY == "bash" ]]; then
+        elif [[ $SHENTRY == "bash" ]]; then
             pacstrap /mnt bash-completion >/dev/null
             usershell="bash"
         else
