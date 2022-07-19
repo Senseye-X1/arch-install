@@ -10,7 +10,7 @@ pipewire="alsa-utils pipewire pipewire-alsa pipewire-pulse"
 browser="firefox"
 base-uefi="base linux linux-firmware nano sudo efibootmgr grub os-prober pacman-contrib rsync stow reflector"
 btrfsutils="grub-btrfs btrfs-progs snap-pac snapper"
-nvidia="nvidia nvidia-settings"
+gfx="nvidia nvidia-settings"
 basesetup="${base-uefi} ${btrfsutils} ${microcode} ${swaptype} ${network} ${pulseaudio} ${browser} ${xdg} ${nvidia}"
 
 # Microcode detector (function).
@@ -262,7 +262,7 @@ locale_selector
 winmgr_selector
 
 # Install base setup.
-pacstrap /mnt ${base-uefi} ${btrfsutils} ${microcode} ${swaptype} ${network} ${pulseaudio} ${wmsetup} ${browser} ${nvidia}
+pacstrap /mnt ${base-uefi} ${btrfsutils} ${microcode} ${swaptype} ${network} ${pulseaudio} ${wmsetup} ${browser} ${gfx}
 
 cmdshell_selector
 
