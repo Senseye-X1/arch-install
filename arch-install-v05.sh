@@ -78,8 +78,8 @@ winmgr_selector () {
 	        winmanager=""
         fi
         echo "Installed window manager $winmanager."
-#        break
-    done
+        break
+done
 }
 
 
