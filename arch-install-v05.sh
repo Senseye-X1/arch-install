@@ -8,9 +8,10 @@ network="networkmanager"
 pulseaudio="alsa-utils pulseaudio"
 pipewire="alsa-utils pipewire pipewire-alsa pipewire-pulse"
 browser="firefox"
-basesetup="base linux linux-firmware nano sudo efibootmgr grub os-prober pacman-contrib rsync stow reflector"
+base-uefi="base linux linux-firmware nano sudo efibootmgr grub os-prober pacman-contrib rsync stow reflector"
 btrfsutils="grub-btrfs btrfs-progs snap-pac snapper"
 nvidia="nvidia nvidia-settings"
+basesetup="${base-uefi} ${btrfsutils} ${microcode} ${swaptype} ${network} ${pulseaudio} ${browser} ${xdg} ${nvidia}"
 
 # Microcode detector (function).
 microcode_detector () {
@@ -59,27 +60,28 @@ winmgr_selector () {
     select WMENTRY in bspwm dwm kde gnome;
     do
         if [[ $WMENTRY == "bspwm" ]]; then
-            pacstrap /mnt bspwm sxhkd rofi polybar light-locker lightdm-gtk-greeter ${xorgminimal} ${fonts} ${winmgrutils} ${pulseaudio} ${xdg} >/dev/null
-	        winmanager="bspwm"
-	        systemctl enable lightdm.service --root=/mnt &>/dev/null
+            wmsetup="bspwm sxhkd rofi polybar light-locker lightdm-gtk-greeter ${xorgminimal} ${fonts} ${winmgrutils} ${xdg}"
+	    winmanager="bspwm"
+	    systemctl enable lightdm.service --root=/mnt &>/dev/null
         elif [[ $WMENTRY == "dwm" ]]; then
-            pacstrap /mnt git dmenu light-locker lightdm-gtk-greeter ${xorgminimal} ${fonts} ${winmgrutils} ${pulseaudio} ${xdg} >/dev/null
+            wmsetup="git dmenu light-locker lightdm-gtk-greeter ${xorgminimal} ${fonts} ${winmgrutils} ${xdg}"
     	    winmanager="dwm"
     	    systemctl enable lightdm.service --root=/mnt &>/dev/null
         elif [[ $WMENTRY == "kde" ]]; then
-            pacstrap /mnt xorg plasma kde-graphics-meta kde-multimedia-meta kde-network-meta akregator kalarm kalendar knotes korganizer kde-system-meta kde-utilities-meta >/dev/null
-	        winmanager="kde"
-        	systemctl enable sddm --root=/mnt &>/dev/null
+            wmsetup="xorg plasma kde-graphics-meta kde-multimedia-meta kde-network-meta akregator kalarm kalendar knotes korganizer kde-system-meta kde-utilities-meta"
+	    winmanager="kde"
+            systemctl enable sddm --root=/mnt &>/dev/null
         elif [[ $WMENTRY == "gnome" ]]; then
-            pacstrap /mnt xorg gnome >/dev/null
-	        winmanager="gnome"
-	        systemctl enable gdm --root=/mnt &>/dev/null
+            wmsetup="xorg gnome"
+	    winmanager="gnome"
+	    systemctl enable gdm --root=/mnt &>/dev/null
         else
-	        winmanager=""
+	    wmsetup=""
+	    winmanager=""
         fi
         echo "Installed window manager $winmanager."
         break
-done
+    done
 }
 
 
@@ -257,10 +259,10 @@ hostname_selector
 
 locale_selector
 
-# Install base setup.
-pacstrap /mnt ${basesetup} ${btrfsutils} ${microcode} ${nvidia} ${swaptype} ${network} ${browser} ${xdg}
-
 winmgr_selector
+
+# Install base setup.
+pacstrap /mnt ${base-uefi} ${btrfsutils} ${microcode} ${swaptype} ${network} ${pulseaudio} ${wmsetup} ${browser} ${nvidia}
 
 cmdshell_selector
 
