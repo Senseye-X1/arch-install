@@ -11,6 +11,7 @@ browser="firefox"
 uefibase="base linux linux-firmware nano sudo efibootmgr grub os-prober pacman-contrib rsync stow reflector"
 btrfsutils="grub-btrfs btrfs-progs snap-pac snapper"
 gfx="nvidia nvidia-settings"
+bluetooth="bluez bluez-utils"
 basesetup="${uefibase} ${btrfsutils} ${microcode} ${swaptype} ${network} ${pulseaudio} ${browser} ${xdg} ${nvidia}"
 
 # Microcode detector (function).
@@ -78,22 +79,18 @@ winmgr_selector () {
         if [[ $WMENTRY == "bspwm" ]]; then
             wmsetup="bspwm sxhkd rofi polybar light-locker lightdm-gtk-greeter ${xorgminimal} ${fonts} ${winmgrutils} ${xdg}"
 	    winmanager="bspwm"
-	    systemctl enable lightdm.service --root=/mnt &>/dev/null
         elif [[ $WMENTRY == "dwm" ]]; then
             wmsetup="git dmenu light-locker lightdm-gtk-greeter ${xorgminimal} ${fonts} ${winmgrutils} ${xdg}"
     	    winmanager="dwm"
-    	    systemctl enable lightdm.service --root=/mnt &>/dev/null
         elif [[ $WMENTRY == "kde" ]]; then
             wmsetup="xorg plasma kde-graphics-meta kde-multimedia-meta kde-network-meta akregator kalarm kalendar knotes korganizer kde-system-meta kde-utilities-meta"
 	    winmanager="kde"
-            systemctl enable sddm --root=/mnt &>/dev/null
         elif [[ $WMENTRY == "gnome" ]]; then
             wmsetup="xorg gnome"
 	    winmanager="gnome"
-	    systemctl enable gdm --root=/mnt &>/dev/null
         else
 	    wmsetup=""
-	    winmanager=""
+	    winmanager="none"
         fi
         echo "Selected $winmanager."
         break
@@ -108,10 +105,8 @@ bluetooth_selector () {
     if [[ "$bt" =~ ^(yes|y)$ ]]; then
         echo
         echo "Installing Bluetooth."
-        pacstrap /mnt bluez bluez-utils >/dev/null
-        bluetooth="yes"
     else
-        bluetooth="no"
+        bluetooth=""
     fi
 }
 
@@ -282,12 +277,12 @@ audio_selector
 
 winmgr_selector
 
+bluetooth_selector
+
 # Install base setup.
-pacstrap /mnt ${uefibase} ${btrfsutils} ${microcode} ${swaptype} ${network} ${audio} ${wmsetup} ${browser} ${gfx}
+pacstrap /mnt ${uefibase} ${btrfsutils} ${microcode} ${swaptype} ${network} ${audio} ${wmsetup} ${browser} ${gfx} ${bluetooth}
 
 cmdshell_selector
-
-bluetooth_selector
 
 # Generating /etc/fstab.
 echo "Generating a new fstab."
@@ -504,15 +499,24 @@ fi
 #firewall-cmd --add-port=1025-65535/udp --permanent
 #firewall-cmd --reload
 
-# Enabling various services excluding lightdm. Lightdm will be enabled after reboot as user from install-dotfiles.sh.
+# Enabling various services.
 echo "Enabling services."
 # Use this instead if nested BTRFS layout:
 #for service in NetworkManager fstrim.timer bluetooth systemd-timesyncd lightdm reflector.timer snapper-timeline.timer snapper-cleanup.timer btrfs-scrub@-.timer btrfs-scrub@home.timer btrfs-scrub@var.timer btrfs-scrub@\\x2esnapshots.timer grub-btrfs.path
-# Add bluetooth to the line below if needed.
 for service in NetworkManager fstrim.timer systemd-timesyncd reflector.timer snapper-timeline.timer snapper-cleanup.timer btrfs-scrub@-.timer btrfs-scrub@home.timer btrfs-scrub@log.timer btrfs-scrub@\\x2esnapshots.timer grub-btrfs.path
 do
     systemctl enable "$service" --root=/mnt &>/dev/null
 done
+
+if [[ $WMENTRY == "bspwm" ]]; then
+    systemctl enable lightdm.service --root=/mnt &>/dev/null
+elif [[ $WMENTRY == "dwm" ]]; then
+    systemctl enable lightdm.service --root=/mnt &>/dev/null
+elif [[ $WMENTRY == "kde" ]]; then
+    systemctl enable sddm --root=/mnt &>/dev/null
+elif [[ $WMENTRY == "gnome" ]]; then
+    systemctl enable gdm --root=/mnt &>/dev/null
+fi
 
 # ZRAM configuration.
 if [ "$swaptype" = "zram-generator" ]; then
@@ -527,11 +531,13 @@ systemctl enable systemd-oomd --root=/mnt &>/dev/null
 fi
 
 # Fix Keychron Bluetooth Keyboard Connection
-if [ "$bluetooth" = "yes" ]; then
+#if [ "$bluetooth" = "yes" ]; then
+if [ -n "$bluetooth" ]; then
     sed -i 's/#AutoEnable=false/AutoEnable=true/' /mnt/etc/bluetooth/main.conf
     sed -i 's/#FastConnectable.*/FastConnectable = true/' /mnt/etc/bluetooth/main.conf
     sed -i 's/#\(ReconnectAttempts=.*\)/\1/' /mnt/etc/bluetooth/main.conf
     sed -i 's/#\(ReconnectIntervals=.*\)/\1/' /mnt/etc/bluetooth/main.conf
+    systemctl enable bluetooth --root=/mnt &>/dev/null
 fi
 
 if [ "$WMENTRY" = "dwm" ]; then
