@@ -516,7 +516,7 @@ done
 
 # ZRAM configuration.
 if [ "$swaptype" = "zram-generator" ]; then
-print "Configuring ZRAM."
+echo "Configuring ZRAM."
 cat > /mnt/etc/systemd/zram-generator.conf <<EOF
 [zram0]
 zram-size = ram / 2
