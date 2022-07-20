@@ -508,16 +508,6 @@ do
     systemctl enable "$service" --root=/mnt &>/dev/null
 done
 
-if [[ $WMENTRY == "bspwm" ]]; then
-    systemctl enable lightdm.service --root=/mnt &>/dev/null
-elif [[ $WMENTRY == "dwm" ]]; then
-    systemctl enable lightdm.service --root=/mnt &>/dev/null
-elif [[ $WMENTRY == "kde" ]]; then
-    systemctl enable sddm --root=/mnt &>/dev/null
-elif [[ $WMENTRY == "gnome" ]]; then
-    systemctl enable gdm --root=/mnt &>/dev/null
-fi
-
 # ZRAM configuration.
 if [ "$swaptype" = "zram-generator" ]; then
 echo "Configuring ZRAM."
@@ -591,12 +581,25 @@ EOF
 fi
 
 # User-specific configuration.
-cat << 'EOF' > /mnt/home/$username/install-dotfiles.sh
+cat << 'EOF' > /mnt/home/$username/install-userconfig.sh
 #!/usr/bin/env -S bash -e
 
 timedatectl set-ntp true
 localectl set-x11-keymap se
+EOF
 
+if [[ $WMENTRY == "bspwm" ]]; then
+    echo "systemctl enable lightdm.service" >> /mnt/home/$username/install-userconfig.sh
+elif [[ $WMENTRY == "dwm" ]]; then
+    echo "systemctl enable lightdm.service" >> /mnt/home/$username/install-userconfig.sh
+elif [[ $WMENTRY == "kde" ]]; then
+    echo "systemctl enable sddm" >> /mnt/home/$username/install-userconfig.sh
+elif [[ $WMENTRY == "gnome" ]]; then
+echo "systemctl enable gdm" >> /mnt/home/$username/install-userconfig.sh
+fi
+
+cat << 'EOF' > /mnt/home/$username/install-dotfiles.sh
+#!/usr/bin/env -S bash -e
 git clone https://github.com/Senseye-X1/dotfiles.git $HOME/dotfiles
 chmod +x $HOME/dotfiles/bspwm/\.config/bspwm/bspwmrc
 chmod +x $HOME/dotfiles/polybar/\.config/polybar/launch.sh
@@ -621,6 +624,8 @@ EOF
 arch-chroot /mnt /bin/bash -e <<EOF
 chown "$username:$username" "/home/$username/install-dotfiles.sh"
 chmod +x "/home/$username/install-dotfiles.sh"
+chown "$username:$username" "/home/$username/install-userconfig.sh"
+chmod +x "/home/$username/install-userconfig.sh"
 EOF
 
-echo -e "All done!\numount -a\nreboot\n\nAfter reboot login as user $username and run ./install-dotfiles.sh"
+echo -e "All done!\numount -a\nreboot\n\nAfter reboot login as user $username and run ./install-userconfig.sh"
