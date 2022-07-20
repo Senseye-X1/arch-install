@@ -13,6 +13,7 @@ btrfsutils="grub-btrfs btrfs-progs snap-pac snapper"
 gfx="nvidia nvidia-settings"
 bluetooth="bluez bluez-utils"
 basesetup="${uefibase} ${btrfsutils} ${microcode} ${swaptype} ${network} ${pulseaudio} ${browser} ${xdg} ${nvidia}"
+kde="xorg plasma-meta kde-graphics-meta kde-multimedia-meta akregator kalarm kalendar knotes korganizer kde-system-meta kde-utilities-meta kdeconnect kdenetwork-filesharing kget kio-extras kio-gdrive konversation kopete krdc krfb ktorrent telepathy-kde-meta zeroconf-ioslave"
 
 # Microcode detector (function).
 microcode_detector () {
@@ -84,7 +85,7 @@ winmgr_selector () {
             wmsetup="git dmenu light-locker lightdm-gtk-greeter ${xorgminimal} ${fonts} ${winmgrutils} ${xdg}"
     	    winmanager="dwm"
         elif [[ $WMENTRY == "kde" ]]; then
-            wmsetup="xorg plasma kde-graphics-meta kde-multimedia-meta kde-network-meta akregator kalarm kalendar knotes korganizer kde-system-meta kde-utilities-meta"
+            wmsetup=$kde
 	    winmanager="kde"
         elif [[ $WMENTRY == "gnome" ]]; then
             wmsetup="xorg gnome"
