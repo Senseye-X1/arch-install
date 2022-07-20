@@ -72,9 +72,10 @@ audio_selector () {
 }
 
 # Selecting the DE/WM for the installation (function).
+# DWM setup not complete (no module files for dmenu).
 winmgr_selector () {
     PS3="Please select the DE/WM: "
-    select WMENTRY in bspwm dwm kde gnome;
+    select WMENTRY in bspwm kde gnome;
     do
         if [[ $WMENTRY == "bspwm" ]]; then
             wmsetup="bspwm sxhkd rofi polybar light-locker lightdm-gtk-greeter ${xorgminimal} ${fonts} ${winmgrutils} ${xdg}"
@@ -257,8 +258,8 @@ chattr +C /mnt/var/log
 mount $ESP /mnt/boot/
 if [ "$SWENTRY" == "file" ]; then
     mkdir -p /mnt/swap
-    chattr +C /mnt/swap
     mount -o subvol=@swap $BTRFS /mnt/swap
+    chattr +C /mnt/swap
 fi
 
 # Setting username and password.
@@ -294,7 +295,7 @@ sed -i 's/^GRUB_DEFAULT=.*/GRUB_DEFAULT=saved/' /mnt/etc/default/grub
 sed -i 's/\(^GRUB_CMDLINE_LINUX_DEFAULT=".*\)\(.\)$/\1 nvidia-drm.modeset=1\2/' /mnt/etc/default/grub
 sed -i 's/^#GRUB_SAVEDEFAULT=.*/GRUB_SAVEDEFAULT=true/' /mnt/etc/default/grub
 echo 'GRUB_DISABLE_OS_PROBER=false' >> /mnt/etc/default/grub
-if [ "$SWENTRY" = "zram-generator" ]; then
+if [ "$SWENTRY" == "ram" ]; then
 sed -i 's/\(^GRUB_CMDLINE_LINUX_DEFAULT=".*\)\(.\)$/\1 zswap.enabled=0\2/' /mnt/etc/default/grub
 fi
 ### End creating BTRFS subvolumes for Snapper manual flat layout.
@@ -509,7 +510,7 @@ do
 done
 
 # ZRAM configuration.
-if [ "$swaptype" = "zram-generator" ]; then
+if [ "$SWENTRY" = "ram" ]; then
 echo "Configuring ZRAM."
 cat > /mnt/etc/systemd/zram-generator.conf <<EOF
 [zram0]
