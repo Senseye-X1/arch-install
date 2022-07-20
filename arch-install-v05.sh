@@ -76,7 +76,7 @@ audio_selector () {
 # DWM setup not complete (no module files for dmenu).
 winmgr_selector () {
     PS3="Please select the DE/WM: "
-    select WMENTRY in bspwm kde gnome;
+    select WMENTRY in bspwm dwm kde gnome;
     do
         if [[ $WMENTRY == "bspwm" ]]; then
             wmsetup="bspwm sxhkd rofi polybar light-locker lightdm-gtk-greeter ${xorgminimal} ${fonts} ${winmgrutils} ${xdg}"
