@@ -263,13 +263,13 @@ if [ "$SWENTRY" == "file" ]; then
     chattr +C /mnt/swap
 fi
 
+# Checking the microcode to install.
+microcode_detector
+
 # Setting username and password.
 echo
 read -r -p "Please enter name for a user account (leave empty to not create one): " username
 userpass_selector
-
-# Checking the microcode to install.
-microcode_detector
 
 hostname_selector
 
