@@ -12,7 +12,7 @@ uefibase="base linux linux-firmware nano sudo efibootmgr grub os-prober pacman-c
 btrfsutils="grub-btrfs btrfs-progs snap-pac snapper"
 gfx="nvidia nvidia-settings"
 bluetooth="bluez bluez-utils"
-basesetup="${uefibase} ${btrfsutils} ${microcode} ${swaptype} ${network} ${pulseaudio} ${browser} ${xdg} ${nvidia}"
+#basesetup="${uefibase} ${btrfsutils} ${microcode} ${swaptype} ${network} ${pulseaudio} ${browser} ${xdg} ${nvidia}"
 kde="xorg plasma-meta gwenview kamera kcolorchooser kdegraphics-thumbnailers kolourpaint okular spectacle svgpart dragon elisa ffmpegthumbs kmix kwave akregator kalarm kalendar knotes korganizer kde-system-meta kde-utilities-meta kdeconnect kdenetwork-filesharing kio-extras kio-gdrive krdc krfb telepathy-kde-meta zeroconf-ioslave"
 
 # Microcode detector (function).
