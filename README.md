@@ -1,19 +1,9 @@
 # arch-install
 
-bash <(curl -s https://raw.githubusercontent.com/Senseye-X1/arch-install/main/arch-install.sh)
+bash <(curl -s https://raw.githubusercontent.com/Senseye-X1/arch-install/main/arch-install-v05.sh)
 
 When done, reboot
 
-Login as user and run ./install-dotfiles.sh
+Login as user and run ./install-userconfig.sh as well as ./install-dotfiles.sh
 
-Reboot again and everything should be up and running
-
-Debugging: normal shell for user, no stow gtkrc2/gtk3/picom/x, enabled firewalld
-
-removed gnome-themes-extra, lxappearance-gtk3, zsh
-
-could rofi cause it? 
-No errors so far with dmenu. 
-
-todo: statusbar scripts for dwmblocks
-move scripts to .local/bin and change config paths so they match
+Reboot again and everything should be up and running.
