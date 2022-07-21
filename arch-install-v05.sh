@@ -501,9 +501,7 @@ if [ "$SWENTRY" = "ram" ]; then
 echo "Configuring ZRAM."
 cat > /mnt/etc/systemd/zram-generator.conf <<EOF
 [zram0]
-zram-size = ram / 2
-#zram-fraction = 1
-#max-zram-size = 8192
+zram-size = min(ram, 8192)
 EOF
 fi
 
