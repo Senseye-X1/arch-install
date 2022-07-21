@@ -496,20 +496,6 @@ EndSection
 EOF
 fi
 
-# Firewall config
-#firewall-cmd --add-port=1025-65535/tcp --permanent
-#firewall-cmd --add-port=1025-65535/udp --permanent
-#firewall-cmd --reload
-
-# Enabling various services.
-echo "Enabling services."
-# Use this instead if nested BTRFS layout:
-#for service in NetworkManager fstrim.timer bluetooth systemd-timesyncd lightdm reflector.timer snapper-timeline.timer snapper-cleanup.timer btrfs-scrub@-.timer btrfs-scrub@home.timer btrfs-scrub@var.timer btrfs-scrub@\\x2esnapshots.timer grub-btrfs.path
-for service in NetworkManager fstrim.timer systemd-timesyncd reflector.timer snapper-timeline.timer snapper-cleanup.timer btrfs-scrub@-.timer btrfs-scrub@home.timer btrfs-scrub@log.timer btrfs-scrub@\\x2esnapshots.timer grub-btrfs.path
-do
-    systemctl enable "$service" --root=/mnt &>/dev/null
-done
-
 # ZRAM configuration.
 if [ "$SWENTRY" = "ram" ]; then
 echo "Configuring ZRAM."
@@ -519,11 +505,23 @@ zram-size = ram / 2
 #zram-fraction = 1
 #max-zram-size = 8192
 EOF
-systemctl enable systemd-oomd --root=/mnt &>/dev/null
 fi
 
+# Firewall config
+#firewall-cmd --add-port=1025-65535/tcp --permanent
+#firewall-cmd --add-port=1025-65535/udp --permanent
+#firewall-cmd --reload
+
+# Enabling various services.
+echo "Enabling services."
+# Use this instead if nested BTRFS layout:
+#for service in NetworkManager fstrim.timer bluetooth systemd-timesyncd lightdm reflector.timer snapper-timeline.timer snapper-cleanup.timer btrfs-scrub@-.timer btrfs-scrub@home.timer btrfs-scrub@var.timer btrfs-scrub@\\x2esnapshots.timer grub-btrfs.path
+for service in NetworkManager fstrim.timer systemd-timesyncd reflector.timer snapper-timeline.timer snapper-cleanup.timer btrfs-scrub@-.timer btrfs-scrub@home.timer btrfs-scrub@log.timer btrfs-scrub@\\x2esnapshots.timer grub-btrfs.path systemd-oomd
+do
+    systemctl enable "$service" --root=/mnt &>/dev/null
+done
+
 # Fix Keychron Bluetooth Keyboard Connection
-#if [ "$bluetooth" = "yes" ]; then
 if [ -n "$bluetooth" ]; then
     sed -i 's/#AutoEnable=false/AutoEnable=true/' /mnt/etc/bluetooth/main.conf
     sed -i 's/#FastConnectable.*/FastConnectable = true/' /mnt/etc/bluetooth/main.conf
@@ -630,4 +628,4 @@ chown "$username:$username" "/home/$username/install-userconfig.sh"
 chmod +x "/home/$username/install-userconfig.sh"
 EOF
 
-echo -e "All done!\numount -a\nreboot\n\nAfter reboot login as user $username and run ./install-userconfig.sh"
+echo -e "All done!\numount -a\nreboot\n\nAfter reboot login as user $username and run ./install-userconfig.sh and ./install-dotfiles.sh"
