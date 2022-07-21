@@ -12,8 +12,10 @@ uefibase="base linux linux-firmware nano sudo efibootmgr grub os-prober pacman-c
 btrfsutils="grub-btrfs btrfs-progs snap-pac snapper"
 gfx="nvidia nvidia-settings"
 bluetooth="bluez bluez-utils"
-#basesetup="${uefibase} ${btrfsutils} ${microcode} ${swaptype} ${network} ${pulseaudio} ${browser} ${xdg} ${nvidia}"
 kde="xorg plasma-meta packagekit-qt5 gwenview kcolorchooser kdegraphics-thumbnailers kolourpaint okular spectacle svgpart dragon elisa ffmpegthumbs kmix kwave akregator kalarm kalendar knotes kde-system-meta kde-utilities-meta kdeconnect kdenetwork-filesharing kio-extras kio-gdrive krdc krfb telepathy-kde-meta zeroconf-ioslave"
+gnome="xorg gnome"
+dwm="git dmenu light-locker lightdm-gtk-greeter ${xorgminimal} ${fonts} ${winmgrutils} ${xdg}"
+bspwm="bspwm sxhkd rofi polybar light-locker lightdm-gtk-greeter ${xorgminimal} ${fonts} ${winmgrutils} ${xdg}"
 
 # Microcode detector (function).
 microcode_detector () {
@@ -79,16 +81,16 @@ winmgr_selector () {
     select WMENTRY in bspwm dwm kde gnome;
     do
         if [[ $WMENTRY == "bspwm" ]]; then
-            wmsetup="bspwm sxhkd rofi polybar light-locker lightdm-gtk-greeter ${xorgminimal} ${fonts} ${winmgrutils} ${xdg}"
+            wmsetup=$bspwm
 	    winmanager="bspwm"
         elif [[ $WMENTRY == "dwm" ]]; then
-            wmsetup="git dmenu light-locker lightdm-gtk-greeter ${xorgminimal} ${fonts} ${winmgrutils} ${xdg}"
+            wmsetup=$dwm
     	    winmanager="dwm"
         elif [[ $WMENTRY == "kde" ]]; then
             wmsetup=$kde
 	    winmanager="kde"
         elif [[ $WMENTRY == "gnome" ]]; then
-            wmsetup="xorg gnome"
+            wmsetup=$gnome
 	    winmanager="gnome"
         else
 	    wmsetup=""
